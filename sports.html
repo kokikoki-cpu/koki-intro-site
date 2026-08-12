@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>身体こそすべて | I am KOKI</title>
+<meta name="description" content="物心ついたときから大好きなスポーツたち。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/sports.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="logo" href="index.html">I am <span>KOKI</span></a>
+    <button class="nav-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">I am KOKI</a>
+      <a href="world.html">あぁ素晴らしき地球</a>
+      <a href="people.html">世界のクセ強人類</a>
+      <a href="sports.html" aria-current="page">身体こそすべて</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="ambient-bg pulse-field" aria-hidden="true">
+      <span class="pulse p1"></span>
+      <span class="pulse p2"></span>
+      <span class="pulse p3"></span>
+      <span class="pulse p4"></span>
+      <span class="pulse p5"></span>
+    </div>
+    <div class="wrap">
+      <h1 class="page-hero__title reveal">身体こそすべて</h1>
+      <p class="page-hero__lead reveal">大好きなスポーツ &mdash; <span id="sports-lead"></span></p>
+    </div>
+  </section>
+
+  <section class="sports-section">
+    <div class="wrap">
+      <div class="sports-grid reveal-stagger" id="sports-grid"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">&copy; 2026 Koki Shimizu</div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script src="js/sports.js"></script>
+</body>
+</html>

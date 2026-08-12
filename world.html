@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>あぁ素晴らしき地球 | I am KOKI</title>
+<meta name="description" content="訪れた40カ国。世界地図のピンをクリックして旅のエピソードを見る。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/world.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="logo" href="index.html">I am <span>KOKI</span></a>
+    <button class="nav-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">I am KOKI</a>
+      <a href="world.html" aria-current="page">あぁ素晴らしき地球</a>
+      <a href="people.html">世界のクセ強人類</a>
+      <a href="sports.html">身体こそすべて</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="ambient-bg globe" aria-hidden="true">
+      <svg viewBox="0 0 400 400">
+        <circle class="globe-outline" cx="200" cy="200" r="188" />
+        <ellipse class="globe-line" cx="200" cy="200" rx="188" ry="130" />
+        <ellipse class="globe-line" cx="200" cy="200" rx="188" ry="66" />
+        <ellipse class="meridian" cx="200" cy="200" rx="188" ry="188" />
+        <ellipse class="meridian" cx="200" cy="200" rx="188" ry="188" />
+        <ellipse class="meridian" cx="200" cy="200" rx="188" ry="188" />
+        <ellipse class="meridian" cx="200" cy="200" rx="188" ry="188" />
+      </svg>
+    </div>
+    <div class="wrap">
+      <h1 class="page-hero__title reveal">あぁ素晴らしき地球</h1>
+      <p class="page-hero__lead reveal" id="world-lead"></p>
+    </div>
+  </section>
+
+  <section class="map-section">
+    <div class="wrap">
+      <div class="map-frame reveal">
+        <img class="map-frame__img" src="images/world-map.svg" alt="世界地図" draggable="false">
+        <div class="map-frame__pins" id="map-pins"></div>
+      </div>
+      <p class="map-hint">地図上のピンをクリックすると、その国のエピソードが表示されます</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">&copy; 2026 Koki Shimizu</div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script src="js/world.js"></script>
+</body>
+</html>

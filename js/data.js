@@ -1,0 +1,226 @@
+/* ==========================================================================
+   コンテンツデータ
+   写真を差し替える際は images/ 配下のファイル名を合わせるだけでOK
+   ========================================================================== */
+
+const PROFILE = {
+  name: "清水航樹",
+  englishName: "KOKI SHIMIZU",
+  meta: "30歳・既婚 / 1996.02.06生まれ / A型 / 早起き / 水瓶座",
+  photo: "images/profile/koki.jpg",
+  strengths: [
+    {
+      key: "action",
+      title: "行動力",
+      desc: "知らない場所へ行くこと",
+      link: "world.html",
+      linkLabel: "世界地図を見る",
+    },
+    {
+      key: "curiosity",
+      title: "好奇心",
+      desc: "知らない人に話しかけること",
+      link: "people.html",
+      linkLabel: "人図鑑を見る",
+    },
+    {
+      key: "body",
+      title: "体力",
+      desc: "身体能力",
+      link: "sports.html",
+      linkLabel: "スポーツを見る",
+    },
+  ],
+};
+
+/* x/y は images/world-map.svg (Wikimedia Commons "BlankMap-World-Equirectangular",
+   パブリックドメイン) 上の各国パス(id=ISOコード)の中心を実測した % 座標           */
+const COUNTRIES = [
+  {
+    id: "argentina",
+    name: "アルゼンチン",
+    tagline: "みんな大好きメッシとパタゴニアの国",
+    story:
+      "アルゼンチンにてブラジルのユニフォームを着たところ、タトゥー軍団に追いかけられる。",
+    photo: "images/countries/argentina.jpg",
+    x: 28.48,
+    y: 68.76,
+  },
+  {
+    id: "brazil",
+    name: "ブラジル",
+    tagline: "最強のサッカー王国",
+    story:
+      "地球の裏側なのに巨大な日本人街がある。地球の裏側でわざわざ食べる松屋こそ贅沢of贅沢。",
+    photo: "images/countries/brazil.jpg",
+    x: 31.05,
+    y: 56.57,
+  },
+  {
+    id: "peru",
+    name: "ペルー",
+    tagline: "食と密林の国",
+    story:
+      "アマゾンの秘境にてペルーとブラジルでしか合法摂取を許されてないありがたい樹液をいただく。三日三晩嘔吐と下痢と幻覚に苦しむ。",
+    photo: "images/countries/peru.jpg",
+    x: 25.32,
+    y: 54.03,
+  },
+  {
+    id: "antarctica",
+    name: "南極",
+    tagline: "世界で最も建造物が少ない土地。自然なままの土地",
+    story: "ペンギンはかわいいけど臭いことが発覚。",
+    photo: "images/countries/antarctica.jpg",
+    x: 48.93,
+    y: 84.35,
+  },
+  {
+    id: "india",
+    name: "インド",
+    tagline: "人間の森",
+    story:
+      "手軽に刺激を味わいたいならインド一択。ただ街を歩いているだけで、自分の常識が崩れるありがたい場所。",
+    photo: "images/countries/india.jpg",
+    x: 69.14,
+    y: 38.75,
+  },
+  {
+    id: "jordan",
+    name: "ヨルダン",
+    tagline: "イスラム圏no.1満足度",
+    story:
+      "地政学的にとっても行きづらい場所。敬遠されがちだが、治安は良くて見どころたっぷり！泊まったドミトリーでお気に入りのサンダルをパクられたのでマイナス1点。",
+    photo: "images/countries/jordan.jpg",
+    x: 56.46,
+    y: 33.62,
+  },
+  {
+    id: "turkey",
+    name: "トルコ",
+    tagline: "気球インスタ映えスポット",
+    story:
+      "何も考えずに一生に一度はカッパドキアで気球に乗りに行くべし。",
+    photo: "images/countries/turkey.jpg",
+    x: 55.99,
+    y: 29.76,
+  },
+  {
+    id: "kenya",
+    name: "ケニア",
+    tagline: "マサイの国の戦士たち",
+    story: "物乞いに半日付きまとわれて結果仲良くなる。別れ際に1000円あげた。",
+    photo: "images/countries/kenya.jpg",
+    x: 56.68,
+    y: 49.41,
+  },
+  {
+    id: "namibia",
+    name: "ナミビア",
+    tagline: "砂漠と動物の国",
+    story:
+      "1週間ロードトリップ中に誤って車の後ろを開けたまま就寝。食料を猿にすべて没収され、アフリカにて強制ラマダン開始。",
+    photo: "images/countries/namibia.jpg",
+    x: 51.29,
+    y: 60.97,
+  },
+];
+
+const WORLD_MAP_ASPECT = 2752.766 / 1537.631;
+
+const WORLD_INTRO = {
+  visited: 40,
+  lead: "訪れた国は40カ国。知らない場所を歩くと子どものように、360度すべてが新鮮",
+  sub: "体感寿命を伸ばすコツ",
+};
+
+const PEOPLE = [
+  {
+    id: "p1",
+    no: "No.1",
+    name: "清水航樹",
+    place: "日本",
+    photo: "images/profile/koki.jpg",
+    isSelf: true,
+    career: [
+      "日本大学 体育学科",
+      "東京消防庁 府中消防署 朝日出張所 特別消火中隊2番隊員",
+      "株式会社セルミュラー",
+      "旅人",
+      "株式会社Beyond（インバウンドマーケ）",
+      "株式会社セルミュラー",
+    ],
+    goals: ["良き出会いと強い繋がりを作る", "旅人を助けるためのサービスを作りたい"],
+  },
+  {
+    id: "p2",
+    no: "No.2",
+    name: "宿のオーナー",
+    place: "スリランカ",
+    photo: "images/people/p2-srilanka.jpg",
+    story:
+      "宿のオーナー。サファリツアーが何故か男性だけ高い料金にて設定。他の日本人女性を連れてきたところ、大幅ディスカウント。下心は人を動かすのだ。",
+  },
+  {
+    id: "p3",
+    no: "No.3",
+    name: "インドのおばちゃん",
+    place: "インド",
+    photo: "images/people/p3-india.jpg",
+    story:
+      "インド料理店にて隣のインド人女性に好かれる。写真撮影者はおそらく彼女の子ども。",
+  },
+  {
+    id: "p4",
+    no: "No.4",
+    name: "アフリカの詐欺師",
+    place: "エチオピア",
+    photo: "images/people/p4-ethiopia.jpg",
+    story:
+      "詐欺師。謎の寺院に案内されて、その後入場料1万円を請求される。お金ないから逃げた。",
+  },
+];
+
+const SPORTS = [
+  {
+    id: "tennis",
+    name: "公式テニス",
+    photo: "images/sports/tennis.jpg",
+    desc: "中学校・高校にてハマる。今でも定期的にやります。",
+  },
+  {
+    id: "ultimate",
+    name: "アルティメット",
+    photo: "images/sports/ultimate.jpg",
+    desc: "大学にて始める。インカレ3位。",
+  },
+  {
+    id: "padel",
+    name: "パデル",
+    photo: "images/sports/padel.jpg",
+    desc: "当時のクライアントに誘われてハマる。「Fire padel TV」というYouTubeチャンネルを作る。今もたまに試合に出る。",
+  },
+  {
+    id: "futsal",
+    name: "フットサル",
+    photo: "images/sports/futsal.jpg",
+    desc: "渋谷でたまにやります！サッカーを知っていると世界中の男と仲良くなりやすい。",
+  },
+  {
+    id: "tabletennis",
+    name: "卓球",
+    photo: "images/sports/tabletennis.jpg",
+    desc: "すべてのスポーツの中で一番好き。高校時代にハマりすぎてスポッチャで徹夜卓球をする。",
+  },
+  {
+    id: "marathon",
+    name: "マラソン",
+    photo: "images/sports/marathon.jpg",
+    desc: "妻の趣味に付き合う。ハーフマラソンとトレランの大会には何回か出た。今年の目標はフルマラソン制覇。",
+  },
+];
+
+const SPORTS_INTRO = {
+  lead:
+    "物心ついたときから大好きなスポーツ。スポーツをやっているときが一番集中力が上がります。毎日1hのなにかしらの運動が日課。",
+};
