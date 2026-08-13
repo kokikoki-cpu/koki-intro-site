@@ -1,11 +1,11 @@
 .globe {
-  top: -70px;
+  top: 6%;
   right: -90px;
   left: auto;
   bottom: auto;
   width: clamp(260px, 36vw, 460px);
   height: clamp(260px, 36vw, 460px);
-  opacity: 0.55;
+  opacity: 0.8;
 }
 
 .globe svg {
@@ -16,12 +16,12 @@
 .globe circle,
 .globe ellipse {
   fill: none;
-  stroke: var(--color-accent);
+  stroke: rgba(255, 255, 255, 0.55);
   stroke-width: 1;
 }
 
 .globe .globe-outline {
-  stroke: var(--color-ink-soft);
+  stroke: rgba(255, 255, 255, 0.7);
   stroke-width: 1.2;
 }
 
@@ -138,13 +138,6 @@
   50% {
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 8px rgba(168, 86, 48, 0);
   }
-}
-
-.map-hint {
-  margin-top: 16px;
-  font-size: 0.85rem;
-  color: var(--color-ink-soft);
-  text-align: center;
 }
 
 @media (max-width: 640px) {
