@@ -30,13 +30,23 @@
 
 <main>
   <section class="hero">
+    <div class="ambient-bg egypt" id="egyptBg" aria-hidden="true">
+      <svg class="egypt-layer" data-depth="0.02" viewBox="0 0 200 200"><circle class="egypt-sun" cx="100" cy="90" r="50"/></svg>
+      <svg class="egypt-layer" data-depth="0.05" viewBox="0 0 300 180"><polygon class="egypt-pyramid egypt-pyramid--1" points="90,20 190,170 -10,170"/></svg>
+      <svg class="egypt-layer" data-depth="0.08" viewBox="0 0 300 180"><polygon class="egypt-pyramid egypt-pyramid--2" points="180,50 270,170 90,170"/></svg>
+      <svg class="egypt-layer" data-depth="0.03" viewBox="0 0 300 40" preserveAspectRatio="none"><path class="egypt-dune" d="M0,20 Q75,0 150,20 T300,20 V40 H0 Z"/></svg>
+    </div>
     <div class="wrap hero__inner">
       <div class="hero__photo reveal">
-        <img src="images/profile/koki.jpg" alt="清水航樹">
+        <img id="hero-photo" src="" alt="">
+        <div class="hero__photo-overlay">
+          <h1 class="hero__title" id="hero-name"></h1>
+          <p class="hero__tagline" id="hero-tagline"></p>
+        </div>
       </div>
-      <div class="hero__text">
-        <h1 class="hero__title reveal">清水航樹</h1>
-        <p class="hero__meta reveal">30歳・既婚 / 1996.02.06生まれ / A型 / 早起き / 水瓶座</p>
+      <div class="hero__foot">
+        <p class="hero__photo-caption" id="hero-photo-caption"></p>
+        <p class="hero__meta" id="hero-meta"></p>
       </div>
     </div>
   </section>
@@ -63,12 +73,27 @@
       </div>
     </div>
   </section>
+
+  <section class="profile-extra">
+    <div class="wrap profile-extra__grid reveal-stagger">
+      <div class="info-card reveal" style="--i:0">
+        <span class="info-card__tag">職歴</span>
+        <ul class="career-list" id="home-career"></ul>
+      </div>
+      <div class="info-card reveal" style="--i:1">
+        <span class="info-card__tag">趣味・活動</span>
+        <div class="tag-list" id="home-hobbies"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
   <div class="wrap">&copy; 2026 Koki Shimizu</div>
 </footer>
 
+<script src="js/data.js"></script>
 <script src="js/main.js"></script>
+<script src="js/index.js"></script>
 </body>
 </html>

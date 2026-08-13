@@ -6,8 +6,11 @@
 const PROFILE = {
   name: "清水航樹",
   englishName: "KOKI SHIMIZU",
+  tagline: "旅。野生。世界。",
   meta: "30歳・既婚 / 1996.02.06生まれ / A型 / 早起き / 水瓶座",
-  photo: "images/profile/koki.jpg",
+  photo: "images/profile/pyramid.jpg",
+  photoCaption: "エジプト・ギザの三大ピラミッドにて",
+  hobbies: ["世界一周記YouTube", "旅行 40カ国制覇", "スポーツ全般", "お酒"],
   strengths: [
     {
       key: "action",
