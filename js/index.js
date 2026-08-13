@@ -18,7 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const hobbiesWrap = document.getElementById("home-hobbies");
   if (hobbiesWrap && PROFILE.hobbies) {
     hobbiesWrap.innerHTML = PROFILE.hobbies
-      .map((h) => `<span class="tag">${h}</span>`)
+      .map((h) =>
+        h.href
+          ? `<a class="tag" href="${h.href}" target="_blank" rel="noopener">${h.label}</a>`
+          : `<span class="tag">${h.label}</span>`
+      )
       .join("");
   }
 

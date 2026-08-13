@@ -123,7 +123,8 @@ koki-design-taste的にNGなので、**枠線ベース**に統一済み:
 白文字のHeroに変更済み。
 
 - 使用写真: world→`images/countries/turkey.jpg`（カッパドキアの気球）、
-  people→`images/people/p3-india.jpg`（インドの女性との一枚）、
+  people→`images/people/p4-ethiopia.jpg`（エチオピアの詐欺師との一枚。最初は
+  `p3-india.jpg`だったが指定でこちらに変更）、
   sports→`images/sports/padel.jpg`（パデル仲間との集合写真）
 - 各ページの抽象アンビエントモチーフ（地球儀/往来ドット/熱狂パルス）はそのまま残し、
   白系の半透明色（`rgba(255,255,255,…)`）に塗り替えて写真の上でも視認できるようにした
@@ -207,6 +208,12 @@ koki-design-taste的にNGなので、**枠線ベース**に統一済み:
   構成に変更した。`.profile-extra__grid` は `align-items: start` にして2枚の高さを強制的に
   揃えない（揃えると短い方が間延びして見える）。趣味タグに「旅行 40カ国制覇」のような
   数字とかぶる項目を残さない（統計と重複させない）
+- タグは `PROFILE.hobbies` を `{label, href}` の配列にしており、`href`がある項目だけ
+  `<a>`（新規タブで開く外部リンク）、ないものは`<span>`でレンダリングされる
+  （`js/index.js`）。現在「世界一周記YouTube」だけ https://www.youtube.com/@koookiblog
+  にリンクしている。他のタグ（スポーツ全般/早起き）はリンクなしでよい
+- `PROFILE.meta` は「30歳 / 1996.02.06生まれ / A型 / 水瓶座」に簡略化済み（既婚・早起きは
+  外した。早起きは趣味タグ側に移動している）
 
 ## トップページのHero写真（旧仕様のメモ）
 
