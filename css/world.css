@@ -55,17 +55,19 @@
 }
 
 .map-section {
-  padding: 0 0 clamp(56px, 10vw, 100px);
+  padding: clamp(20px, 4vw, 32px) 0 clamp(28px, 5vw, 44px);
 }
 
 .map-frame {
   position: relative;
   width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
   aspect-ratio: 2752.766 / 1537.631;
-  background: #cfe3df;
-  border-radius: var(--radius);
+  background: var(--color-bg-soft);
+  border: 2px solid var(--color-ink);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 24px 48px rgba(31, 42, 46, 0.16);
 }
 
 .map-frame__img {

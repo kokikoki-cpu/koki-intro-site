@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     careerList.innerHTML = self.career.map((step) => `<li>${step}</li>`).join("");
   }
 
+  const statEl = document.getElementById("home-stat-countries");
+  if (statEl) statEl.textContent = WORLD_INTRO.visited;
+
   const hobbiesWrap = document.getElementById("home-hobbies");
   if (hobbiesWrap && PROFILE.hobbies) {
     hobbiesWrap.innerHTML = PROFILE.hobbies

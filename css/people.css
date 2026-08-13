@@ -29,7 +29,7 @@
 }
 
 .people-section {
-  padding: 0 0 clamp(56px, 10vw, 100px);
+  padding: clamp(20px, 4vw, 32px) 0 clamp(28px, 5vw, 44px);
 }
 
 .slider {
@@ -77,7 +77,7 @@
 
 .person-card__photo {
   width: 100%;
-  aspect-ratio: 4/5;
+  aspect-ratio: 1/1;
   object-fit: cover;
   background: var(--color-bg-soft);
 }

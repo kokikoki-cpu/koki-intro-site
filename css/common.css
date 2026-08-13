@@ -174,9 +174,9 @@ ul {
    ========================================================================== */
 .site-footer {
   border-top: 1px solid var(--color-line);
-  padding: 40px var(--gutter);
+  padding: 14px var(--gutter);
   text-align: center;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--color-ink-soft);
 }
 
@@ -209,15 +209,15 @@ ul {
 }
 
 .page-hero__title {
-  font-size: clamp(2.1rem, 6vw, 3.4rem);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
   font-weight: 800;
 }
 
 .page-hero__lead {
-  margin-top: 18px;
+  margin-top: 10px;
   max-width: 560px;
   color: var(--color-ink-soft);
-  font-size: 1.02rem;
+  font-size: 0.98rem;
 }
 
 /* ==========================================================================
@@ -225,7 +225,7 @@ ul {
    ========================================================================== */
 .page-hero--photo {
   padding: 0;
-  min-height: clamp(360px, 58vh, 540px);
+  min-height: clamp(200px, 30vh, 280px);
   display: flex;
   align-items: flex-end;
 }
@@ -252,7 +252,7 @@ ul {
 
 .page-hero--photo > .wrap {
   z-index: 3;
-  padding: clamp(28px, 8vw, 56px) var(--gutter) clamp(28px, 6vw, 44px);
+  padding: clamp(18px, 4vw, 28px) var(--gutter) clamp(16px, 3vw, 24px);
 }
 
 .page-hero--photo .page-hero__title,
@@ -378,9 +378,9 @@ ul {
 }
 
 .career-list li {
-  padding: 8px 0 8px 20px;
+  padding: 6px 0 6px 20px;
   position: relative;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   border-left: 2px solid var(--color-line);
   margin-left: 4px;
 }

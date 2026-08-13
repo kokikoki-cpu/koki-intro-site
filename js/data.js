@@ -10,7 +10,7 @@ const PROFILE = {
   meta: "30歳・既婚 / 1996.02.06生まれ / A型 / 早起き / 水瓶座",
   photo: "images/profile/pyramid.jpg",
   photoCaption: "エジプト・ギザの三大ピラミッドにて",
-  hobbies: ["世界一周記YouTube", "旅行 40カ国制覇", "スポーツ全般", "お酒"],
+  hobbies: ["世界一周記YouTube", "スポーツ全般", "お酒"],
   strengths: [
     {
       key: "action",
