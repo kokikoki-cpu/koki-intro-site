@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #f0ede4;
+  --color-bg-soft: #e5e0d2;
+  --color-ink: #1a1c16;
+  --color-ink-soft: #565a4d;
+  --color-accent: #3f5c43;
+  --color-accent-dark: #2c4230;
+  --color-clay: #a85630;
+  --color-white: #fffdf8;
+  --color-line: rgba(26, 28, 22, 0.14);
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-bg-soft: var(--color-bg-soft);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-accent: var(--color-accent);
+  --color-accent-dark: var(--color-accent-dark);
+  --color-clay: var(--color-clay);
+  --color-white: var(--color-white);
+  --color-line: var(--color-line);
+  --font-display: var(--font-shippori-mincho-b1);
+  --font-body: var(--font-noto-sans-jp);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  margin: 0;
+  line-height: 1.3;
+}
