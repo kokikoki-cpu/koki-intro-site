@@ -9,7 +9,6 @@ const PROFILE = {
   tagline: "旅。野生。世界。",
   meta: "30歳 / 1996.02.06生まれ / A型 / 水瓶座",
   photo: "images/profile/pyramid.jpg",
-  photoCaption: "エジプト・ギザの三大ピラミッドにて",
   hobbies: [
     { label: "世界一周記YouTube", href: "https://www.youtube.com/@koookiblog" },
     { label: "スポーツ全般" },

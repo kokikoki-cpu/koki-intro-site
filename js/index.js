@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("hero-photo").src = PROFILE.photo;
   document.getElementById("hero-photo").alt = PROFILE.name;
-  document.getElementById("hero-photo-caption").textContent = PROFILE.photoCaption || "";
   document.getElementById("hero-name").textContent = PROFILE.name;
   document.getElementById("hero-tagline").textContent = PROFILE.tagline || "";
   document.getElementById("hero-meta").textContent = PROFILE.meta;
