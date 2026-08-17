@@ -150,6 +150,105 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
+   トップページの太陽系（太陽 = こうき、惑星 = 各セクション）
+   ========================================================================== */
+.space {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 52% at 50% 46%, rgba(126, 96, 60, 0.34) 0%, rgba(11, 13, 10, 0) 70%),
+    radial-gradient(ellipse 52% 42% at 16% 80%, rgba(63, 92, 67, 0.26) 0%, rgba(11, 13, 10, 0) 72%),
+    radial-gradient(ellipse 46% 38% at 86% 18%, rgba(168, 86, 48, 0.2) 0%, rgba(11, 13, 10, 0) 72%),
+    #0b0d0a;
+}
+
+.space__star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fffdf8;
+  animation-name: star-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.16; }
+  50%      { opacity: 0.92; }
+}
+
+.system {
+  position: relative;
+}
+
+/* 軌道そのもの。円が回っても見た目は変わらないので、この円が軌道線を兼ねる */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--d);
+  height: var(--d);
+  margin-top: calc(var(--d) / -2);
+  margin-left: calc(var(--d) / -2);
+  border: 1px solid rgba(255, 253, 248, 0.14);
+  border-radius: 50%;
+  animation: orbit-spin var(--dur) linear infinite;
+  animation-delay: var(--delay);
+}
+
+.orbit__anchor {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 親と同じ長さ・同じ遅延の逆再生。これで惑星の中身が常に正立する */
+.orbit__spin {
+  animation: orbit-spin var(--dur) linear infinite reverse;
+  animation-delay: var(--delay);
+}
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 惑星に触れている間は系全体を止めて、狙って押せるようにする */
+.system:has(.planet:hover) .orbit,
+.system:has(.planet:hover) .orbit__spin,
+.system:focus-within .orbit,
+.system:focus-within .orbit__spin {
+  animation-play-state: paused;
+}
+
+.sun {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+  animation: sun-pulse 6.5s ease-in-out infinite;
+}
+
+@keyframes sun-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(255, 253, 248, 0.82), 0 0 40px 10px rgba(232, 168, 84, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(255, 253, 248, 0.92), 0 0 64px 18px rgba(232, 168, 84, 0.54);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit,
+  .orbit__spin,
+  .space__star,
+  .sun {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
    ゲートクリア後の映画的トランジション（牛の暴走）
    モンゴル動画の牛がそのまま画面に雪崩れ込んでくる、という見立て
    ========================================================================== */
@@ -159,13 +258,14 @@ h1, h2, h3, h4 {
   z-index: 200;
   overflow: hidden;
   background: linear-gradient(180deg, #241b12 0%, #6b5334 56%, #a8895c 100%);
-  animation: stampede-fade-out 520ms ease-in 2880ms forwards;
+  /* 砂ぼこりが晴れきったところで、そのままサイトへ溶ける */
+  animation: stampede-fade-out 760ms ease-out 3000ms forwards;
 }
 
 .stampede__scene {
   position: absolute;
   inset: 0;
-  animation: stampede-shake 240ms linear 260ms 9;
+  animation: stampede-shake 240ms linear 260ms 8;
 }
 
 .stampede__bull {
@@ -217,13 +317,13 @@ h1, h2, h3, h4 {
   );
   opacity: 0;
   transform: scale(0.4);
-  animation: stampede-dust 2250ms ease-out 640ms forwards;
+  animation: stampede-dust 2100ms ease-out 620ms forwards;
 }
 
 @keyframes stampede-dust {
   0%   { opacity: 0;   transform: scale(0.4); }
   55%  { opacity: 0.9; transform: scale(1.18); }
-  100% { opacity: 1;   transform: scale(1.75); }
+  100% { opacity: 1;   transform: scale(1.7); }
 }
 
 /* シネスコの黒帯 */
@@ -256,14 +356,15 @@ h1, h2, h3, h4 {
   color: #fffdf8;
   text-align: center;
   opacity: 0;
-  animation: stampede-title 1420ms ease-out 1880ms forwards;
+  animation: stampede-title 1150ms ease-out 1850ms forwards;
 }
 
+/* 最後は opacity 1 のまま保持し、消えるのは全体のフェードアウトに任せる
+   （ここで一度消すと、二重にフェードして瞬く） */
 @keyframes stampede-title {
   0%   { opacity: 0; letter-spacing: 0.55em; transform: scale(1.07); }
-  32%  { opacity: 1; }
-  76%  { opacity: 1; letter-spacing: 0.16em; transform: scale(1); }
-  100% { opacity: 0; letter-spacing: 0.16em; transform: scale(1); }
+  40%  { opacity: 1; }
+  100% { opacity: 1; letter-spacing: 0.16em; transform: scale(1); }
 }
 
 @keyframes stampede-fade-out {

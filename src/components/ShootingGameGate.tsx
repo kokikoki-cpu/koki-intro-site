@@ -538,6 +538,10 @@ export default function ShootingGameGate() {
   if (dismissed || (gateOpen && phase !== "won")) return null;
 
   if (phase === "won") {
+    // 転換中は動画画面を外す。残しておくと、砂ぼこりが晴れる瞬間に
+    // サイトではなく黒い動画画面が一瞬見えてしまう
+    if (transitioning) return <StampedeTransition onDone={handleTransitionDone} />;
+
     return (
       <>
         <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
@@ -559,9 +563,6 @@ export default function ShootingGameGate() {
             {videoEnded ? "サイトへ進む →" : "スキップしてサイトへ →"}
           </button>
         </div>
-
-        {/* 動画からサイトへ、牛の暴走で場面転換する */}
-        {transitioning && <StampedeTransition onDone={handleTransitionDone} />}
       </>
     );
   }
@@ -574,10 +575,10 @@ export default function ShootingGameGate() {
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
           <div className="w-full rounded-lg border-2 border-(--color-accent) bg-(--color-accent-dark)/25 px-5 py-4">
             <p className="text-base font-bold leading-relaxed md:text-lg">
-              まずはあなたの別班としての資質があるかをチェックします
+              こうきの自己紹介サイトへようこそ
             </p>
             <p className="mt-2 text-base font-bold leading-relaxed text-(--color-white) md:text-lg">
-              まずはエチオピアの詐欺師を倒してみよう。
+              まずは、肩慣らし、エチオピアの詐欺師を撃退しよう
             </p>
             <p className="mt-3 border-t border-(--color-white)/20 pt-3 text-sm text-(--color-bg-soft)">
               {WIN_SCORE}体撃退でクリア（残機{START_LIVES}）

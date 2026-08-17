@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { COUNTRIES, PEOPLE, PROFILE, SPORTS, WORLD_INTRO } from "@/lib/data";
 import HeroStage3D from "@/components/HeroStage3D";
 import ShootingGameGate from "@/components/ShootingGameGate";
-import CareerCard from "@/components/CareerCard";
+import SolarSystem from "@/components/SolarSystem";
 
 /** 立体ヒーローの円周に並べる実写。旅の写真を主役にする */
 const HERO_PHOTOS = [
@@ -42,66 +41,14 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="px-5 pb-6 pt-5 md:px-14">
-        <div className="mx-auto max-w-[1120px]">
-          <h2 className="mb-2.5 font-display text-xl font-extrabold md:text-2xl">強み</h2>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-[1.25fr_1fr_1fr]">
-            {PROFILE.strengths.map((s) => (
-              <Link
-                key={s.key}
-                href={s.link}
-                className="rounded-md border-2 border-(--color-ink) bg-(--color-white) p-[18px] text-center transition hover:-translate-y-1 hover:border-(--color-accent)"
-              >
-                <h3 className="text-lg font-extrabold">{s.title}</h3>
-                <p className="mt-1 text-sm text-(--color-ink-soft)">{s.desc}</p>
-                <span className="mt-2.5 inline-block text-sm font-bold text-(--color-accent-dark)">
-                  {s.linkLabel} →
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 pb-7 md:px-14">
-        <div className="mx-auto grid max-w-[1120px] grid-cols-1 items-start gap-5 md:grid-cols-[1.25fr_1fr_1fr]">
-          <CareerCard steps={self.career!} />
-
-          <div className="relative rounded-md border-2 border-(--color-ink) bg-(--color-white) p-[22px] pt-7">
-            <span className="absolute -top-3.5 left-[22px] rounded-full bg-(--color-accent) px-3.5 py-1 font-display text-sm font-bold text-(--color-white)">
-              趣味・活動
-            </span>
-            <p className="my-1 mb-4 flex items-baseline gap-2">
-              <strong className="font-display text-4xl font-extrabold leading-none text-(--color-accent-dark)">
-                {WORLD_INTRO.visited}
-              </strong>
-              <span className="text-sm text-(--color-ink-soft)">カ国制覇</span>
-            </p>
-            <div className="flex flex-wrap gap-2.5">
-              {PROFILE.hobbies.map((h) =>
-                h.href ? (
-                  <a
-                    key={h.label}
-                    href={h.href}
-                    target="_blank"
-                    rel="noopener"
-                    className="rounded-full border border-(--color-line) bg-(--color-bg-soft) px-4 py-2 text-sm font-semibold transition hover:border-(--color-accent) hover:text-(--color-accent-dark)"
-                  >
-                    {h.label}
-                  </a>
-                ) : (
-                  <span
-                    key={h.label}
-                    className="rounded-full border border-(--color-line) bg-(--color-bg-soft) px-4 py-2 text-sm font-semibold"
-                  >
-                    {h.label}
-                  </span>
-                )
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      <SolarSystem
+        sunName={PROFILE.name}
+        sunPhoto={self.photo}
+        strengths={PROFILE.strengths}
+        career={self.career!}
+        hobbies={PROFILE.hobbies}
+        visited={WORLD_INTRO.visited}
+      />
     </>
   );
 }

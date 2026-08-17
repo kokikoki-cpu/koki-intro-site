@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { PROFILE } from "@/lib/data";
 
-/** 演出の総尺。globals.css 側の fade-out（2880ms 開始 + 520ms）と揃えている */
-const DURATION = 3400;
+/** 演出の総尺。globals.css 側の fade-out（3000ms 開始 + 760ms）が終わってから畳む */
+const DURATION = 3820;
 
 /** 群れの構成。大きい個体ほど手前 = 画面下・速い、という置き方で奥行きを出す */
 const HERD = [
