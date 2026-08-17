@@ -3,6 +3,51 @@
 このファイルは今後の実装・別セッションでの作業時に参照するための決定事項まとめ。
 デザインや構成を変える際は、まずここを読んでから作業する。
 
+## 【重要】2026-08-14: Next.jsへ全面移行済み（この節を最初に読む）
+
+このリポジトリ（`koki-intro-site`、`/Users/k.s/Claude/koki-site`）は、以前は静的
+HTML/CSS/JSサイトだったが、**Next.js 16（App Router / TypeScript / Tailwind v4）に
+全面的に作り直した**。以下より前の節（カラーパレットやカードの見た目のルールなど）は
+「デザイン方針としては今も有効」だが、**具体的な実装（`.hero__inner`のようなクラス名や
+`css/`配下のファイルなど）はもう存在しない**。コードを触る前に実際のファイル構成
+（`src/app/`, `src/components/`, `src/lib/data.ts`）を確認すること。
+
+- ページ構成: `src/app/page.tsx`（トップ）, `src/app/world/page.tsx`,
+  `src/app/people/page.tsx`, `src/app/sports/page.tsx`
+- 共通レイアウト: `src/app/layout.tsx`（Header/Footer/フォント読み込み）
+- コンテンツデータ: `src/lib/data.ts`（旧`js/data.js`のTS移植版。これが唯一の情報源）
+- 共通UI: `src/components/Header.tsx`, `Footer.tsx`, `Modal.tsx`
+  （国/人物/スポーツの詳細ポップアップはすべてこの`Modal`を共用）
+- デザイントークン（色・フォント変数）とアンビエント背景のCSSキーフレームは
+  `src/app/globals.css` に集約（`.page-hero-photo` / `.globe-layer` / `.walker` /
+  `.pulse-dot` など）
+- **トップページだけの目玉機能**: `src/components/ShootingGameGate.tsx`。
+  「詐欺師撃退シューティングゲーム」をクリア（または合言葉）しないとサイト本編が
+  見られないゲート。クリアするとモンゴル旅行動画（`public/videos/mongolia.mp4`）が
+  再生されてからサイトへ進む。敵キャラの丸アイコンは本人の顔写真を丸くクロップした
+  `public/images/game/scammer.jpg`
+
+### デプロイ方法（重要）
+
+- GitHubの`main`にpushしても、Vercel側の自動ビルドが一度うまく反映されない事故が
+  あった（Framework Presetは正しく`Next.js`なのに本番が404になった）。原因ははっきり
+  特定できていないが、**Vercel CLIから直接`vercel --prod`を実行することで確実に直る**
+  ことを確認済み。今後の本番反映はこれを使う:
+  ```bash
+  cd /Users/k.s/Claude/koki-site
+  npx vercel --prod
+  ```
+  （このマシンはCLIログイン済み・`.vercel/project.json`で`koki-intro-site`に
+  リンク済みなので、そのまま実行できる。`Not authorized`エラーが出たら
+  `.env.local`を削除してから再実行すると直ることがある＝キャッシュされた
+  `VERCEL_OIDC_TOKEN`が古くなっている可能性）
+- `vercel link`を素で実行すると、ディレクトリ名（`koki-site`）から**新しいプロジェクトを
+  勝手に作ってしまう**ので注意。必ず `vercel link --project koki-intro-site --yes`
+  のように既存プロジェクト名を明示すること（一度この事故で`koki-site`という空の
+  プロジェクトが誤って作成されており、Vercelダッシュボードに残っている）
+- Node.js/npmはこのマシンに元々入っておらず、`nvm`経由でインストール済み
+  （`~/.zshrc`に`NVM_DIR`の初期化が追記されている）
+
 ## コーディングルール（厳守）
 
 **`padding` / `margin` はショートハンドで書かず、変更したい辺だけを個別プロパティ
