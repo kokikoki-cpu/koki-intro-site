@@ -235,7 +235,9 @@ h1, h2, h3, h4 {
   position: relative;
 }
 
-/* 軌道そのもの。円が回っても見た目は変わらないので、この円が軌道線を兼ねる */
+/* 軌道そのもの。円が回っても見た目は変わらないので、この円が軌道線を兼ねる。
+   `pointer-events: none` は必須: この要素は「線」ではなく円形の面として当たり判定を持つため、
+   外側の軌道が内側の惑星のクリックを丸ごと奪ってしまう（惑星側で auto に戻す） */
 .orbit {
   position: absolute;
   top: 50%;
@@ -246,8 +248,13 @@ h1, h2, h3, h4 {
   margin-left: calc(var(--d) / -2);
   border: 1px solid rgba(255, 253, 248, 0.14);
   border-radius: 50%;
+  pointer-events: none;
   animation: orbit-spin var(--dur) linear infinite;
   animation-delay: var(--delay);
+}
+
+.planet {
+  pointer-events: auto;
 }
 
 .orbit__anchor {
