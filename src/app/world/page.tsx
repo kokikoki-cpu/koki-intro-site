@@ -70,11 +70,8 @@ export default function WorldPage() {
       </section>
 
       <section className="px-5 py-6 md:px-14">
-        <p className="mx-auto mb-3 max-w-[760px] text-sm text-(--color-ink-soft)">
-          ピンを押すとその国へのフライトが始まる。無事たどり着けたら旅の話が読める。
-          <span className="ml-2 font-bold text-(--color-accent-dark)">
-            到達 {open.size} / {COUNTRIES.length}
-          </span>
+        <p className="mx-auto mb-3 max-w-[760px] text-sm font-bold text-(--color-accent-dark)">
+          到達 {open.size} / {COUNTRIES.length}
         </p>
         <div
           className="relative mx-auto w-full max-w-[760px] overflow-hidden rounded-lg border-2 border-(--color-ink) bg-(--color-bg-soft)"

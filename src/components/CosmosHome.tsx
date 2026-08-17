@@ -66,7 +66,6 @@ type Strength = { key: string; title: string; desc: string; link: string; linkLa
 
 type Props = {
   name: string;
-  tagline: string;
   meta: string;
   sunPhoto: string;
   photos: string[];
@@ -78,7 +77,6 @@ type Props = {
 
 export default function CosmosHome({
   name,
-  tagline,
   meta,
   sunPhoto,
   photos,
@@ -152,18 +150,13 @@ export default function CosmosHome({
           最大幅まで広がらず最も広い子（太陽系）の幅に縮んでしまう */}
       <div className="relative mx-auto flex w-full max-w-[1120px] flex-col items-center">
         <header className="w-full">
-          <h1 className="font-display text-[clamp(2.6rem,8vw,5.5rem)] font-extrabold leading-[0.98] tracking-tight">
-            {name}
+          <h1 className="font-display text-[clamp(2.8rem,9vw,6rem)] font-extrabold leading-[0.98] tracking-tight">
+            Who am I ?
           </h1>
-          <p className="mt-2 font-display text-lg font-bold tracking-[0.18em] text-(--color-bg-soft) md:text-2xl">
-            {tagline}
-          </p>
-          <p className="mt-1.5 text-sm text-(--color-bg-soft)/60">{meta}</p>
+          <p className="mt-2 text-sm text-(--color-bg-soft)/60">{meta}</p>
         </header>
 
-        <p className="mt-8 text-sm text-(--color-bg-soft)/70">惑星を押すと中身が見られる</p>
-
-        <div className="system mt-2 aspect-square w-[min(88vw,560px)]">
+        <div className="system mt-6 aspect-square w-[min(88vw,560px)]">
           {/* 太陽 = こうき本人 */}
           <div className="sun h-[clamp(74px,20vw,144px)] w-[clamp(74px,20vw,144px)]">
             <Image

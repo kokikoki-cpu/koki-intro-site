@@ -15,8 +15,8 @@ import {
   type GamePhase,
 } from "./three-kit";
 
-const HIT_TARGET = 5;
-const TIME_LIMIT = 18_000;
+const HIT_TARGET = 6;
+const TIME_LIMIT = 14_000;
 
 const X_LIMIT = 5.4;
 const Y_LIMIT = 3.1;
@@ -78,7 +78,8 @@ export default function EncounterGame({
     }
 
     // --- 標的（本人の写真を貼った球体） ---
-    const sphereGeo = new THREE.SphereGeometry(1.15, 26, 20);
+    // 的は小さめ。大きくすると「置いてある的を押す」だけの作業になる
+    const sphereGeo = new THREE.SphereGeometry(0.95, 26, 20);
     const sphereMat = new THREE.MeshPhongMaterial({ color: 0xf3ead9, shininess: 10 });
     const targetMesh = new THREE.Mesh(sphereGeo, sphereMat);
     targetMesh.add(outlineFor(targetMesh, 1.05));
@@ -104,7 +105,7 @@ export default function EncounterGame({
     burst.visible = false;
     scene.add(burst);
 
-    const vel = { x: 0.075, y: 0.052, z: 0.02 };
+    const vel = { x: 0.105, y: 0.075, z: 0.024 };
     let burstAge = -1;
     let popAge = -1;
     let startedAt = 0;
@@ -137,11 +138,11 @@ export default function EncounterGame({
       popAge = 0;
 
       // 当てるたびに逃げ足が速くなる
-      const boost = 1 + hitsRef.current * 0.16;
+      const boost = 1 + hitsRef.current * 0.22;
       const dir = () => (Math.random() < 0.5 ? -1 : 1);
-      vel.x = dir() * (0.075 + Math.random() * 0.03) * boost;
-      vel.y = dir() * (0.052 + Math.random() * 0.03) * boost;
-      vel.z = dir() * 0.024 * boost;
+      vel.x = dir() * (0.105 + Math.random() * 0.04) * boost;
+      vel.y = dir() * (0.075 + Math.random() * 0.04) * boost;
+      vel.z = dir() * 0.028 * boost;
       reposition();
     }
     renderer.domElement.addEventListener("pointerdown", onPointerDown);

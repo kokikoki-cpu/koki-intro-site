@@ -253,8 +253,27 @@ h1, h2, h3, h4 {
   animation-delay: var(--delay);
 }
 
+/* 「押せる」ことを文字で説明せず、静かに脈打つ光の輪で伝える。
+   （button は既定で cursor:default なので、ここで pointer に揃える） */
 .planet {
   pointer-events: auto;
+  cursor: pointer;
+  animation: planet-breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes planet-breathe {
+  0%, 100% {
+    box-shadow: 0 0 22px rgba(0, 0, 0, 0.6), 0 0 0 0 rgba(255, 253, 248, 0);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(0, 0, 0, 0.6), 0 0 0 6px rgba(255, 253, 248, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planet {
+    animation: none !important;
+  }
 }
 
 .orbit__anchor {

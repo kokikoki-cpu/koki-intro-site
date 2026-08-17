@@ -129,11 +129,8 @@ export default function PeoplePage() {
       </section>
 
       <section className="px-5 py-6 md:px-14">
-        <p className="mx-auto mb-3 max-w-[1120px] text-sm text-(--color-ink-soft)">
-          影を押すと本人が逃げ出す。捕まえて話を聞けたら図鑑に載る。
-          <span className="ml-2 font-bold text-(--color-accent-dark)">
-            発見 {found.size} / {PEOPLE.length}
-          </span>
+        <p className="mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-dark)">
+          発見 {found.size} / {PEOPLE.length}
         </p>
 
         <div className="relative mx-auto flex max-w-[1120px] items-center gap-3">

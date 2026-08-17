@@ -14,10 +14,11 @@ import {
   type GamePhase,
 } from "./three-kit";
 
-const PASS_TARGET = 5;
-const MAX_MISS = 3;
-const RING_RADIUS = 2.3;
-const SPAWN_INTERVAL = 950;
+const PASS_TARGET = 6;
+const MAX_MISS = 2;
+/** 輪を小さくするのが一番効く難易度調整。緩めると通過が作業になる */
+const RING_RADIUS = 1.75;
+const SPAWN_INTERVAL = 780;
 const PLAYER_Z = 0;
 const SPAWN_Z = -62;
 
@@ -123,7 +124,7 @@ export default function FlightGame({
         SPAWN_Z
       );
       scene.add(g);
-      rings.push({ mesh: g, prevZ: SPAWN_Z, speed: 0.62 + passedRef.current * 0.05 });
+      rings.push({ mesh: g, prevZ: SPAWN_Z, speed: 0.88 + passedRef.current * 0.08 });
     }
 
     function clearRings() {

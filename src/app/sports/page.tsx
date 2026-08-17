@@ -76,11 +76,8 @@ export default function SportsPage() {
       </section>
 
       <section className="px-5 py-6 md:px-14">
-        <p className="mx-auto mb-3 max-w-[1120px] text-sm text-(--color-ink-soft)">
-          ラリーを続けられたら、そのスポーツのエピソードが読める。
-          <span className="ml-2 font-bold text-(--color-accent-dark)">
-            突破 {cleared.size} / {SPORTS.length}
-          </span>
+        <p className="mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-dark)">
+          突破 {cleared.size} / {SPORTS.length}
         </p>
 
         <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">

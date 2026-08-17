@@ -14,13 +14,13 @@ import {
   type GamePhase,
 } from "./three-kit";
 
-const RALLY_TARGET = 6;
-const MAX_MISS = 3;
+const RALLY_TARGET = 8;
+const MAX_MISS = 2;
 
 const START_Z = -46;
 const PLAYER_Z = 5.2;
-/** この幅にボールがいる間に振れば当たり */
-const HIT_WINDOW = 2.1;
+/** この幅にボールがいる間に振れば当たり。広げるとタイミングゲームでなくなる */
+const HIT_WINDOW = 1.4;
 /** ラケットの待機位置（振ると左へ振り抜く） */
 const RACKET_X = 1.75;
 const RACKET_Y = 1.05;
@@ -115,7 +115,7 @@ export default function RallyGame({
     scene.add(ball);
 
     let ballZ = START_Z;
-    let ballSpeed = 0.62;
+    let ballSpeed = 0.8;
     let swung = false;
     let swingAge = -1;
     let hitFlash = -1;
@@ -123,7 +123,7 @@ export default function RallyGame({
     function resetBall(faster: boolean) {
       ballZ = START_Z;
       swung = false;
-      if (faster) ballSpeed = Math.min(ballSpeed + 0.075, 1.5);
+      if (faster) ballSpeed = Math.min(ballSpeed + 0.09, 1.9);
     }
 
     function ballY(): number {
@@ -174,7 +174,7 @@ export default function RallyGame({
 
       if (seenReset !== resetSignal.current) {
         seenReset = resetSignal.current;
-        ballSpeed = 0.62;
+        ballSpeed = 0.8;
         swingAge = -1;
         hitFlash = -1;
         resetBall(false);

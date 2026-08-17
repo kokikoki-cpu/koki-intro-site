@@ -8,7 +8,10 @@ import StampedeTransition from "@/components/StampedeTransition";
 /** 解錠キー。合言葉で全解錠した場合もこれを満たす */
 const GATE_ID = "gate";
 const WIN_SCORE = 10;
-const START_LIVES = 5;
+/* 難易度は、ゲームロジックをそのまま再現したシミュレータで詰めた値。
+   「初見の人が半分くらい勝てる」= 初見 53% / 数回遊んで慣れた人 75% を狙っている。
+   どれか一つでも緩めると一気に簡単になるので、変えるときはセットで考えること。 */
+const START_LIVES = 3;
 
 const CANVAS_W = 360;
 const CANVAS_H = 560;
@@ -17,12 +20,12 @@ const PLAYER_H = 26;
 const PLAYER_Y = CANVAS_H - 50;
 const PLAYER_SPEED = 6;
 const BULLET_SPEED = 8;
-const FIRE_INTERVAL = 180;
-const ENEMY_SPAWN_INTERVAL = 950;
+const FIRE_INTERVAL = 240;
+const ENEMY_SPAWN_INTERVAL = 780;
 const ENEMY_SIZE = 26;
 
 const ENEMY_SPRITE_SRC = "/images/game/scammer.jpg";
-const DODGE_START_Y = PLAYER_Y - 160;
+const DODGE_START_Y = PLAYER_Y - 210;
 
 const MAX_BULLETS = 36;
 const MAX_ENEMIES = 22;
@@ -41,8 +44,10 @@ type Burst = { x: number; y: number; born: number };
 function enemyDisplayX(en: Enemy): number {
   if (en.y <= DODGE_START_Y) return en.baseX;
   const progress = Math.min(1, (en.y - DODGE_START_Y) / (PLAYER_Y - DODGE_START_Y));
-  const eased = progress * progress; // 際どく近づくほど大きく横にそれる
-  const x = en.baseX + en.driftDir * en.driftAmp * eased;
+  /* 一度よけたあと、手元に来る直前で逆方向に切り返す（sin を 1.5π まで回す）。
+     ただ追いかけるだけだと置いていかれるので、ここが難しさの中心。 */
+  const shape = Math.sin(progress * Math.PI * 1.5);
+  const x = en.baseX + en.driftDir * en.driftAmp * shape;
   return Math.max(ENEMY_SIZE / 2, Math.min(CANVAS_W - ENEMY_SIZE / 2, x));
 }
 
@@ -342,9 +347,9 @@ export default function ShootingGameGate() {
           enemies.current.push({
             baseX: ENEMY_SIZE / 2 + Math.random() * (CANVAS_W - ENEMY_SIZE),
             y: -ENEMY_SIZE,
-            speed: 1.1 + Math.random() * 1.1,
+            speed: 2.8 + Math.random() * 1.2,
             driftDir: Math.random() < 0.5 ? -1 : 1,
-            driftAmp: 55 + Math.random() * 45,
+            driftAmp: 80 + Math.random() * 45,
           });
           lastSpawn.current = t;
         }
@@ -377,7 +382,8 @@ export default function ShootingGameGate() {
             if (hitBulletIdx.has(bi) || hit) return;
             const dx = b.x - enX;
             const dy = b.y - en.y;
-            if (Math.abs(dx) < ENEMY_SIZE / 2 + 10 && Math.abs(dy) < ENEMY_SIZE / 2 + 12) {
+            // 弾（幅4px）と敵（直径26px）の実寸に近い判定。緩めると途端に簡単になる
+            if (Math.abs(dx) < ENEMY_SIZE / 2 + 3 && Math.abs(dy) < ENEMY_SIZE / 2 + 7) {
               hit = true;
               hitBulletIdx.add(bi);
             }
