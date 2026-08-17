@@ -176,6 +176,61 @@ h1, h2, h3, h4 {
   50%      { opacity: 0.92; }
 }
 
+/* --- 旅の写真が流れ星として夜空を横切る --------------------------------- */
+/* .shooter を進行方向へ回しておき、中身をローカルの +x 方向へ流す。
+   こうすると尾の向きと進行方向が必ず一致する */
+.shooter {
+  position: absolute;
+  transform: rotate(var(--angle));
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.shooter__run {
+  position: relative;
+  opacity: 0;
+  animation: shoot var(--dur) linear infinite;
+  animation-delay: var(--delay);
+  will-change: transform, opacity;
+}
+
+@keyframes shoot {
+  0%   { transform: translateX(0);           opacity: 0; }
+  7%   { opacity: 1; }
+  66%  { opacity: 1; }
+  100% { transform: translateX(var(--dist)); opacity: 0; }
+}
+
+/* 尾は進行方向の後ろ（ローカル -x）へ伸ばす */
+.shooter__trail {
+  position: absolute;
+  top: 50%;
+  right: calc(100% - 8px);
+  width: var(--trail);
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(to left, rgba(255, 234, 196, 0.95), rgba(255, 234, 196, 0));
+}
+
+/* 親の回転を打ち消して、写真だけは正立させる */
+.shooter__upright {
+  transform: rotate(calc(var(--angle) * -1));
+}
+
+.shooter__photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 253, 248, 0.78);
+  box-shadow: 0 0 20px 3px rgba(255, 224, 170, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shooter {
+    display: none;
+  }
+}
+
 .system {
   position: relative;
 }

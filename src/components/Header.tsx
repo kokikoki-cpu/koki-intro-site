@@ -16,7 +16,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-(--color-line) bg-(--color-bg)/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-(--color-white)/12 bg-(--color-ink)/92 text-(--color-white) backdrop-blur-sm">
       <div className="mx-auto flex max-w-[1120px] items-center justify-between px-5 py-4 md:px-14">
         <Link href="/" className="font-display text-lg font-bold">
           I am <span className="text-(--color-accent)">KOKI</span>
@@ -26,9 +26,9 @@ export default function Header() {
           aria-label="メニュー"
           onClick={() => setOpen((v) => !v)}
         >
-          <span className="block h-0.5 w-6 bg-(--color-ink)" />
-          <span className="block h-0.5 w-6 bg-(--color-ink)" />
-          <span className="block h-0.5 w-6 bg-(--color-ink)" />
+          <span className="block h-0.5 w-6 bg-(--color-white)" />
+          <span className="block h-0.5 w-6 bg-(--color-white)" />
+          <span className="block h-0.5 w-6 bg-(--color-white)" />
         </button>
         <nav className="hidden gap-6 md:flex lg:gap-9">
           {NAV.map((item) => (
@@ -45,13 +45,13 @@ export default function Header() {
         </nav>
       </div>
       {open && (
-        <nav className="flex flex-col border-t border-(--color-line) bg-(--color-white) md:hidden">
+        <nav className="flex flex-col border-t border-(--color-white)/12 bg-(--color-ink) md:hidden">
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="border-t border-(--color-line) px-5 py-3.5 text-sm font-semibold first:border-t-0"
+              className="border-t border-(--color-white)/12 px-5 py-3.5 text-sm font-semibold first:border-t-0"
             >
               {item.label}
             </Link>
