@@ -1,8 +1,15 @@
-import Image from "next/image";
 import Link from "next/link";
-import { PEOPLE, PROFILE, WORLD_INTRO } from "@/lib/data";
-import EgyptParallax from "@/components/EgyptParallax";
+import { COUNTRIES, PEOPLE, PROFILE, SPORTS, WORLD_INTRO } from "@/lib/data";
+import HeroStage3D from "@/components/HeroStage3D";
 import ShootingGameGate from "@/components/ShootingGameGate";
+
+/** 立体ヒーローの円周に並べる実写。旅の写真を主役にする */
+const HERO_PHOTOS = [
+  PROFILE.photo,
+  ...COUNTRIES.map((c) => c.photo),
+  SPORTS[2].photo,
+  SPORTS[5].photo,
+];
 
 export default function Home() {
   const self = PEOPLE.find((p) => p.isSelf)!;
@@ -11,35 +18,30 @@ export default function Home() {
     <>
       <ShootingGameGate />
 
-      <section className="hero-section relative overflow-hidden">
-        <EgyptParallax />
-        <div className="relative z-1 mx-auto max-w-[1120px] px-5 pt-4 md:px-14 md:pt-6">
-          <div className="relative overflow-hidden rounded-2xl shadow-[0_24px_48px_rgba(31,42,46,0.2)]">
-            <div className="relative aspect-[3/2] w-full md:aspect-[16/5]">
-              <Image
-                src={PROFILE.photo}
-                alt={PROFILE.name}
-                fill
-                sizes="(max-width: 768px) 100vw, 1120px"
-                className="object-cover"
-                style={{ objectPosition: "32% 55%" }}
-                priority
-              />
-            </div>
-            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/0 to-transparent px-5 pb-4 pt-8 md:px-8 md:pb-6">
-              <h1 className="font-display text-3xl font-extrabold text-(--color-white) [text-shadow:0_2px_12px_rgba(0,0,0,0.25)] md:text-5xl">
-                {PROFILE.name}
-              </h1>
-              <p className="mt-1.5 font-display text-sm font-bold tracking-wider text-(--color-white)/90 md:text-lg">
-                {PROFILE.tagline}
-              </p>
-            </div>
+      <section className="relative h-[clamp(300px,46vh,420px)] w-full overflow-hidden md:h-[clamp(380px,62vh,560px)]">
+        <HeroStage3D photos={HERO_PHOTOS} />
+
+        {/* 文字を読ませるための、背景色と同じ色のフェード（下から） */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-(--color-bg) via-(--color-bg)/82 to-transparent" />
+
+        <div className="pointer-events-none absolute inset-0 flex items-end">
+          <div className="mx-auto w-full max-w-[1120px] px-5 pb-6 md:px-14 md:pb-9">
+            <h1 className="font-display text-[clamp(2.6rem,8vw,5.5rem)] font-extrabold leading-[0.98] tracking-tight">
+              {PROFILE.name}
+            </h1>
+            <p className="mt-2 font-display text-lg font-bold tracking-[0.18em] text-(--color-accent-dark) md:text-2xl">
+              {PROFILE.tagline}
+            </p>
+            <p className="mt-1.5 text-sm text-(--color-ink-soft)">{PROFILE.meta}</p>
           </div>
-          <p className="mt-2.5 text-sm text-(--color-ink-soft)">{PROFILE.meta}</p>
         </div>
+
+        <p className="pointer-events-none absolute right-5 top-4 text-xs text-(--color-ink-soft)/70 md:right-14">
+          写真はドラッグで回せる
+        </p>
       </section>
 
-      <section className="px-5 pb-6 pt-3.5 md:px-14">
+      <section className="px-5 pb-6 pt-5 md:px-14">
         <div className="mx-auto max-w-[1120px]">
           <h2 className="mb-2.5 font-display text-xl font-extrabold md:text-2xl">強み</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-[1.25fr_1fr_1fr]">

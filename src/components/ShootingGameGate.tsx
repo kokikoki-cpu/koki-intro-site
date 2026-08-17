@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { tryPassphrase, unlock, useIsUnlocked } from "@/lib/unlock";
 
-const PASSPHRASE = "こうきいつもありがとう";
-const STORAGE_KEY = "koki-gate-unlocked";
+/** 解錠キー。合言葉で全解錠した場合もこれを満たす */
+const GATE_ID = "gate";
 const WIN_SCORE = 10;
 const START_LIVES = 5;
 
@@ -201,7 +202,7 @@ function buildMarkers(): THREE.Mesh[] {
 }
 
 export default function ShootingGameGate() {
-  const [checked, setChecked] = useState(false);
+  const gateOpen = useIsUnlocked(GATE_ID);
   const [dismissed, setDismissed] = useState(false);
   const [phase, setPhase] = useState<Phase>("intro");
   const [score, setScore] = useState(0);
@@ -224,12 +225,6 @@ export default function ShootingGameGate() {
   const scoreRef = useRef(0);
   const livesRef = useRef(START_LIVES);
   const phaseRef = useRef<Phase>("intro");
-
-  useEffect(() => {
-    const isUnlocked = window.sessionStorage.getItem(STORAGE_KEY) === "1";
-    if (isUnlocked) setDismissed(true);
-    setChecked(true);
-  }, []);
 
   // --- Three.js シーンのセットアップ（マウント時に1回だけ、フェーズが変わっても維持する） ---
   useEffect(() => {
@@ -413,7 +408,8 @@ export default function ShootingGameGate() {
         if (scoreRef.current >= WIN_SCORE) {
           phaseRef.current = "won";
           setPhase("won");
-          window.sessionStorage.setItem(STORAGE_KEY, "1");
+          // 勝ちを即座に記録する。この後に動画を見せるので、画面自体はまだ閉じない
+          unlock(GATE_ID);
         } else if (livesRef.current <= 0) {
           phaseRef.current = "lost";
           setPhase("lost");
@@ -506,7 +502,7 @@ export default function ShootingGameGate() {
       });
       mount.removeChild(renderer.domElement);
     };
-  }, [checked]);
+  }, []);
 
   const resetGame = () => {
     playerX.current = CANVAS_W / 2;
@@ -522,15 +518,15 @@ export default function ShootingGameGate() {
   };
 
   const checkPassphrase = () => {
-    if (passInput.trim() === PASSPHRASE) {
-      window.sessionStorage.setItem(STORAGE_KEY, "1");
+    if (tryPassphrase(passInput)) {
       setDismissed(true);
     } else {
       setPassError(true);
     }
   };
 
-  if (!checked || dismissed) return null;
+  // クリア直後だけは、解錠済みでもご褒美動画の画面を出し続ける
+  if (dismissed || (gateOpen && phase !== "won")) return null;
 
   if (phase === "won") {
     return (
