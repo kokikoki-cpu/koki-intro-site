@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { tryPassphrase, unlock, useIsUnlocked } from "@/lib/unlock";
+import StampedeTransition from "@/components/StampedeTransition";
 
 /** 解錠キー。合言葉で全解錠した場合もこれを満たす */
 const GATE_ID = "gate";
@@ -211,6 +212,7 @@ export default function ShootingGameGate() {
   const [passInput, setPassInput] = useState("");
   const [passError, setPassError] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -525,50 +527,69 @@ export default function ShootingGameGate() {
     }
   };
 
+  // 動画を止めてから場面転換に入る（暗転の裏で音だけ鳴り続けないように）
+  const startTransition = () => {
+    videoRef.current?.pause();
+    setTransitioning(true);
+  };
+  const handleTransitionDone = useCallback(() => setDismissed(true), []);
+
   // クリア直後だけは、解錠済みでもご褒美動画の画面を出し続ける
   if (dismissed || (gateOpen && phase !== "won")) return null;
 
   if (phase === "won") {
     return (
-      <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 bg-(--color-ink) px-4 py-6 text-(--color-white)">
-        <p className="font-display text-2xl font-bold">CLEAR!</p>
-        <p className="text-sm text-(--color-bg-soft)">よくやった。ご褒美にモンゴルの旅動画をどうぞ。</p>
-        <video
-          ref={videoRef}
-          src="/videos/mongolia.mp4"
-          controls
-          autoPlay
-          playsInline
-          onEnded={() => setVideoEnded(true)}
-          className="max-h-[60vh] w-full max-w-md rounded-lg border-2 border-(--color-line) bg-black"
-        />
-        <button
-          onClick={() => setDismissed(true)}
-          className="rounded-full bg-(--color-accent) px-8 py-3 font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
-        >
-          {videoEnded ? "サイトへ進む →" : "スキップしてサイトへ →"}
-        </button>
-      </div>
+      <>
+        <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
+          <p className="font-display text-2xl font-bold">CLEAR!</p>
+          <p className="text-sm text-(--color-bg-soft)">よくやった。ご褒美にモンゴルの旅動画をどうぞ。</p>
+          <video
+            ref={videoRef}
+            src="/videos/mongolia.mp4"
+            controls
+            autoPlay
+            playsInline
+            onEnded={() => setVideoEnded(true)}
+            className="max-h-[60vh] w-full max-w-md rounded-lg border-2 border-(--color-line) bg-black"
+          />
+          <button
+            onClick={startTransition}
+            className="rounded-full bg-(--color-accent) px-8 py-3 font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+          >
+            {videoEnded ? "サイトへ進む →" : "スキップしてサイトへ →"}
+          </button>
+        </div>
+
+        {/* 動画からサイトへ、牛の暴走で場面転換する */}
+        {transitioning && <StampedeTransition onDone={handleTransitionDone} />}
+      </>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 bg-(--color-ink) px-4 py-6 text-(--color-white)">
+    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
       <p className="text-center font-display text-2xl font-bold">I am KOKI</p>
 
       {phase === "intro" && (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <p className="max-w-xs text-sm text-(--color-bg-soft)">
-            この先を見るには、まず腕試し。
-            <br />
-            エチオピアの詐欺師たちを{WIN_SCORE}体撃退せよ。
-          </p>
-          <p className="text-xs text-(--color-bg-soft)/70">
-            PC: ←→ または A/D で移動（自動発射） ／ スマホ: 画面をドラッグ
-          </p>
+        <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
+          <div className="w-full rounded-lg border-2 border-(--color-accent) bg-(--color-accent-dark)/25 px-5 py-4">
+            <p className="text-base font-bold leading-relaxed md:text-lg">
+              まずはあなたの別班としての資質があるかをチェックします
+            </p>
+            <p className="mt-2 text-base font-bold leading-relaxed text-(--color-white) md:text-lg">
+              まずはエチオピアの詐欺師を倒してみよう。
+            </p>
+            <p className="mt-3 border-t border-(--color-white)/20 pt-3 text-sm text-(--color-bg-soft)">
+              {WIN_SCORE}体撃退でクリア（残機{START_LIVES}）
+              <br />
+              PC: ←→ または A/D キーで移動（弾は自動）
+              <br />
+              スマホ: 画面を指でなぞって移動
+            </p>
+          </div>
           <button
             onClick={resetGame}
-            className="rounded-full bg-(--color-accent) px-8 py-3 font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+            className="rounded-full bg-(--color-accent) px-10 py-3.5 text-lg font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
           >
             ゲームスタート
           </button>
@@ -586,7 +607,13 @@ export default function ShootingGameGate() {
         <div
           ref={mountRef}
           className="touch-none overflow-hidden rounded-lg border-2 border-(--color-line) bg-black"
-          style={{ width: "min(88vw, 360px)", height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
+          // 画面が低いときも縦長キャンバスが収まるよう、高さを基準に決める
+          style={{
+            height: "min(56vh, 560px)",
+            width: "auto",
+            maxWidth: "88vw",
+            aspectRatio: `${CANVAS_W}/${CANVAS_H}`,
+          }}
         />
 
         {phase === "lost" && (

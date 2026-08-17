@@ -14,6 +14,8 @@ type Props = {
   phase: GamePhase;
   /** プレイ中に出すスコア等 */
   hud?: ReactNode;
+  /** キャンバスの上に重ねる表示（到達地点の名前など）。プレイ中だけ出る */
+  overlay?: ReactNode;
   /** Three.js のキャンバスを挿す先 */
   mountRef: RefObject<HTMLDivElement | null>;
   onStart: () => void;
@@ -32,6 +34,7 @@ export default function GameShell({
   rule,
   phase,
   hud,
+  overlay,
   mountRef,
   onStart,
   onRetry,
@@ -96,6 +99,12 @@ export default function GameShell({
           ref={mountRef}
           className="aspect-16/10 w-full touch-none overflow-hidden rounded-lg border-2 border-(--color-line) bg-black"
         />
+
+        {phase === "playing" && overlay && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-4">
+            {overlay}
+          </div>
+        )}
 
         {phase === "lost" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-black/78 text-center">

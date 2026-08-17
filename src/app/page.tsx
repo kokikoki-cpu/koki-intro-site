@@ -2,6 +2,7 @@ import Link from "next/link";
 import { COUNTRIES, PEOPLE, PROFILE, SPORTS, WORLD_INTRO } from "@/lib/data";
 import HeroStage3D from "@/components/HeroStage3D";
 import ShootingGameGate from "@/components/ShootingGameGate";
+import CareerCard from "@/components/CareerCard";
 
 /** 立体ヒーローの円周に並べる実写。旅の写真を主役にする */
 const HERO_PHOTOS = [
@@ -64,22 +65,7 @@ export default function Home() {
 
       <section className="px-5 pb-7 md:px-14">
         <div className="mx-auto grid max-w-[1120px] grid-cols-1 items-start gap-5 md:grid-cols-[1.25fr_1fr_1fr]">
-          <div className="relative rounded-md border-2 border-(--color-ink) bg-(--color-white) p-[22px] pt-7 md:col-span-2">
-            <span className="absolute -top-3.5 left-[22px] rounded-full bg-(--color-accent) px-3.5 py-1 font-display text-sm font-bold text-(--color-white)">
-              職歴
-            </span>
-            <ul className="m-0 list-none p-0 text-left">
-              {self.career!.map((step, i) => (
-                <li
-                  key={i}
-                  className="relative ml-1 border-l-2 border-(--color-line) py-1.5 pl-5 text-sm"
-                >
-                  <span className="absolute -left-[5px] top-3.5 h-2 w-2 rounded-full bg-(--color-accent)" />
-                  {step}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <CareerCard steps={self.career!} />
 
           <div className="relative rounded-md border-2 border-(--color-ink) bg-(--color-white) p-[22px] pt-7">
             <span className="absolute -top-3.5 left-[22px] rounded-full bg-(--color-accent) px-3.5 py-1 font-display text-sm font-bold text-(--color-white)">

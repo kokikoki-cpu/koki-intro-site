@@ -149,6 +149,138 @@ h1, h2, h3, h4 {
   to   { transform: translateX(-115vw); }
 }
 
+/* ==========================================================================
+   ゲートクリア後の映画的トランジション（牛の暴走）
+   モンゴル動画の牛がそのまま画面に雪崩れ込んでくる、という見立て
+   ========================================================================== */
+.stampede {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: linear-gradient(180deg, #241b12 0%, #6b5334 56%, #a8895c 100%);
+  animation: stampede-fade-out 520ms ease-in 2880ms forwards;
+}
+
+.stampede__scene {
+  position: absolute;
+  inset: 0;
+  animation: stampede-shake 240ms linear 260ms 9;
+}
+
+.stampede__bull {
+  position: absolute;
+  left: 0;
+  will-change: transform;
+  animation-name: stampede-run;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes stampede-run {
+  from { transform: translateX(118vw); }
+  to   { transform: translateX(-58vw); }
+}
+
+.stampede__leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: stampede-leg 240ms linear infinite;
+}
+
+.stampede__leg--b {
+  animation-delay: -120ms;
+}
+
+@keyframes stampede-leg {
+  0%, 100% { transform: rotate(24deg); }
+  50%      { transform: rotate(-24deg); }
+}
+
+@keyframes stampede-shake {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-7px, 3px); }
+  50%  { transform: translate(6px, -4px); }
+  75%  { transform: translate(-3px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* 巻き上がる砂ぼこり。最後は画面を覆ってワイプの役目を果たす */
+.stampede__dust {
+  position: absolute;
+  inset: -22%;
+  background: radial-gradient(
+    ellipse at 50% 72%,
+    rgba(230, 211, 175, 0.98) 0%,
+    rgba(203, 175, 128, 0.86) 42%,
+    rgba(160, 130, 88, 0) 74%
+  );
+  opacity: 0;
+  transform: scale(0.4);
+  animation: stampede-dust 2250ms ease-out 640ms forwards;
+}
+
+@keyframes stampede-dust {
+  0%   { opacity: 0;   transform: scale(0.4); }
+  55%  { opacity: 0.9; transform: scale(1.18); }
+  100% { opacity: 1;   transform: scale(1.75); }
+}
+
+/* シネスコの黒帯 */
+.stampede__bars::before,
+.stampede__bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #0d0a06;
+  animation: stampede-bar 420ms ease-out forwards;
+}
+
+.stampede__bars::before { top: 0; }
+.stampede__bars::after  { bottom: 0; }
+
+@keyframes stampede-bar {
+  to { height: 11%; }
+}
+
+.stampede__title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fffdf8;
+  text-align: center;
+  opacity: 0;
+  animation: stampede-title 1420ms ease-out 1880ms forwards;
+}
+
+@keyframes stampede-title {
+  0%   { opacity: 0; letter-spacing: 0.55em; transform: scale(1.07); }
+  32%  { opacity: 1; }
+  76%  { opacity: 1; letter-spacing: 0.16em; transform: scale(1); }
+  100% { opacity: 0; letter-spacing: 0.16em; transform: scale(1); }
+}
+
+@keyframes stampede-fade-out {
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stampede,
+  .stampede *,
+  .stampede *::before,
+  .stampede *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
 /* --- sports.html: 熱狂パルス --- */
 .pulse-dot {
   position: absolute;
