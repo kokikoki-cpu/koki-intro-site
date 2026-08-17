@@ -7,6 +7,8 @@
   --color-ink-soft: #565a4d;
   --color-accent: #3f5c43;
   --color-accent-dark: #2c4230;
+  /* 暗い背景の上で使う明るいアクセント。--color-accent は濃すぎて沈む */
+  --color-accent-light: #85b48d;
   --color-clay: #a85630;
   --color-white: #fffdf8;
   --color-line: rgba(26, 28, 22, 0.14);
@@ -19,6 +21,7 @@
   --color-ink-soft: var(--color-ink-soft);
   --color-accent: var(--color-accent);
   --color-accent-dark: var(--color-accent-dark);
+  --color-accent-light: var(--color-accent-light);
   --color-clay: var(--color-clay);
   --color-white: var(--color-white);
   --color-line: var(--color-line);

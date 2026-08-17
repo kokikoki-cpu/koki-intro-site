@@ -575,7 +575,7 @@ export default function ShootingGameGate() {
 
   return (
     <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
-      <p className="text-center font-display text-2xl font-bold">I am KOKI</p>
+      <p className="text-center font-display text-2xl font-bold">Who am I ?</p>
 
       {phase === "intro" && (
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">

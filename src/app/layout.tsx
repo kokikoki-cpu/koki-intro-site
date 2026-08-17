@@ -17,7 +17,7 @@ const shipporiMinchoB1 = Shippori_Mincho_B1({
 });
 
 export const metadata: Metadata = {
-  title: "I am KOKI | 清水航樹",
+  title: "Who am I ? | 清水航樹",
   description:
     "清水航樹の自己紹介サイト。行動力・好奇心・体力を軸に、旅・人との出会い・スポーツを紹介します。",
 };
