@@ -5,6 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { COUNTRIES, WORLD_INTRO, type Country } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
+import SpaceBackdrop from "@/components/SpaceBackdrop";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
 const FlightGame = dynamic(() => import("@/components/games/FlightGame"), { ssr: false });
@@ -39,42 +40,20 @@ export default function WorldPage() {
 
   return (
     <>
-      <section className="page-hero-photo">
-        <Image
-          src="/images/countries/turkey.jpg"
-          alt=""
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="page-hero-scrim" />
-        <div className="page-hero-ambient" aria-hidden>
-          <svg className="globe-layer" viewBox="0 0 400 400">
-            <circle className="globe-outline" cx="200" cy="200" r="188" />
-            <ellipse className="globe-line" cx="200" cy="200" rx="188" ry="130" />
-            <ellipse className="globe-line" cx="200" cy="200" rx="188" ry="66" />
-            <ellipse className="meridian" cx="200" cy="200" rx="188" ry="188" />
-            <ellipse className="meridian" cx="200" cy="200" rx="188" ry="188" />
-            <ellipse className="meridian" cx="200" cy="200" rx="188" ry="188" />
-            <ellipse className="meridian" cx="200" cy="200" rx="188" ry="188" />
-          </svg>
-        </div>
-        <div className="relative z-3 mx-auto w-full max-w-[1120px] px-5 py-5 md:px-14">
-          <h1 className="font-display text-2xl font-extrabold text-(--color-white) md:text-4xl">
+      <section className="space relative flex min-h-[calc(100vh-60px)] flex-col justify-center px-5 py-10 text-(--color-white) md:px-14">
+        <SpaceBackdrop scenery="sun" />
+
+        <div className="relative mx-auto mb-6 w-full max-w-[1120px]">
+          <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
             あぁ素晴らしき地球
           </h1>
-          <p className="mt-2 max-w-md text-sm text-(--color-white)/85">
-            {WORLD_INTRO.lead}（{WORLD_INTRO.sub}）
-          </p>
+          <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">{WORLD_INTRO.lead}（{WORLD_INTRO.sub}）</p>
         </div>
-      </section>
-
-      <section className="px-5 py-6 md:px-14">
-        <p className="mx-auto mb-3 max-w-[760px] text-sm font-bold text-(--color-accent-dark)">
+        <p className="relative mx-auto mb-3 max-w-[760px] text-sm font-bold text-(--color-accent-light)">
           到達 {open.size} / {COUNTRIES.length}
         </p>
         <div
-          className="relative mx-auto w-full max-w-[760px] overflow-hidden rounded-lg border-2 border-(--color-ink) bg-(--color-bg-soft)"
+          className="relative mx-auto w-full max-w-[760px] overflow-hidden rounded-lg border-2 border-(--color-white)/30 bg-(--color-bg-soft)/95"
           style={{ aspectRatio: "2752.766 / 1537.631" }}
         >
           <Image

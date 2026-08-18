@@ -6,7 +6,7 @@ import GameShell from "./GameShell";
 import type { GamePhase } from "./three-kit";
 
 /** 光る順番を覚えて、同じ順に押し返す。回を追うごとに1つ長くなる */
-const ROUNDS = 5;
+const ROUNDS = 4;
 const START_LENGTH = 3;
 /** 1つ光る時間 */
 const FLASH_MS = 620;
@@ -111,6 +111,7 @@ export default function MemoryGame({
           1回ごとに順番が1つ増える。
         </>
       }
+      difficulty={2}
       phase={phase}
       hud={
         <>

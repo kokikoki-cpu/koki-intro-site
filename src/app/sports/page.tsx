@@ -5,19 +5,12 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { SPORTS, SPORTS_INTRO, type Sport } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
+import SpaceBackdrop from "@/components/SpaceBackdrop";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
 const SprintGame = dynamic(() => import("@/components/games/SprintGame"), { ssr: false });
 
 const SPORT_IDS = SPORTS.map((s) => s.id);
-
-const PULSES = [
-  { top: "10%", left: "8%", size: 60, delay: "0s" },
-  { top: "55%", left: "22%", size: 90, delay: "-1.1s" },
-  { top: "20%", left: "55%", size: 46, delay: "-2.2s" },
-  { top: "65%", left: "70%", size: 70, delay: "-0.5s" },
-  { top: "5%", left: "82%", size: 50, delay: "-1.8s" },
-];
 
 export default function SportsPage() {
   const [modal, setModal] = useState<ModalData>(null);
@@ -46,48 +39,27 @@ export default function SportsPage() {
 
   return (
     <>
-      <section className="page-hero-photo">
-        <Image src="/images/sports/padel.jpg" alt="" fill className="object-cover" sizes="100vw" />
-        <div className="page-hero-scrim" />
-        <div className="page-hero-ambient" aria-hidden>
-          {PULSES.map((p, i) => (
-            <span
-              key={i}
-              className="pulse-dot"
-              style={{
-                top: p.top,
-                left: p.left,
-                width: p.size,
-                height: p.size,
-                background: "radial-gradient(circle, rgba(255,255,255,0.9) 0%, transparent 72%)",
-                animationDelay: p.delay,
-              }}
-            />
-          ))}
-        </div>
-        <div className="relative z-3 mx-auto w-full max-w-[1120px] px-5 py-5 md:px-14">
-          <h1 className="font-display text-2xl font-extrabold text-(--color-white) md:text-4xl">
+      <section className="space relative flex min-h-[calc(100vh-60px)] flex-col justify-center px-5 py-10 text-(--color-white) md:px-14">
+        <SpaceBackdrop scenery="desert" />
+
+        <div className="relative mx-auto mb-6 w-full max-w-[1120px]">
+          <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
             身体こそすべて
           </h1>
-          <p className="mt-2 max-w-md text-sm text-(--color-white)/85">
-            大好きなスポーツ — {SPORTS_INTRO.lead}
-          </p>
+          <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">大好きなスポーツ — {SPORTS_INTRO.lead}</p>
         </div>
-      </section>
-
-      <section className="px-5 py-6 md:px-14">
-        <p className="mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-dark)">
+        <p className="relative mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
           突破 {cleared.size} / {SPORTS.length}
         </p>
 
-        <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+        <div className="relative z-1 mx-auto grid max-w-[1120px] grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
           {SPORTS.map((s) => {
             const done = cleared.has(s.id);
             return (
               <button
                 key={s.id}
                 onClick={() => onTile(s)}
-                className="group relative aspect-4/3 overflow-hidden rounded-md border-2 border-(--color-ink) bg-(--color-bg-soft) transition hover:-translate-y-1 hover:border-(--color-accent)"
+                className="group relative aspect-4/3 overflow-hidden rounded-md border-2 border-(--color-white)/30 bg-black/40 transition hover:-translate-y-1 hover:border-(--color-accent-light)"
               >
                 <Image
                   src={s.photo}

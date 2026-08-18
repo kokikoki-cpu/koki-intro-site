@@ -321,6 +321,7 @@ export default function CareerRunGame({
           関門を越えるごとに速くなり、すき間は狭くなる。
         </>
       }
+      difficulty={5}
       phase={phase}
       hud={
         <>

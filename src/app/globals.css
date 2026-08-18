@@ -179,6 +179,55 @@ h1, h2, h3, h4 {
   50%      { opacity: 0.92; }
 }
 
+/* --- 下層ページの情景（太陽・砂漠・草原）------------------------------- */
+.scene-horizon {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(160px, 26vh, 300px);
+}
+
+/* 地平線から昇る太陽 */
+.scene-sun {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(90px, 15vh, 170px);
+  width: clamp(150px, 26vw, 300px);
+  height: clamp(150px, 26vw, 300px);
+  margin-left: calc(clamp(150px, 26vw, 300px) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd9a0 0%, #f0a95c 46%, rgba(214, 130, 60, 0) 72%);
+  animation: scene-sun-breathe 8s ease-in-out infinite;
+}
+
+@keyframes scene-sun-breathe {
+  0%, 100% { opacity: 0.72; transform: scale(1); }
+  50%      { opacity: 0.95; transform: scale(1.05); }
+}
+
+/* 地平線あたりのぼんやりした明かり */
+.scene-glow {
+  position: absolute;
+  inset-inline: -10%;
+  bottom: 0;
+  height: clamp(200px, 34vh, 380px);
+}
+
+.scene-glow--warm {
+  background: radial-gradient(ellipse 60% 100% at 50% 100%, rgba(226, 152, 78, 0.42) 0%, rgba(226, 152, 78, 0) 72%);
+}
+
+.scene-glow--cool {
+  background: radial-gradient(ellipse 62% 100% at 46% 100%, rgba(126, 168, 132, 0.34) 0%, rgba(126, 168, 132, 0) 74%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-sun {
+    animation: none !important;
+  }
+}
+
 /* --- 旅の写真が流れ星として夜空を横切る --------------------------------- */
 /* .shooter を進行方向へ回しておき、中身をローカルの +x 方向へ流す。
    こうすると尾の向きと進行方向が必ず一致する */

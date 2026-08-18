@@ -5,6 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { PEOPLE, type Person } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
+import SpaceBackdrop from "@/components/SpaceBackdrop";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
 const MemoryGame = dynamic(() => import("@/components/games/MemoryGame"), { ssr: false });
@@ -20,16 +21,6 @@ const MEMORY_CELLS = [
 ];
 
 const PEOPLE_IDS = PEOPLE.map((p) => p.id);
-
-const WALKERS = [
-  { top: "14%", size: 9, dir: "walk-right" as const, dur: "16s", delay: "-2s", left: "-6%" },
-  { top: "30%", size: 13, dir: "walk-left" as const, dur: "21s", delay: "-6s", left: "108%" },
-  { top: "48%", size: 7, dir: "walk-right" as const, dur: "13s", delay: "-9s", left: "-6%" },
-  { top: "63%", size: 11, dir: "walk-left" as const, dur: "19s", delay: "-1s", left: "108%" },
-  { top: "78%", size: 8, dir: "walk-right" as const, dur: "17s", delay: "-12s", left: "-6%" },
-  { top: "22%", size: 6, dir: "walk-left" as const, dur: "24s", delay: "-4s", left: "108%" },
-  { top: "88%", size: 10, dir: "walk-right" as const, dur: "20s", delay: "-15s", left: "-6%" },
-];
 
 export default function PeoplePage() {
   const [modal, setModal] = useState<ModalData>(null);
@@ -102,52 +93,24 @@ export default function PeoplePage() {
 
   return (
     <>
-      <section className="page-hero-photo">
-        <Image
-          src="/images/people/p4-ethiopia.jpg"
-          alt=""
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="page-hero-scrim" />
-        <div className="page-hero-ambient" aria-hidden>
-          {WALKERS.map((w, i) => (
-            <span
-              key={i}
-              className="walker"
-              style={{
-                top: w.top,
-                left: w.left,
-                width: w.size,
-                height: w.size,
-                background: "rgba(255,255,255,0.8)",
-                animation: `${w.dir} ${w.dur} linear infinite`,
-                animationDelay: w.delay,
-              }}
-            />
-          ))}
-        </div>
-        <div className="relative z-3 mx-auto w-full max-w-[1120px] px-5 py-5 md:px-14">
-          <h1 className="font-display text-2xl font-extrabold text-(--color-white) md:text-4xl">
+      <section className="space relative flex min-h-[calc(100vh-60px)] flex-col justify-center px-5 py-10 text-(--color-white) md:px-14">
+        <SpaceBackdrop scenery="steppe" />
+
+        <div className="relative mx-auto mb-6 w-full max-w-[1120px]">
+          <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
             世界のクセ強人類
           </h1>
-          <p className="mt-2 max-w-md text-sm text-(--color-white)/85">
-            人図鑑 — 好奇心の先で出会った、忘れられない人たち
-          </p>
+          <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">人図鑑 — 好奇心の先で出会った、忘れられない人たち</p>
         </div>
-      </section>
-
-      <section className="px-5 py-6 md:px-14">
-        <p className="mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-dark)">
+        <p className="relative mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
           発見 {found.size} / {PEOPLE.length}
         </p>
 
-        <div className="relative mx-auto flex max-w-[1120px] items-center gap-3">
+        <div className="relative z-1 mx-auto flex max-w-[1120px] items-center gap-3">
           <button
             onClick={() => scrollByCard(-1)}
             aria-label="前へ"
-            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-line) bg-(--color-white) text-lg transition hover:scale-105 hover:bg-(--color-accent) hover:text-(--color-white) md:block"
+            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-accent-dark) md:block"
           >
             &#8592;
           </button>
@@ -162,9 +125,9 @@ export default function PeoplePage() {
                   key={p.id}
                   data-card
                   onClick={() => onCard(p)}
-                  className="w-[min(72vw,300px)] flex-none cursor-pointer rounded-md border-2 border-(--color-ink) bg-(--color-white) [scroll-snap-align:start] transition hover:-translate-y-1 hover:border-(--color-accent)"
+                  className="w-[min(72vw,300px)] flex-none cursor-pointer rounded-md border-2 border-(--color-white)/30 bg-(--color-ink)/80 backdrop-blur-sm [scroll-snap-align:start] transition hover:-translate-y-1 hover:border-(--color-accent-light)"
                 >
-                  <div className="relative aspect-square w-full overflow-hidden rounded-t-[4px] bg-(--color-bg-soft)">
+                  <div className="relative aspect-square w-full overflow-hidden rounded-t-[4px] bg-black/40">
                     <Image
                       src={p.photo}
                       alt={done ? p.name : "未発見"}
@@ -180,10 +143,10 @@ export default function PeoplePage() {
                   </div>
                   <div className="p-5 text-center">
                     <h3 className="text-xl font-extrabold">{done ? p.name : "？？？"}</h3>
-                    <p className="mt-0.5 mb-2 text-sm text-(--color-ink-soft)">
+                    <p className="mt-0.5 mb-2 text-sm text-(--color-bg-soft)/70">
                       出現場所: {done ? p.place : "？"}
                     </p>
-                    <p className="line-clamp-3 text-sm text-(--color-ink-soft)">
+                    <p className="line-clamp-3 text-sm text-(--color-bg-soft)/80">
                       {done ? (p.isSelf ? p.goals![0] : p.story) : "押して捕まえると正体がわかる"}
                     </p>
                   </div>
@@ -194,7 +157,7 @@ export default function PeoplePage() {
           <button
             onClick={() => scrollByCard(1)}
             aria-label="次へ"
-            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-line) bg-(--color-white) text-lg transition hover:scale-105 hover:bg-(--color-accent) hover:text-(--color-white) md:block"
+            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-accent-dark) md:block"
           >
             &#8594;
           </button>

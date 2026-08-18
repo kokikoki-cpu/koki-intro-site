@@ -112,6 +112,7 @@ export default function SprintGame({
           手を止めるとじりじり戻される。
         </>
       }
+      difficulty={3}
       phase={phase}
       hud={
         <>

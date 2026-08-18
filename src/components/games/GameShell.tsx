@@ -11,6 +11,8 @@ type Props = {
   target: string;
   /** 遊び方の説明。1〜2行に収める */
   rule: ReactNode;
+  /** 難易度（1〜5）。挑戦前に★で示す */
+  difficulty: 1 | 2 | 3 | 4 | 5;
   phase: GamePhase;
   /** プレイ中に出すスコア等 */
   hud?: ReactNode;
@@ -34,6 +36,7 @@ export default function GameShell({
   title,
   target,
   rule,
+  difficulty,
   phase,
   hud,
   overlay,
@@ -83,6 +86,10 @@ export default function GameShell({
 
       {phase === "intro" && (
         <div className="flex flex-col items-center gap-3 text-center">
+          <p className="text-lg tracking-[0.3em] text-(--color-accent-light)" aria-label={`難易度 ${difficulty} / 5`}>
+            {"★".repeat(difficulty)}
+            <span className="text-(--color-white)/25">{"★".repeat(5 - difficulty)}</span>
+          </p>
           <div className="max-w-sm text-sm text-(--color-bg-soft)">{rule}</div>
           <button
             onClick={onStart}

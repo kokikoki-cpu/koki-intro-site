@@ -621,6 +621,9 @@ export default function ShootingGameGate() {
 
       {phase === "intro" && (
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
+          <p className="text-lg tracking-[0.3em] text-(--color-accent-light)" aria-label="難易度 3 / 5">
+            ★★★<span className="text-(--color-white)/25">★★</span>
+          </p>
           <div className="w-full rounded-lg border-2 border-(--color-accent) bg-(--color-accent-dark)/25 px-5 py-4">
             <p className="text-sm text-(--color-bg-soft)">
               {WIN_SCORE}体撃退でクリア（残機{START_LIVES}）

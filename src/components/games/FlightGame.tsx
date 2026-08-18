@@ -17,7 +17,7 @@ import {
 const PASS_TARGET = 6;
 const MAX_MISS = 2;
 /** 輪を小さくするのが一番効く難易度調整。緩めると通過が作業になる */
-const RING_RADIUS = 1.75;
+const RING_RADIUS = 1.6;
 const SPAWN_INTERVAL = 780;
 const PLAYER_Z = 0;
 const SPAWN_Z = -62;
@@ -124,7 +124,7 @@ export default function FlightGame({
         SPAWN_Z
       );
       scene.add(g);
-      rings.push({ mesh: g, prevZ: SPAWN_Z, speed: 0.88 + passedRef.current * 0.08 });
+      rings.push({ mesh: g, prevZ: SPAWN_Z, speed: 0.95 + passedRef.current * 0.09 });
     }
 
     function clearRings() {
@@ -288,6 +288,7 @@ export default function FlightGame({
           マウス（スマホは指）で機体を動かす。
         </>
       }
+      difficulty={4}
       phase={phase}
       hud={
         <>
