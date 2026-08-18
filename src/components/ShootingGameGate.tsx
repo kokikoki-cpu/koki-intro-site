@@ -582,9 +582,10 @@ export default function ShootingGameGate() {
   }
 
   /* 入口。文字だけを順に浮かび上がらせて「何が始まるのか」と思わせる。
-     3Dシーンは下でマウントしたまま覆うので、開始した瞬間からすぐ動く */
-  if (!welcomed) {
-    return (
+     ここで early return してはいけない: キャンバスがDOMに無いまま
+     Three.js の初期化が走り、二度と作られなくなる（実際にゲームが動かなくなった）。
+     必ず本体を描いたうえで、その「上に重ねる」こと。 */
+  const welcomeOverlay = !welcomed ? (
       <div className="fixed inset-0 z-110 flex flex-col items-center justify-center gap-8 overflow-y-auto bg-(--color-ink) px-6 py-10 text-center text-(--color-white)">
         <div className="flex max-w-lg flex-col gap-5">
           <p
@@ -611,10 +612,10 @@ export default function ShootingGameGate() {
           ゲームスタート
         </button>
       </div>
-    );
-  }
+  ) : null;
 
   return (
+    <>
     <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
       <p className="text-center font-display text-2xl font-bold">Who am I ?</p>
 
@@ -706,5 +707,8 @@ export default function ShootingGameGate() {
         )}
       </div>
     </div>
+
+    {welcomeOverlay}
+    </>
   );
 }
