@@ -3,6 +3,7 @@ import { Noto_Sans_JP, Shippori_Mincho_B1 } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BgmPlayer from "@/components/BgmPlayer";
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -17,7 +18,7 @@ const shipporiMinchoB1 = Shippori_Mincho_B1({
 });
 
 export const metadata: Metadata = {
-  title: "Who am I ? | 清水航樹",
+  title: "Who am I ?",
   description:
     "清水航樹の自己紹介サイト。行動力・好奇心・体力を軸に、旅・人との出会い・スポーツを紹介します。",
 };
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main>{children}</main>
         <Footer />
+        <BgmPlayer />
       </body>
     </html>
   );

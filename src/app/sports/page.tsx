@@ -7,7 +7,7 @@ import { SPORTS, SPORTS_INTRO, type Sport } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
-const RallyGame = dynamic(() => import("@/components/games/RallyGame"), { ssr: false });
+const SprintGame = dynamic(() => import("@/components/games/SprintGame"), { ssr: false });
 
 const SPORT_IDS = SPORTS.map((s) => s.id);
 
@@ -108,7 +108,7 @@ export default function SportsPage() {
       </section>
 
       {pending && (
-        <RallyGame
+        <SprintGame
           sportName={pending.name}
           onReveal={reveal}
           onClose={() => setPending(null)}

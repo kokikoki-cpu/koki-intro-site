@@ -18,6 +18,8 @@ type Props = {
   overlay?: ReactNode;
   /** Three.js のキャンバスを挿す先 */
   mountRef: RefObject<HTMLDivElement | null>;
+  /** 3Dを使わないゲーム用。渡すと既定のマウント用 div の代わりにこれを描く */
+  canvas?: ReactNode;
   onStart: () => void;
   onRetry: () => void;
   /** 閉じる（解錠しない） */
@@ -36,6 +38,7 @@ export default function GameShell({
   hud,
   overlay,
   mountRef,
+  canvas,
   onStart,
   onRetry,
   onClose,
@@ -95,10 +98,9 @@ export default function GameShell({
       )}
 
       <div className="relative w-[min(92vw,620px)]">
-        <div
-          ref={mountRef}
-          className="aspect-16/10 w-full touch-none overflow-hidden rounded-lg border-2 border-(--color-line) bg-black"
-        />
+        <div className="aspect-16/10 w-full touch-none overflow-hidden rounded-lg border-2 border-(--color-line) bg-black">
+          {canvas ?? <div ref={mountRef} className="h-full w-full" />}
+        </div>
 
         {phase === "playing" && overlay && (
           <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-4">

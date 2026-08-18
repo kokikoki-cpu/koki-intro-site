@@ -7,14 +7,15 @@ import { PROFILE } from "@/lib/data";
 const DURATION = 3820;
 
 /** 群れの構成。大きい個体ほど手前 = 画面下・速い、という置き方で奥行きを出す */
+/* 走る距離を 244vw に広げたぶん、見た目の速さを保つため周期も伸ばしてある */
 const HERD = [
-  { top: "44%", width: 190, dur: 1.75, delay: 0.0, color: "#332615" },
-  { top: "50%", width: 240, dur: 1.5, delay: 0.5, color: "#241a0f" },
-  { top: "57%", width: 320, dur: 1.15, delay: 0.15, color: "#180f07" },
-  { top: "62%", width: 360, dur: 1.05, delay: 0.72, color: "#120c06" },
-  { top: "66%", width: 410, dur: 0.95, delay: 0.4, color: "#0f0a05" },
-  { top: "71%", width: 470, dur: 0.85, delay: 1.05, color: "#0b0703" },
-  { top: "54%", width: 280, dur: 1.3, delay: 1.28, color: "#1a1209" },
+  { top: "44%", width: 190, dur: 2.4, delay: 0.0, color: "#332615" },
+  { top: "50%", width: 240, dur: 2.1, delay: 0.42, color: "#241a0f" },
+  { top: "57%", width: 320, dur: 1.6, delay: 0.12, color: "#180f07" },
+  { top: "62%", width: 360, dur: 1.45, delay: 0.6, color: "#120c06" },
+  { top: "66%", width: 410, dur: 1.3, delay: 0.34, color: "#0f0a05" },
+  { top: "71%", width: 470, dur: 1.15, delay: 0.88, color: "#0b0703" },
+  { top: "54%", width: 280, dur: 1.8, delay: 1.05, color: "#1a1209" },
 ];
 
 /** 頭を下げて突進する牛のシルエット。肩のこぶと大きな角で「牛」に見せる */

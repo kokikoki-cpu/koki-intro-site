@@ -7,7 +7,17 @@ import { PEOPLE, type Person } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
-const EncounterGame = dynamic(() => import("@/components/games/EncounterGame"), { ssr: false });
+const MemoryGame = dynamic(() => import("@/components/games/MemoryGame"), { ssr: false });
+
+/** 記憶ゲームの盤面（6マス）。人物写真＋旅の写真を混ぜる */
+const MEMORY_CELLS = [
+  { photo: "/images/profile/koki.jpg", label: "1" },
+  { photo: "/images/people/p2-srilanka.jpg", label: "2" },
+  { photo: "/images/people/p3-india.jpg", label: "3" },
+  { photo: "/images/people/p4-ethiopia.jpg", label: "4" },
+  { photo: "/images/countries/india.jpg", label: "5" },
+  { photo: "/images/countries/kenya.jpg", label: "6" },
+];
 
 const PEOPLE_IDS = PEOPLE.map((p) => p.id);
 
@@ -192,9 +202,9 @@ export default function PeoplePage() {
       </section>
 
       {pending && (
-        <EncounterGame
+        <MemoryGame
           personName="？？？"
-          personPhoto={pending.photo}
+          cells={MEMORY_CELLS}
           onReveal={reveal}
           onClose={() => setPending(null)}
           onUnlockAll={unlockAll}

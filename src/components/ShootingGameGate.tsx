@@ -218,6 +218,8 @@ export default function ShootingGameGate() {
   const [passError, setPassError] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  /** 入口の文字だけの画面を抜けたか */
+  const [welcomed, setWelcomed] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -533,6 +535,12 @@ export default function ShootingGameGate() {
     }
   };
 
+  /** 入口からそのままゲームへ入る（説明画面は挟まない） */
+  const startFromWelcome = () => {
+    setWelcomed(true);
+    resetGame();
+  };
+
   // 動画を止めてから場面転換に入る（暗転の裏で音だけ鳴り続けないように）
   const startTransition = () => {
     videoRef.current?.pause();
@@ -573,6 +581,39 @@ export default function ShootingGameGate() {
     );
   }
 
+  /* 入口。文字だけを順に浮かび上がらせて「何が始まるのか」と思わせる。
+     3Dシーンは下でマウントしたまま覆うので、開始した瞬間からすぐ動く */
+  if (!welcomed) {
+    return (
+      <div className="fixed inset-0 z-110 flex flex-col items-center justify-center gap-8 overflow-y-auto bg-(--color-ink) px-6 py-10 text-center text-(--color-white)">
+        <div className="flex max-w-lg flex-col gap-5">
+          <p
+            className="welcome__line font-display text-xl font-bold leading-relaxed md:text-2xl"
+            style={{ animationDelay: "0.25s" }}
+          >
+            こうきの自己紹介サイトへようこそ
+          </p>
+          <p
+            className="welcome__line font-display text-xl font-bold leading-relaxed md:text-2xl"
+            style={{ animationDelay: "1.5s" }}
+          >
+            まずは、肩慣らし、
+            <br className="md:hidden" />
+            エチオピアの詐欺師を撃退しよう
+          </p>
+        </div>
+
+        <button
+          onClick={startFromWelcome}
+          className="welcome__hint rounded-full bg-(--color-accent) px-12 py-4 text-lg font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+          style={{ animationDelay: "2.9s" }}
+        >
+          ゲームスタート
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
       <p className="text-center font-display text-2xl font-bold">Who am I ?</p>
@@ -580,13 +621,7 @@ export default function ShootingGameGate() {
       {phase === "intro" && (
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
           <div className="w-full rounded-lg border-2 border-(--color-accent) bg-(--color-accent-dark)/25 px-5 py-4">
-            <p className="text-base font-bold leading-relaxed md:text-lg">
-              こうきの自己紹介サイトへようこそ
-            </p>
-            <p className="mt-2 text-base font-bold leading-relaxed text-(--color-white) md:text-lg">
-              まずは、肩慣らし、エチオピアの詐欺師を撃退しよう
-            </p>
-            <p className="mt-3 border-t border-(--color-white)/20 pt-3 text-sm text-(--color-bg-soft)">
+            <p className="text-sm text-(--color-bg-soft)">
               {WIN_SCORE}体撃退でクリア（残機{START_LIVES}）
               <br />
               PC: ←→ または A/D キーで移動（弾は自動）
