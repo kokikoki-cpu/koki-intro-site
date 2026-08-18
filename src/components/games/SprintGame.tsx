@@ -4,25 +4,31 @@ import { useEffect, useRef, useState } from "react";
 import GameShell from "./GameShell";
 import type { GamePhase } from "./three-kit";
 
-/** 制限時間内にゴールまで走りきる。押した回数がそのまま進む距離 */
-const TIME_LIMIT = 10_000;
 const GOAL = 100;
-/** 1回押すと進む量。押し続けないと戻されるので、連打の速さが要る */
-const PER_TAP = 2.6;
-/** 毎秒この分だけ後ろへ戻される */
-const DRAG_PER_SEC = 9;
+
+/** 難易度ごとの調整。時間が短く、1回で進む量が減り、戻される力が強くなる */
+function tuning(level: number) {
+  return {
+    timeLimit: (13 - level) * 1000,
+    perTap: 3.3 - level * 0.16,
+    dragPerSec: 5.5 + level * 1.4,
+  };
+}
 
 export default function SprintGame({
   sportName,
+  level,
   onReveal,
   onClose,
   onUnlockAll,
 }: {
   sportName: string;
+  level: 1 | 2 | 3 | 4 | 5;
   onReveal: () => void;
   onClose: () => void;
   onUnlockAll: () => void;
 }) {
+  const { timeLimit: TIME_LIMIT, perTap: PER_TAP, dragPerSec: DRAG_PER_SEC } = tuning(level);
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [progress, setProgress] = useState(0);
   const [remain, setRemain] = useState(TIME_LIMIT);
@@ -86,6 +92,13 @@ export default function SprintGame({
     setProgress(progressRef.current);
     legRef.current = 1 - legRef.current;
     setLeg(legRef.current);
+
+    /* ここで勝ちを見ること。ループ側は「減速 → 判定」の順なので、
+       ゴールに触れた次のフレームで 100 を割り、永久に勝てなくなっていた */
+    if (progressRef.current >= GOAL) {
+      phaseRef.current = "won";
+      setPhase("won");
+    }
   };
 
   useEffect(() => {
@@ -99,7 +112,7 @@ export default function SprintGame({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const pct = Math.round((progress / GOAL) * 100);
+  const pct = Math.floor((progress / GOAL) * 100);
 
   return (
     <GameShell
@@ -112,7 +125,7 @@ export default function SprintGame({
           手を止めるとじりじり戻される。
         </>
       }
-      difficulty={3}
+      difficulty={level}
       phase={phase}
       hud={
         <>

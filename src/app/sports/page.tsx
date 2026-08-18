@@ -48,11 +48,11 @@ export default function SportsPage() {
           </h1>
           <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">大好きなスポーツ — {SPORTS_INTRO.lead}</p>
         </div>
-        <p className="relative mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
+        <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
           突破 {cleared.size} / {SPORTS.length}
         </p>
 
-        <div className="relative z-1 mx-auto grid max-w-[1120px] grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+        <div className="relative z-1 mx-auto grid w-full max-w-[1120px] grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
           {SPORTS.map((s) => {
             const done = cleared.has(s.id);
             return (
@@ -70,8 +70,14 @@ export default function SportsPage() {
                   }`}
                   sizes="(max-width: 768px) 50vw, 33vw"
                 />
-                <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/82 to-transparent px-4 py-3.5 text-center font-extrabold text-(--color-white)">
+                <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/82 to-transparent px-4 pb-2.5 pt-3.5 text-center font-extrabold text-(--color-white)">
                   {s.name}
+                  {!done && (
+                    <span className="mt-0.5 block text-xs tracking-[0.2em] text-(--color-accent-light)">
+                      {"★".repeat(s.level)}
+                      <span className="text-(--color-white)/25">{"★".repeat(5 - s.level)}</span>
+                    </span>
+                  )}
                 </span>
               </button>
             );
@@ -82,6 +88,7 @@ export default function SportsPage() {
       {pending && (
         <SprintGame
           sportName={pending.name}
+          level={pending.level}
           onReveal={reveal}
           onClose={() => setPending(null)}
           onUnlockAll={unlockAll}

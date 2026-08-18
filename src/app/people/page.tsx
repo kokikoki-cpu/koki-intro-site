@@ -102,11 +102,11 @@ export default function PeoplePage() {
           </h1>
           <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">人図鑑 — 好奇心の先で出会った、忘れられない人たち</p>
         </div>
-        <p className="relative mx-auto mb-3 max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
+        <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
           発見 {found.size} / {PEOPLE.length}
         </p>
 
-        <div className="relative z-1 mx-auto flex max-w-[1120px] items-center gap-3">
+        <div className="relative z-1 mx-auto flex w-full max-w-[1120px] items-center gap-3">
           <button
             onClick={() => scrollByCard(-1)}
             aria-label="前へ"
@@ -149,6 +149,12 @@ export default function PeoplePage() {
                     <p className="line-clamp-3 text-sm text-(--color-bg-soft)/80">
                       {done ? (p.isSelf ? p.goals![0] : p.story) : "押して捕まえると正体がわかる"}
                     </p>
+                    {!done && (
+                      <p className="mt-2 text-sm tracking-[0.2em] text-(--color-accent-light)">
+                        {"★".repeat(p.level)}
+                        <span className="text-(--color-white)/25">{"★".repeat(5 - p.level)}</span>
+                      </p>
+                    )}
                   </div>
                 </div>
               );
@@ -167,6 +173,7 @@ export default function PeoplePage() {
       {pending && (
         <MemoryGame
           personName="？？？"
+          level={pending.level}
           cells={MEMORY_CELLS}
           onReveal={reveal}
           onClose={() => setPending(null)}

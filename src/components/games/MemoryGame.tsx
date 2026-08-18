@@ -5,27 +5,34 @@ import Image from "next/image";
 import GameShell from "./GameShell";
 import type { GamePhase } from "./three-kit";
 
-/** 光る順番を覚えて、同じ順に押し返す。回を追うごとに1つ長くなる */
-const ROUNDS = 4;
-const START_LENGTH = 3;
-/** 1つ光る時間 */
-const FLASH_MS = 620;
+/** 難易度ごとの調整。回数と初期の長さが増え、光る時間が短くなる */
+function tuning(level: number) {
+  return {
+    rounds: 1 + level,
+    startLength: 1 + Math.ceil(level / 2),
+    flashMs: 720 - level * 55,
+  };
+}
 
 type Cell = { photo: string; label: string };
 
 export default function MemoryGame({
   personName,
+  level,
   cells,
   onReveal,
   onClose,
   onUnlockAll,
 }: {
   personName: string;
+  level: 1 | 2 | 3 | 4 | 5;
   cells: Cell[];
   onReveal: () => void;
   onClose: () => void;
   onUnlockAll: () => void;
 }) {
+  const { rounds: ROUNDS, startLength: START_LENGTH, flashMs: FLASH_MS } = tuning(level);
+
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [round, setRound] = useState(0);
   const [sequence, setSequence] = useState<number[]>([]);
@@ -111,7 +118,7 @@ export default function MemoryGame({
           1回ごとに順番が1つ増える。
         </>
       }
-      difficulty={2}
+      difficulty={level}
       phase={phase}
       hud={
         <>

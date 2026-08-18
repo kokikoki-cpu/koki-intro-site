@@ -49,7 +49,7 @@ export default function WorldPage() {
           </h1>
           <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">{WORLD_INTRO.lead}（{WORLD_INTRO.sub}）</p>
         </div>
-        <p className="relative mx-auto mb-3 max-w-[760px] text-sm font-bold text-(--color-accent-light)">
+        <p className="relative mx-auto mb-3 w-full max-w-[760px] text-sm font-bold text-(--color-accent-light)">
           到達 {open.size} / {COUNTRIES.length}
         </p>
         <div
@@ -75,8 +75,7 @@ export default function WorldPage() {
                   style={{ left: `${c.x}%`, top: `${c.y}%` }}
                 >
                   <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-full bg-(--color-ink) px-2.5 py-1 text-xs font-bold text-(--color-white) opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100">
-                    {c.name}
-                    {!done && " — 未到達"}
+                    {c.name} {"★".repeat(c.level)}
                   </span>
                   {/* 指で押せるように、見た目を変えずに当たり判定だけ広げる */}
                   <span className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2" />
@@ -95,6 +94,7 @@ export default function WorldPage() {
       {pending && (
         <FlightGame
           countryName={pending.name}
+          level={pending.level}
           onReveal={reveal}
           onClose={() => setPending(null)}
           onUnlockAll={unlockAll}

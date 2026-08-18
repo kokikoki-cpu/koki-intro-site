@@ -36,8 +36,12 @@ export const PROFILE = {
   ],
 };
 
+/** ゲームの難易度（1=やさしい 〜 5=最難関）。項目ごとに変える */
+export type Level = 1 | 2 | 3 | 4 | 5;
+
 export type Country = {
   id: string;
+  level: Level;
   name: string;
   tagline: string;
   story: string;
@@ -51,6 +55,7 @@ export type Country = {
 export const COUNTRIES: Country[] = [
   {
     id: "argentina",
+    level: 2,
     name: "アルゼンチン",
     tagline: "みんな大好きメッシとパタゴニアの国",
     story:
@@ -61,6 +66,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "brazil",
+    level: 3,
     name: "ブラジル",
     tagline: "最強のサッカー王国",
     story:
@@ -71,6 +77,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "peru",
+    level: 1,
     name: "ペルー",
     tagline: "食と密林の国",
     story:
@@ -81,6 +88,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "antarctica",
+    level: 5,
     name: "南極",
     tagline: "世界で最も建造物が少ない土地。自然なままの土地",
     story: "ペンギンはかわいいけど臭いことが発覚。",
@@ -90,6 +98,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "india",
+    level: 2,
     name: "インド",
     tagline: "人間の森",
     story:
@@ -100,6 +109,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "jordan",
+    level: 3,
     name: "ヨルダン",
     tagline: "イスラム圏no.1満足度",
     story:
@@ -110,6 +120,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "turkey",
+    level: 1,
     name: "トルコ",
     tagline: "気球インスタ映えスポット",
     story: "何も考えずに一生に一度はカッパドキアで気球に乗りに行くべし。",
@@ -119,6 +130,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "kenya",
+    level: 4,
     name: "ケニア",
     tagline: "マサイの国の戦士たち",
     story: "物乞いに半日付きまとわれて結果仲良くなる。別れ際に1000円あげた。",
@@ -128,6 +140,7 @@ export const COUNTRIES: Country[] = [
   },
   {
     id: "namibia",
+    level: 4,
     name: "ナミビア",
     tagline: "砂漠と動物の国",
     story:
@@ -148,6 +161,7 @@ export const WORLD_INTRO = {
 
 export type Person = {
   id: string;
+  level: Level;
   no: string;
   name: string;
   place: string;
@@ -161,6 +175,7 @@ export type Person = {
 export const PEOPLE: Person[] = [
   {
     id: "p1",
+    level: 5,
     no: "No.1",
     name: "清水航樹",
     place: "日本",
@@ -178,6 +193,7 @@ export const PEOPLE: Person[] = [
   },
   {
     id: "p2",
+    level: 2,
     no: "No.2",
     name: "宿のオーナー",
     place: "スリランカ",
@@ -187,6 +203,7 @@ export const PEOPLE: Person[] = [
   },
   {
     id: "p3",
+    level: 3,
     no: "No.3",
     name: "インドのおばちゃん",
     place: "インド",
@@ -196,6 +213,7 @@ export const PEOPLE: Person[] = [
   },
   {
     id: "p4",
+    level: 4,
     no: "No.4",
     name: "アフリカの詐欺師",
     place: "エチオピア",
@@ -207,6 +225,7 @@ export const PEOPLE: Person[] = [
 
 export type Sport = {
   id: string;
+  level: Level;
   name: string;
   photo: string;
   desc: string;
@@ -215,36 +234,42 @@ export type Sport = {
 export const SPORTS: Sport[] = [
   {
     id: "tennis",
+    level: 1,
     name: "公式テニス",
     photo: "/images/sports/tennis.jpg",
     desc: "中学校・高校にてハマる。今でも定期的にやります。",
   },
   {
     id: "ultimate",
+    level: 2,
     name: "アルティメット",
     photo: "/images/sports/ultimate.jpg",
     desc: "大学にて始める。インカレ3位。",
   },
   {
     id: "padel",
+    level: 3,
     name: "パデル",
     photo: "/images/sports/padel.jpg",
     desc: "当時のクライアントに誘われてハマる。「Fire padel TV」というYouTubeチャンネルを作る。今もたまに試合に出る。",
   },
   {
     id: "futsal",
+    level: 3,
     name: "フットサル",
     photo: "/images/sports/futsal.jpg",
     desc: "渋谷でたまにやります！サッカーを知っていると世界中の男と仲良くなりやすい。",
   },
   {
     id: "tabletennis",
+    level: 4,
     name: "卓球",
     photo: "/images/sports/tabletennis.jpg",
     desc: "すべてのスポーツの中で一番好き。高校時代にハマりすぎてスポッチャで徹夜卓球をする。",
   },
   {
     id: "marathon",
+    level: 5,
     name: "マラソン",
     photo: "/images/sports/marathon.jpg",
     desc: "妻の趣味に付き合う。ハーフマラソンとトレランの大会には何回か出た。今年の目標はフルマラソン制覇。",
