@@ -61,17 +61,23 @@ export default function SportsPage() {
                 onClick={() => onTile(s)}
                 className="group relative aspect-4/3 overflow-hidden rounded-md border-2 border-(--color-white)/30 bg-black/40 transition hover:-translate-y-1 hover:border-(--color-accent-light)"
               >
+                {/* 未突破は写真をぼかして中身を隠す。分かるのは難易度だけ */}
                 <Image
                   src={s.photo}
-                  alt={s.name}
+                  alt={done ? s.name : "未突破"}
                   fill
                   className={`object-cover transition duration-400 group-hover:scale-[1.08] ${
-                    done ? "" : "grayscale-[0.85] brightness-[0.72]"
+                    done ? "" : "scale-110 grayscale brightness-[0.5] blur-lg"
                   }`}
                   sizes="(max-width: 768px) 50vw, 33vw"
                 />
+                {!done && (
+                  <span className="absolute inset-0 flex items-center justify-center font-display text-5xl font-extrabold text-(--color-white)/70">
+                    ?
+                  </span>
+                )}
                 <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/82 to-transparent px-4 pb-2.5 pt-3.5 text-center font-extrabold text-(--color-white)">
-                  {s.name}
+                  {done ? s.name : "？？？"}
                   {!done && (
                     <span className="mt-0.5 block text-xs tracking-[0.2em] text-(--color-accent-light)">
                       {"★".repeat(s.level)}
@@ -87,7 +93,7 @@ export default function SportsPage() {
 
       {pending && (
         <SprintGame
-          sportName={pending.name}
+          sportName="？？？"
           level={pending.level}
           onReveal={reveal}
           onClose={() => setPending(null)}
