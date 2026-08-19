@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { SPORTS, SPORTS_INTRO, type Sport } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
 import SpaceBackdrop from "@/components/SpaceBackdrop";
+import ReturnToSystem from "@/components/ReturnToSystem";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
 const SprintGame = dynamic(() => import("@/components/games/SprintGame"), { ssr: false });
@@ -17,7 +18,8 @@ export default function SportsPage() {
   const [pending, setPending] = useState<Sport | null>(null);
   const cleared = useUnlockedFrom(SPORT_IDS);
 
-  const showSport = (s: Sport) => setModal({ photo: s.photo, title: s.name, body: s.desc });
+  const showSport = (s: Sport, celebrate = false) =>
+    setModal({ photo: s.photo, title: s.name, body: s.desc, celebrate });
 
   const onTile = (s: Sport) => {
     if (cleared.has(s.id)) showSport(s);
@@ -27,7 +29,7 @@ export default function SportsPage() {
   const reveal = () => {
     if (!pending) return;
     unlock(pending.id);
-    showSport(pending);
+    showSport(pending, true);
     setPending(null);
   };
 
@@ -101,6 +103,7 @@ export default function SportsPage() {
         />
       )}
 
+      <ReturnToSystem />
       <Modal data={modal} onClose={() => setModal(null)} />
     </>
   );

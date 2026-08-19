@@ -162,8 +162,11 @@ export default function FlightGame({
       const rect = renderer.domElement.getBoundingClientRect();
       const nx = (e.clientX - rect.left) / rect.width - 0.5;
       const ny = (e.clientY - rect.top) / rect.height - 0.5;
+      /* 指で操作するときは、指の少し上を飛ばす。
+         そのままだと機体が指の下に入って見えなくなる */
+      const touchLift = e.pointerType === "touch" ? 2.1 : 0;
       target.current.x = THREE.MathUtils.clamp(nx * X_LIMIT * 2.2, -X_LIMIT, X_LIMIT);
-      target.current.y = THREE.MathUtils.clamp(-ny * 8 + 0.9, Y_MIN, Y_MAX);
+      target.current.y = THREE.MathUtils.clamp(-ny * 8 + 0.9 + touchLift, Y_MIN, Y_MAX);
     }
     function onPointer(e: PointerEvent) {
       if (phaseRef.current !== "playing") return;

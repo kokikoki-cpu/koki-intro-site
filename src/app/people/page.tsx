@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { PEOPLE, type Person } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
 import SpaceBackdrop from "@/components/SpaceBackdrop";
+import ReturnToSystem from "@/components/ReturnToSystem";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
 const MemoryGame = dynamic(() => import("@/components/games/MemoryGame"), { ssr: false });
@@ -28,12 +29,13 @@ export default function PeoplePage() {
   const found = useUnlockedFrom(PEOPLE_IDS);
   const trackRef = useRef<HTMLDivElement | null>(null);
 
-  const showPerson = (p: Person) => {
+  const showPerson = (p: Person, celebrate = false) => {
     if (p.isSelf && p.career) {
       setModal({
         photo: p.photo,
         title: p.name,
         tagline: `出現場所: ${p.place}`,
+        celebrate,
         body: (
           <>
             <ul className="m-0 list-none p-0 text-left">
@@ -61,7 +63,7 @@ export default function PeoplePage() {
         ),
       });
     } else {
-      setModal({ photo: p.photo, title: p.name, tagline: `出現場所: ${p.place}`, body: p.story });
+      setModal({ photo: p.photo, title: p.name, tagline: `出現場所: ${p.place}`, body: p.story, celebrate });
     }
   };
 
@@ -73,7 +75,7 @@ export default function PeoplePage() {
   const reveal = () => {
     if (!pending) return;
     unlock(pending.id);
-    showPerson(pending);
+    showPerson(pending, true);
     setPending(null);
   };
 
@@ -181,6 +183,7 @@ export default function PeoplePage() {
         />
       )}
 
+      <ReturnToSystem />
       <Modal data={modal} onClose={() => setModal(null)} />
     </>
   );

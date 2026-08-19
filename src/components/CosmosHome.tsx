@@ -4,8 +4,13 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import type { Hobby } from "@/lib/data";
-import { unlock, useIsUnlocked } from "@/lib/unlock";
+import { COUNTRIES, PEOPLE, SPORTS, type Hobby } from "@/lib/data";
+import { unlock, useIsUnlocked, useUnlockedFrom } from "@/lib/unlock";
+
+/* 各惑星の収集対象。トップで「どれだけ集めたか」を出すために使う */
+const COUNTRY_IDS = COUNTRIES.map((c) => c.id);
+const PEOPLE_IDS = PEOPLE.map((p) => p.id);
+const SPORT_IDS = SPORTS.map((s) => s.id);
 
 const CareerRunGame = dynamic(() => import("@/components/games/CareerRunGame"), { ssr: false });
 
@@ -86,8 +91,22 @@ export default function CosmosHome({
   visited,
 }: Props) {
   const careerOpen = useIsUnlocked(CAREER_ID);
+  const foundCountries = useUnlockedFrom(COUNTRY_IDS);
+  const foundPeople = useUnlockedFrom(PEOPLE_IDS);
+  const foundSports = useUnlockedFrom(SPORT_IDS);
   const [panel, setPanel] = useState<null | "career" | "hobby">(null);
   const [playing, setPlaying] = useState(false);
+
+  /* 強み3つの惑星に、集めた数を出す。順番はこの進み具合で示すので、
+     文章の案内は置かない */
+  const progress: Record<string, { got: number; total: number }> = {
+    action: { got: foundCountries.size, total: COUNTRY_IDS.length },
+    curiosity: { got: foundPeople.size, total: PEOPLE_IDS.length },
+    body: { got: foundSports.size, total: SPORT_IDS.length },
+  };
+  const collected =
+    foundCountries.size + foundPeople.size + foundSports.size + (careerOpen ? 1 : 0);
+  const collectTotal = COUNTRY_IDS.length + PEOPLE_IDS.length + SPORT_IDS.length + 1;
 
   const planetClass =
     "planet flex h-[clamp(60px,12.5vw,94px)] w-[clamp(60px,12.5vw,94px)] flex-col items-center justify-center rounded-full border-2 border-(--color-white)/85 bg-(--color-ink) px-1.5 text-center text-[clamp(11px,2.3vw,13px)] font-bold leading-tight text-(--color-white) shadow-[0_0_22px_rgba(0,0,0,0.6)] transition hover:scale-110 hover:border-(--color-accent) hover:bg-(--color-accent-dark)";
@@ -154,6 +173,9 @@ export default function CosmosHome({
             Who am I ?
           </h1>
           <p className="mt-2 text-sm text-(--color-bg-soft)/60">{meta}</p>
+          <p className="mt-3 text-sm font-bold text-(--color-accent-light)">
+            集めた記憶 {collected} / {collectTotal}
+          </p>
         </header>
 
         <div className="system mt-6 aspect-square w-[min(88vw,560px)]">
@@ -170,13 +192,26 @@ export default function CosmosHome({
           </div>
 
           {/* 惑星: 強み3つ → 各ページへ、職歴と趣味 → その場で開く */}
-          {strengths.map((s, i) => (
-            <Orbit key={s.key} {...ORBITS[i]}>
-              <Link href={s.link} className={planetClass} title={`${s.title} — ${s.desc}`}>
-                {s.title}
-              </Link>
-            </Orbit>
-          ))}
+          {strengths.map((s, i) => {
+            const p = progress[s.key];
+            const complete = p && p.got === p.total;
+            return (
+              <Orbit key={s.key} {...ORBITS[i]}>
+                <Link href={s.link} className={planetClass} title={`${s.title} — ${s.desc}`}>
+                  {s.title}
+                  {p && (
+                    <span
+                      className={
+                        complete ? "text-[0.85em] text-(--color-accent-light)" : "text-[0.85em] text-(--color-bg-soft)/70"
+                      }
+                    >
+                      {p.got}/{p.total}
+                    </span>
+                  )}
+                </Link>
+              </Orbit>
+            );
+          })}
 
           <Orbit {...ORBITS[3]}>
             <button
@@ -185,7 +220,9 @@ export default function CosmosHome({
               title={careerOpen ? "職歴" : "職歴（未解錠）"}
             >
               職歴
-              {!careerOpen && <span className="text-(--color-clay)">？</span>}
+              <span className={careerOpen ? "text-[0.85em] text-(--color-accent-light)" : "text-(--color-clay)"}>
+                {careerOpen ? "1/1" : "？"}
+              </span>
             </button>
           </Orbit>
 

@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { COUNTRIES, WORLD_INTRO, type Country } from "@/lib/data";
 import Modal, { type ModalData } from "@/components/Modal";
 import SpaceBackdrop from "@/components/SpaceBackdrop";
+import ReturnToSystem from "@/components/ReturnToSystem";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
 const FlightGame = dynamic(() => import("@/components/games/FlightGame"), { ssr: false });
@@ -17,8 +18,8 @@ export default function WorldPage() {
   const [pending, setPending] = useState<Country | null>(null);
   const open = useUnlockedFrom(COUNTRY_IDS);
 
-  const showCountry = (c: Country) =>
-    setModal({ photo: c.photo, title: c.name, tagline: c.tagline, body: c.story });
+  const showCountry = (c: Country, celebrate = false) =>
+    setModal({ photo: c.photo, title: c.name, tagline: c.tagline, body: c.story, celebrate });
 
   const onPin = (c: Country) => {
     if (open.has(c.id)) showCountry(c);
@@ -28,7 +29,7 @@ export default function WorldPage() {
   const reveal = () => {
     if (!pending) return;
     unlock(pending.id);
-    showCountry(pending);
+    showCountry(pending, true);
     setPending(null);
   };
 
@@ -101,6 +102,7 @@ export default function WorldPage() {
         />
       )}
 
+      <ReturnToSystem />
       <Modal data={modal} onClose={() => setModal(null)} />
     </>
   );

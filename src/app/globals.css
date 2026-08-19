@@ -179,6 +179,66 @@ h1, h2, h3, h4 {
   50%      { opacity: 0.92; }
 }
 
+/* ==========================================================================
+   解錠したものが出てくる瞬間の演出（ガチャを開けた感じ）
+   ========================================================================== */
+.reveal__card {
+  animation: reveal-pop 620ms cubic-bezier(0.16, 1.1, 0.3, 1) both;
+}
+
+@keyframes reveal-pop {
+  0%   { opacity: 0; transform: scale(0.55) rotate(-7deg); }
+  55%  { opacity: 1; transform: scale(1.06) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* 開いた瞬間の閃光 */
+.reveal__flash {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 244, 214, 0.95) 0%, rgba(255, 224, 170, 0.5) 32%, rgba(255, 224, 170, 0) 68%);
+  animation: reveal-flash 780ms ease-out both;
+}
+
+@keyframes reveal-flash {
+  0%   { opacity: 0; transform: scale(0.2); }
+  22%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* 飛び散る粒 */
+.reveal__spark {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: reveal-spark 900ms ease-out both;
+  animation-delay: var(--d);
+}
+
+@keyframes reveal-spark {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(1); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateY(var(--r)) scale(0.3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal__card,
+  .reveal__flash,
+  .reveal__spark {
+    animation: none !important;
+  }
+  .reveal__flash,
+  .reveal__spark {
+    display: none;
+  }
+}
+
 /* --- 下層ページの情景（太陽・砂漠・草原）------------------------------- */
 .scene-horizon {
   position: absolute;

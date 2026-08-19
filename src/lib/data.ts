@@ -8,7 +8,7 @@ export const PROFILE = {
   photo: "/images/profile/pyramid.jpg",
   hobbies: [
     { label: "世界一周記YouTube", href: "https://www.youtube.com/@koookiblog" },
-    { label: "スポーツ全般" },
+    { label: "映画鑑賞", href: "https://filmarks.com/users/25852744" },
     { label: "早起き" },
   ] as Hobby[],
   strengths: [
