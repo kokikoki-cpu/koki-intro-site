@@ -424,7 +424,7 @@ h1, h2, h3, h4 {
   overflow: hidden;
   background: linear-gradient(180deg, #241b12 0%, #6b5334 56%, #a8895c 100%);
   /* 砂ぼこりが晴れきったところで、そのままサイトへ溶ける */
-  animation: stampede-fade-out 760ms ease-out 3000ms forwards;
+  animation: stampede-fade-out 700ms ease-out 2560ms forwards;
 }
 
 .stampede__scene {
@@ -514,28 +514,6 @@ h1, h2, h3, h4 {
 
 @keyframes stampede-bar {
   to { height: 11%; }
-}
-
-.stampede__title {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: #fffdf8;
-  text-align: center;
-  opacity: 0;
-  animation: stampede-title 1150ms ease-out 1850ms forwards;
-}
-
-/* 最後は opacity 1 のまま保持し、消えるのは全体のフェードアウトに任せる
-   （ここで一度消すと、二重にフェードして瞬く） */
-@keyframes stampede-title {
-  0%   { opacity: 0; letter-spacing: 0.55em; transform: scale(1.07); }
-  40%  { opacity: 1; }
-  100% { opacity: 1; letter-spacing: 0.16em; transform: scale(1); }
 }
 
 @keyframes stampede-fade-out {

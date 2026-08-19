@@ -6,6 +6,9 @@ import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 const VOLUME = 0.3;
 const PREF_KEY = "koki-bgm-muted";
 
+/** 流している曲 */
+const TRACK = { title: "宇宙海賊", artist: "もりつぐ" };
+
 /**
  * サイト共通のBGM。
  *
@@ -100,15 +103,24 @@ export default function BgmPlayer() {
   return (
     <>
       <audio ref={audioRef} src="/audio/bgm.m4a" loop preload="none" />
-      <button
-        onClick={toggle}
-        aria-label={muted ? "BGMを鳴らす" : "BGMを止める"}
-        aria-pressed={!muted}
-        title={muted ? "BGMを鳴らす" : "BGMを止める"}
-        className="fixed bottom-4 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-(--color-white)/25 bg-(--color-ink)/85 text-(--color-white) backdrop-blur-sm transition hover:border-(--color-accent-light) hover:bg-(--color-accent-dark)"
-      >
-        {muted ? <IconMuted /> : <IconSound />}
-      </button>
+
+      {/* z-120: ゲートやゲームのオーバーレイ(z-100/110)より前。いつでも消せるようにする */}
+      <div className="fixed bottom-4 right-4 z-120 flex items-center gap-2">
+        {!muted && (
+          <span className="hidden rounded-full border border-(--color-white)/20 bg-(--color-ink)/85 px-3 py-1.5 text-xs text-(--color-bg-soft)/80 backdrop-blur-sm sm:block">
+            ♫ {TRACK.title} / {TRACK.artist}
+          </span>
+        )}
+        <button
+          onClick={toggle}
+          aria-label={muted ? `BGMを鳴らす（${TRACK.title} / ${TRACK.artist}）` : "BGMを止める"}
+          aria-pressed={!muted}
+          title={`${TRACK.title} / ${TRACK.artist}`}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-(--color-white)/25 bg-(--color-ink)/85 text-(--color-white) backdrop-blur-sm transition hover:border-(--color-accent-light) hover:bg-(--color-accent-dark)"
+        >
+          {muted ? <IconMuted /> : <IconSound />}
+        </button>
+      </div>
     </>
   );
 }

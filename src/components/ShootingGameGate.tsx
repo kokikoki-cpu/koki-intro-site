@@ -560,7 +560,11 @@ export default function ShootingGameGate() {
       <>
         <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
           <p className="font-display text-2xl font-bold">CLEAR!</p>
-          <p className="text-sm text-(--color-bg-soft)">よくやった。ご褒美にモンゴルの旅動画をどうぞ。</p>
+          <p className="text-center text-sm text-(--color-bg-soft)">
+            へぇ 案外やるじゃん
+            <br />
+            ご褒美にモンゴルの牛動画をプレゼントフォーユー
+          </p>
           <video
             ref={videoRef}
             src="/videos/mongolia.mp4"

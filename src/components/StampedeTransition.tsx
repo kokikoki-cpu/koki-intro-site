@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { PROFILE } from "@/lib/data";
 
-/** 演出の総尺。globals.css 側の fade-out（3000ms 開始 + 760ms）が終わってから畳む */
-const DURATION = 3820;
+/** 演出の総尺。globals.css 側の fade-out（2560ms 開始 + 700ms）が終わってから畳む */
+const DURATION = 3320;
 
 /** 群れの構成。大きい個体ほど手前 = 画面下・速い、という置き方で奥行きを出す */
 /* 走る距離を 244vw に広げたぶん、見た目の速さを保つため周期も伸ばしてある */
@@ -68,10 +67,6 @@ export default function StampedeTransition({ onDone }: { onDone: () => void }) {
 
       <div className="stampede__bars" />
 
-      <div className="stampede__title">
-        <p className="font-display text-[clamp(2rem,7vw,4rem)] font-extrabold">{PROFILE.name}</p>
-        <p className="font-display text-sm font-bold md:text-base">{PROFILE.tagline}</p>
-      </div>
     </div>
   );
 }
