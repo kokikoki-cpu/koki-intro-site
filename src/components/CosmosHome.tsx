@@ -275,19 +275,34 @@ export default function CosmosHome({
           <div className="flex flex-wrap gap-2.5">
             {hobbies.map((h) =>
               h.href ? (
+                /* 外部リンクは、ただの札と絶対に見分けがつくようにする:
+                   濃い色で塗る／震わせる／矢印を付ける／下線を引く */
                 <a
                   key={h.label}
                   href={h.href}
                   target="_blank"
                   rel="noopener"
-                  className="rounded-full border border-(--color-line) bg-(--color-bg-soft) px-4 py-2 text-sm font-semibold text-(--color-ink) transition hover:border-(--color-accent) hover:text-(--color-accent-dark)"
+                  className="jiggle inline-flex items-center gap-2 rounded-full bg-(--color-accent) px-5 py-3 text-sm font-extrabold !text-(--color-white) shadow-[0_4px_0_0_var(--color-accent-dark)] transition hover:scale-105 hover:bg-(--color-accent-dark) active:translate-y-1 active:shadow-none"
                 >
-                  {h.label}
+                  <span className="underline decoration-2 underline-offset-2">{h.label}</span>
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M7 17L17 7M9 7h8v8" />
+                  </svg>
                 </a>
               ) : (
                 <span
                   key={h.label}
-                  className="rounded-full border border-(--color-line) bg-(--color-bg-soft) px-4 py-2 text-sm font-semibold text-(--color-ink)"
+                  className="rounded-full border border-(--color-line) bg-(--color-bg-soft) px-4 py-2 text-sm font-semibold text-(--color-ink-soft)"
                 >
                   {h.label}
                 </span>
