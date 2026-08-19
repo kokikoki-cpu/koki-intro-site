@@ -180,8 +180,123 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
+   「押せる」ことを動きで伝える（文字で説明しない方針のため）
+   ========================================================================== */
+/* 外部リンク: ぶるっと震えて、光の縁が脈打つ */
+.jiggle {
+  animation: jiggle 2.6s ease-in-out infinite;
+}
+
+@keyframes jiggle {
+  0%, 62%, 100% { transform: rotate(0) scale(1); }
+  66%  { transform: rotate(-3.5deg) scale(1.06); }
+  70%  { transform: rotate(3.5deg) scale(1.06); }
+  74%  { transform: rotate(-2.5deg) scale(1.04); }
+  78%  { transform: rotate(2.5deg) scale(1.04); }
+  82%  { transform: rotate(0) scale(1); }
+}
+
+.jiggle:hover {
+  animation-play-state: paused;
+}
+
+/* 宇宙船: ふわふわ浮いて、噴射が明滅する */
+.ship {
+  animation: ship-float 3.4s ease-in-out infinite;
+}
+
+@keyframes ship-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-7px) rotate(2deg); }
+}
+
+.ship__flame {
+  transform-origin: 50% 0%;
+  animation: ship-flame 420ms ease-in-out infinite alternate;
+}
+
+@keyframes ship-flame {
+  from { transform: scaleY(0.6); opacity: 0.65; }
+  to   { transform: scaleY(1.25); opacity: 1; }
+}
+
+/* 集めた記憶ボタン: ゆっくり息をする */
+.memory-btn {
+  animation: memory-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes memory-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(133, 180, 141, 0.55), 0 0 18px rgba(0, 0, 0, 0.5); }
+  50%      { box-shadow: 0 0 0 10px rgba(133, 180, 141, 0), 0 0 26px rgba(133, 180, 141, 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jiggle,
+  .ship,
+  .ship__flame,
+  .memory-btn {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
    解錠したものが出てくる瞬間の演出（ガチャを開けた感じ）
    ========================================================================== */
+/* 画面全体が一度白く飛ぶ */
+.reveal__blast {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 46%, rgba(255, 252, 240, 0.95) 0%, rgba(255, 226, 170, 0.55) 26%, rgba(255, 226, 170, 0) 62%);
+  animation: reveal-blast 900ms ease-out both;
+}
+
+@keyframes reveal-blast {
+  0%   { opacity: 0; transform: scale(0.3); }
+  14%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+/* 放射状に伸びる光の筋 */
+.reveal__ray {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 3px;
+  height: 46vh;
+  transform-origin: 50% 0%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 240, 200, 0.9), rgba(255, 240, 200, 0));
+  animation: reveal-ray 820ms ease-out both;
+  animation-delay: var(--d);
+}
+
+@keyframes reveal-ray {
+  0%   { opacity: 0; transform: rotate(var(--a)) scaleY(0); }
+  25%  { opacity: 0.9; }
+  100% { opacity: 0; transform: rotate(var(--a)) scaleY(1.15); }
+}
+
+/* 舞い落ちる紙吹雪 */
+.reveal__confetti {
+  position: fixed;
+  top: -6vh;
+  z-index: 61;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: reveal-confetti var(--dur) cubic-bezier(0.3, 0.5, 0.6, 1) both;
+  animation-delay: var(--d);
+}
+
+@keyframes reveal-confetti {
+  0%   { opacity: 0; transform: translateY(0) rotate(0); }
+  10%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(112vh) rotate(var(--spin)); }
+}
+
 .reveal__card {
   animation: reveal-pop 620ms cubic-bezier(0.16, 1.1, 0.3, 1) both;
 }
@@ -213,11 +328,11 @@ h1, h2, h3, h4 {
   position: absolute;
   left: 50%;
   top: 44%;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   pointer-events: none;
-  animation: reveal-spark 900ms ease-out both;
+  animation: reveal-spark 1100ms cubic-bezier(0.15,0.9,0.3,1) both;
   animation-delay: var(--d);
 }
 
@@ -230,11 +345,17 @@ h1, h2, h3, h4 {
 @media (prefers-reduced-motion: reduce) {
   .reveal__card,
   .reveal__flash,
-  .reveal__spark {
+  .reveal__spark,
+  .reveal__blast,
+  .reveal__ray,
+  .reveal__confetti {
     animation: none !important;
   }
   .reveal__flash,
-  .reveal__spark {
+  .reveal__spark,
+  .reveal__blast,
+  .reveal__ray,
+  .reveal__confetti {
     display: none;
   }
 }

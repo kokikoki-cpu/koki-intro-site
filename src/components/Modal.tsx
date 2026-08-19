@@ -12,12 +12,29 @@ export type ModalData = {
   celebrate?: boolean;
 } | null;
 
-/** 弾ける粒の向きと飛距離 */
-const SPARKS = Array.from({ length: 14 }, (_, i) => ({
-  angle: (360 / 14) * i,
-  distance: 110 + ((i * 37) % 70),
-  color: i % 3 === 0 ? "#ffe0aa" : i % 3 === 1 ? "#85b48d" : "#e8a05c",
-  delay: (i % 5) * 40,
+const PALETTE = ["#ffe0aa", "#85b48d", "#e8a05c", "#fffdf8", "#c98f4e"];
+
+/** 弾ける粒 */
+const SPARKS = Array.from({ length: 26 }, (_, i) => ({
+  angle: (360 / 26) * i,
+  distance: 130 + ((i * 41) % 110),
+  color: PALETTE[i % PALETTE.length],
+  delay: (i % 6) * 35,
+}));
+
+/** 放射状の光の筋 */
+const RAYS = Array.from({ length: 12 }, (_, i) => ({
+  angle: (360 / 12) * i + 15,
+  delay: (i % 4) * 55,
+}));
+
+/** 降ってくる紙吹雪 */
+const CONFETTI = Array.from({ length: 34 }, (_, i) => ({
+  left: `${(i * 2.9 + ((i * 17) % 7)) % 100}%`,
+  color: PALETTE[i % PALETTE.length],
+  duration: 1.9 + ((i * 13) % 11) / 10,
+  delay: ((i * 7) % 9) * 60,
+  spin: `${((i % 2 ? 1 : -1) * (420 + ((i * 53) % 300)))}deg`,
 }));
 
 export default function Modal({ data, onClose }: { data: ModalData; onClose: () => void }) {
@@ -30,10 +47,38 @@ export default function Modal({ data, onClose }: { data: ModalData; onClose: () 
         if (e.target === e.currentTarget) onClose();
       }}
     >
+      {data.celebrate && (
+        <>
+          <span className="reveal__blast" />
+          {CONFETTI.map((c, i) => (
+            <span
+              key={`c${i}`}
+              className="reveal__confetti"
+              style={
+                {
+                  left: c.left,
+                  background: c.color,
+                  "--dur": `${c.duration}s`,
+                  "--d": `${c.delay}ms`,
+                  "--spin": c.spin,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </>
+      )}
+
       <div className="relative">
         {data.celebrate && (
           <>
             <span className="reveal__flash" />
+            {RAYS.map((r, i) => (
+              <span
+                key={`r${i}`}
+                className="reveal__ray"
+                style={{ "--a": `${r.angle}deg`, "--d": `${r.delay}ms` } as CSSProperties}
+              />
+            ))}
             {SPARKS.map((s, i) => (
               <span
                 key={i}

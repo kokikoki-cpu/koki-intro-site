@@ -94,7 +94,7 @@ export default function CosmosHome({
   const foundCountries = useUnlockedFrom(COUNTRY_IDS);
   const foundPeople = useUnlockedFrom(PEOPLE_IDS);
   const foundSports = useUnlockedFrom(SPORT_IDS);
-  const [panel, setPanel] = useState<null | "career" | "hobby">(null);
+  const [panel, setPanel] = useState<null | "career" | "hobby" | "memory">(null);
   const [playing, setPlaying] = useState(false);
 
   /* 強み3つの惑星に、集めた数を出す。順番はこの進み具合で示すので、
@@ -173,9 +173,21 @@ export default function CosmosHome({
             Who am I ?
           </h1>
           <p className="mt-2 text-sm text-(--color-bg-soft)/60">{meta}</p>
-          <p className="mt-3 text-sm font-bold text-(--color-accent-light)">
-            集めた記憶 {collected} / {collectTotal}
-          </p>
+          <button
+            onClick={() => setPanel("memory")}
+            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-accent-light) bg-(--color-accent-dark) px-6 py-3 text-left transition hover:scale-105 hover:bg-(--color-accent)"
+          >
+            <span className="font-display text-3xl font-extrabold leading-none text-(--color-white)">
+              {collected}
+              <span className="text-lg text-(--color-bg-soft)/70"> / {collectTotal}</span>
+            </span>
+            <span className="leading-tight">
+              <span className="block text-[11px] tracking-widest text-(--color-accent-light)">
+                COLLECTION
+              </span>
+              <span className="block text-sm font-bold text-(--color-white)">集めた記憶を見る</span>
+            </span>
+          </button>
         </header>
 
         <div className="system mt-6 aspect-square w-[min(88vw,560px)]">
@@ -285,6 +297,29 @@ export default function CosmosHome({
         </Panel>
       )}
 
+      {panel === "memory" && (
+        <Panel title={`集めた記憶 ${collected} / ${collectTotal}`} onClose={() => setPanel(null)}>
+          <div className="flex flex-col gap-4 text-left">
+            <MemoryGroup
+              title="あぁ素晴らしき地球"
+              href="/world"
+              items={COUNTRIES.map((c) => ({ label: c.name, got: foundCountries.has(c.id) }))}
+            />
+            <MemoryGroup
+              title="世界のクセ強人類"
+              href="/people"
+              items={PEOPLE.map((p) => ({ label: p.name, got: foundPeople.has(p.id) }))}
+            />
+            <MemoryGroup
+              title="身体こそすべて"
+              href="/sports"
+              items={SPORTS.map((s) => ({ label: s.name, got: foundSports.has(s.id) }))}
+            />
+            <MemoryGroup title="職歴" items={[{ label: "経歴", got: careerOpen }]} />
+          </div>
+        </Panel>
+      )}
+
       {playing && (
         <CareerRunGame
           steps={career}
@@ -301,6 +336,48 @@ export default function CosmosHome({
         />
       )}
     </section>
+  );
+}
+
+/** 集めた記憶の一覧。取ったものは名前が出て、まだのものは伏せる */
+function MemoryGroup({
+  title,
+  href,
+  items,
+}: {
+  title: string;
+  href?: string;
+  items: { label: string; got: boolean }[];
+}) {
+  const got = items.filter((i) => i.got).length;
+  return (
+    <div>
+      <p className="mb-1.5 flex items-baseline gap-2 text-sm font-bold">
+        {title}
+        <span className="text-(--color-accent-dark)">
+          {got} / {items.length}
+        </span>
+        {href && got < items.length && (
+          <Link href={href} className="ml-auto text-xs font-bold text-(--color-accent-dark) underline">
+            集めにいく →
+          </Link>
+        )}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((it, i) => (
+          <span
+            key={i}
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              it.got
+                ? "bg-(--color-accent) text-(--color-white)"
+                : "bg-(--color-bg-soft) text-(--color-ink-soft)/50"
+            }`}
+          >
+            {it.got ? it.label : "？"}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
