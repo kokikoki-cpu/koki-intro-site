@@ -3,6 +3,8 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import WarpLink from "@/components/WarpLink";
+import GalaxyBackdrop from "@/components/GalaxyBackdrop";
 import dynamic from "next/dynamic";
 import { COUNTRIES, PEOPLE, SPORTS, type Hobby } from "@/lib/data";
 import { unlock, useIsUnlocked, useUnlockedFrom } from "@/lib/unlock";
@@ -109,12 +111,17 @@ export default function CosmosHome({
   const collectTotal = COUNTRY_IDS.length + PEOPLE_IDS.length + SPORT_IDS.length + 1;
 
   const planetClass =
-    "planet flex h-[clamp(60px,12.5vw,94px)] w-[clamp(60px,12.5vw,94px)] flex-col items-center justify-center rounded-full border-2 border-(--color-white)/85 bg-(--color-ink) px-1.5 text-center text-[clamp(11px,2.3vw,13px)] font-bold leading-tight text-(--color-white) shadow-[0_0_22px_rgba(0,0,0,0.6)] transition hover:scale-110 hover:border-(--color-accent) hover:bg-(--color-accent-dark)";
+    "planet starball block h-[clamp(64px,13vw,98px)] w-[clamp(64px,13vw,98px)] transition hover:scale-110";
+  /* 白熱した星の上なので、文字は黒でないと読めない */
+  const faceClass =
+    "relative z-1 flex h-full w-full flex-col items-center justify-center px-1.5 text-center text-[clamp(11px,2.3vw,13px)] font-extrabold leading-tight text-(--color-ink)";
 
   return (
     /* globals.css の `a { color: inherit }` はレイヤー外で Tailwind より強いので、
        暗い背景の上のリンク色はここで継承させる */
     <section className="space flex min-h-[calc(100vh-60px)] flex-col justify-center px-5 pb-10 pt-[clamp(28px,6vh,64px)] text-(--color-white) md:px-14">
+      <GalaxyBackdrop />
+
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         {STARS.map((s, i) => (
           <span
@@ -175,14 +182,14 @@ export default function CosmosHome({
           <p className="mt-2 text-sm text-(--color-bg-soft)/60">{meta}</p>
           <button
             onClick={() => setPanel("memory")}
-            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-accent-light) bg-(--color-accent-dark) px-6 py-3 text-left transition hover:scale-105 hover:bg-(--color-accent)"
+            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-ember) bg-(--color-crystal-deep)/75 px-6 py-3 text-left transition hover:scale-105 hover:bg-(--color-nebula)/70"
           >
             <span className="font-display text-3xl font-extrabold leading-none text-(--color-white)">
               {collected}
-              <span className="text-lg text-(--color-bg-soft)/70"> / {collectTotal}</span>
+              <span className="text-lg text-(--color-ember)/75"> / {collectTotal}</span>
             </span>
             <span className="leading-tight">
-              <span className="block text-[11px] tracking-widest text-(--color-accent-light)">
+              <span className="block text-[11px] tracking-widest text-(--color-ember)">
                 COLLECTION
               </span>
               <span className="block text-sm font-bold text-(--color-white)">集めた記憶を見る</span>
@@ -209,18 +216,22 @@ export default function CosmosHome({
             const complete = p && p.got === p.total;
             return (
               <Orbit key={s.key} {...ORBITS[i]}>
-                <Link href={s.link} className={planetClass} title={`${s.title} — ${s.desc}`}>
-                  {s.title}
-                  {p && (
-                    <span
-                      className={
-                        complete ? "text-[0.85em] text-(--color-accent-light)" : "text-[0.85em] text-(--color-bg-soft)/70"
-                      }
-                    >
-                      {p.got}/{p.total}
-                    </span>
-                  )}
-                </Link>
+                <WarpLink href={s.link} className={planetClass} title={`${s.title} — ${s.desc}`}>
+                  <span className={faceClass} style={{ "--shine": `${i * 0.9}s` } as CSSProperties}>
+                    {s.title}
+                    {p && (
+                      <span
+                        className={
+                          complete
+                            ? "text-[0.85em] text-(--color-accent-dark)"
+                            : "text-[0.85em] text-(--color-ink)/55"
+                        }
+                      >
+                        {p.got}/{p.total}
+                      </span>
+                    )}
+                  </span>
+                </WarpLink>
               </Orbit>
             );
           })}
@@ -231,18 +242,22 @@ export default function CosmosHome({
               className={planetClass}
               title={careerOpen ? "職歴" : "職歴（未解錠）"}
             >
-              職歴
-              <span className={careerOpen ? "text-[0.85em] text-(--color-accent-light)" : "text-(--color-clay)"}>
-                {careerOpen ? "1/1" : "？"}
+              <span className={faceClass} style={{ "--shine": "2.7s" } as CSSProperties}>
+                職歴
+                <span className={careerOpen ? "text-[0.85em] text-(--color-accent-dark)" : "text-(--color-clay)"}>
+                  {careerOpen ? "1/1" : "？"}
+                </span>
               </span>
             </button>
           </Orbit>
 
           <Orbit {...ORBITS[4]}>
             <button onClick={() => setPanel("hobby")} className={planetClass} title="趣味・活動">
-              趣味
-              <br />
-              活動
+              <span className={faceClass} style={{ "--shine": "3.6s" } as CSSProperties}>
+                趣味
+                <br />
+                活動
+              </span>
             </button>
           </Orbit>
         </div>
@@ -326,7 +341,7 @@ export default function CosmosHome({
               items={PEOPLE.map((p) => ({ label: p.name, got: foundPeople.has(p.id) }))}
             />
             <MemoryGroup
-              title="身体こそすべて"
+              title="スポーツの惑星"
               href="/sports"
               items={SPORTS.map((s) => ({ label: s.name, got: foundSports.has(s.id) }))}
             />

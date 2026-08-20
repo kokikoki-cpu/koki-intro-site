@@ -9,6 +9,13 @@
   --color-accent-dark: #2c4230;
   /* 暗い背景の上で使う明るいアクセント。--color-accent は濃すぎて沈む */
   --color-accent-light: #85b48d;
+  /* 宇宙のクリスタル。トップの星系はこの3色で組む（緑は地上のページ用） */
+  /* 銀河の色。ピンクの星雲と金色の核 */
+  --color-nebula: #d86fa8;
+  --color-ember: #ffcf8a;
+  --color-crystal: #ffe4b8;
+  --color-crystal-mid: #e8a05c;
+  --color-crystal-deep: #8c4a6b;
   --color-clay: #a85630;
   --color-white: #fffdf8;
   --color-line: rgba(26, 28, 22, 0.14);
@@ -22,6 +29,11 @@
   --color-accent: var(--color-accent);
   --color-accent-dark: var(--color-accent-dark);
   --color-accent-light: var(--color-accent-light);
+  --color-nebula: var(--color-nebula);
+  --color-ember: var(--color-ember);
+  --color-crystal: var(--color-crystal);
+  --color-crystal-mid: var(--color-crystal-mid);
+  --color-crystal-deep: var(--color-crystal-deep);
   --color-clay: var(--color-clay);
   --color-white: var(--color-white);
   --color-line: var(--color-line);
@@ -226,8 +238,8 @@ h1, h2, h3, h4 {
 }
 
 @keyframes memory-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(133, 180, 141, 0.55), 0 0 18px rgba(0, 0, 0, 0.5); }
-  50%      { box-shadow: 0 0 0 10px rgba(133, 180, 141, 0), 0 0 26px rgba(133, 180, 141, 0.4); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(146, 190, 224, 0.6), 0 0 18px rgba(0, 0, 0, 0.5); }
+  50%      { box-shadow: 0 0 0 10px rgba(146, 190, 224, 0), 0 0 28px rgba(182, 227, 242, 0.5); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -360,6 +372,23 @@ h1, h2, h3, h4 {
   }
 }
 
+.critter {
+  animation: critter-bob 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+.critter:nth-of-type(2) { animation-delay: -1.4s; }
+.critter:nth-of-type(3) { animation-delay: -2.8s; }
+
+@keyframes critter-bob {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-3deg); }
+  50%      { transform: translate(-50%, -56%) rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .critter { animation: none; }
+}
+
 /* --- 下層ページの情景（太陽・砂漠・草原）------------------------------- */
 .scene-horizon {
   position: absolute;
@@ -479,11 +508,189 @@ h1, h2, h3, h4 {
   height: var(--d);
   margin-top: calc(var(--d) / -2);
   margin-left: calc(var(--d) / -2);
-  border: 1px solid rgba(255, 253, 248, 0.14);
+  border: 1px solid rgba(150, 196, 226, 0.2);
   border-radius: 50%;
   pointer-events: none;
   animation: orbit-spin var(--dur) linear infinite;
   animation-delay: var(--delay);
+}
+
+/* 惑星は白熱した星。今にも爆発しそうに、明るさと大きさが不規則に脈打つ */
+.starball {
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #ffffff 0%, #fff7e6 30%, #ffdda8 58%, #e8a05c 100%);
+  animation: star-unstable 2.6s ease-in-out infinite;
+  animation-delay: var(--shine, 0s);
+}
+
+@keyframes star-unstable {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 16px 3px rgba(255, 240, 214, 0.8), 0 0 42px 12px rgba(255, 176, 96, 0.4);
+  }
+  38% {
+    transform: scale(1.07);
+    box-shadow: 0 0 30px 8px rgba(255, 252, 240, 1), 0 0 76px 24px rgba(255, 160, 80, 0.62);
+  }
+  52% { transform: scale(0.985); }
+  74% {
+    transform: scale(1.035);
+    box-shadow: 0 0 22px 5px rgba(255, 246, 226, 0.92), 0 0 58px 18px rgba(255, 170, 90, 0.5);
+  }
+}
+
+/* 表面の揺らぎ（プロミネンスのような滲み） */
+.starball::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 210, 150, 0.5) 0%, rgba(255, 150, 80, 0) 66%);
+  animation: star-flare 3.4s ease-in-out infinite;
+  animation-delay: var(--shine, 0s);
+  pointer-events: none;
+}
+
+@keyframes star-flare {
+  0%, 100% { opacity: 0.35; transform: scale(0.94); }
+  45%      { opacity: 0.85; transform: scale(1.12); }
+}
+
+/* ==========================================================================
+   銀河の背景。マウスに反応して層ごとにずれる（--mx / --my を JS が更新）
+   ========================================================================== */
+.galaxy {
+  position: absolute;
+  inset: -18%;
+  pointer-events: none;
+  /* 円盤を寝かせて奥行きを出す */
+  transform: rotate(-14deg) scaleY(0.52);
+}
+
+.galaxy__layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transform: translate(calc(var(--mx, 0) * var(--depth, 1)), calc(var(--my, 0) * var(--depth, 1)));
+  transition: transform 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ピンクの星雲 */
+.galaxy__nebula {
+  background:
+    radial-gradient(ellipse 42% 60% at 26% 42%, rgba(216, 111, 168, 0.5) 0%, rgba(216, 111, 168, 0) 62%),
+    radial-gradient(ellipse 38% 52% at 74% 58%, rgba(196, 96, 172, 0.42) 0%, rgba(196, 96, 172, 0) 64%),
+    radial-gradient(ellipse 70% 70% at 50% 50%, rgba(150, 80, 140, 0.28) 0%, rgba(150, 80, 140, 0) 70%);
+  animation: galaxy-turn 190s linear infinite;
+}
+
+/* 金色の核 */
+.galaxy__core {
+  background: radial-gradient(ellipse 26% 42% at 50% 50%, rgba(255, 238, 198, 0.85) 0%, rgba(255, 200, 130, 0.35) 34%, rgba(255, 180, 110, 0) 66%);
+}
+
+/* 塵の帯 */
+.galaxy__dust {
+  background:
+    radial-gradient(ellipse 78% 30% at 50% 36%, rgba(24, 16, 26, 0.55) 0%, rgba(24, 16, 26, 0) 70%),
+    radial-gradient(ellipse 74% 26% at 50% 66%, rgba(20, 14, 22, 0.45) 0%, rgba(20, 14, 22, 0) 70%);
+  animation: galaxy-turn 240s linear infinite reverse;
+}
+
+@keyframes galaxy-turn {
+  to { rotate: 360deg; }
+}
+
+/* 円盤を囲む軌道の輪（参考画像の白い線） */
+.galaxy__ring {
+  position: absolute;
+  border: 1px solid rgba(255, 240, 220, 0.16);
+  border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starball,
+  .starball::after,
+  .galaxy__nebula,
+  .galaxy__dust {
+    animation: none !important;
+  }
+}
+
+/* 競技の小惑星。周りに淡い大気の輪をまとわせる */
+.asteroid {
+  box-shadow: 0 0 0 6px rgba(255, 207, 138, 0.12), 0 0 30px 6px rgba(216, 111, 168, 0.28);
+  animation: asteroid-drift 7s ease-in-out infinite;
+}
+
+.asteroid:nth-of-type(even) { animation-delay: -3.5s; }
+
+@keyframes asteroid-drift {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asteroid { animation: none; }
+}
+
+/* ==========================================================================
+   ページ間の移動: ロケットが画面を横切る
+   ========================================================================== */
+.warp {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(216, 111, 168, 0.22) 0%, rgba(10, 8, 14, 0.94) 62%);
+  animation: warp-veil 1100ms ease-in-out both;
+}
+
+@keyframes warp-veil {
+  0%   { opacity: 0; }
+  18%  { opacity: 1; }
+  74%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 星が線になって流れる */
+.warp__streak {
+  position: absolute;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to top, rgba(255, 240, 214, 0), rgba(255, 240, 214, 0.95));
+  width: 2px;
+  animation: warp-streak 1100ms cubic-bezier(0.4, 0, 0.6, 1) both;
+  animation-delay: var(--d);
+}
+
+@keyframes warp-streak {
+  0%   { opacity: 0; height: 8px; transform: translateY(60vh); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; height: 90px; transform: translateY(-70vh); }
+}
+
+/* ロケット本体が下から上へ飛び抜ける */
+.warp__ship {
+  position: absolute;
+  left: 50%;
+  animation: warp-fly 1100ms cubic-bezier(0.5, 0, 0.5, 1) both;
+}
+
+@keyframes warp-fly {
+  0%   { opacity: 0; transform: translate(-50%, 70vh) scale(0.7); }
+  22%  { opacity: 1; }
+  68%  { opacity: 1; transform: translate(-50%, 18vh) scale(1.08); }
+  100% { opacity: 0; transform: translate(-50%, -60vh) scale(0.8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warp,
+  .warp__streak,
+  .warp__ship {
+    animation-duration: 1ms !important;
+  }
 }
 
 /* 「押せる」ことを文字で説明せず、静かに脈打つ光の輪で伝える。
@@ -495,12 +702,8 @@ h1, h2, h3, h4 {
 }
 
 @keyframes planet-breathe {
-  0%, 100% {
-    box-shadow: 0 0 22px rgba(0, 0, 0, 0.6), 0 0 0 0 rgba(255, 253, 248, 0);
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(0, 0, 0, 0.6), 0 0 0 6px rgba(255, 253, 248, 0.12);
-  }
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(146, 190, 224, 0.35)); }
+  50%      { filter: drop-shadow(0 0 24px rgba(182, 227, 242, 0.7)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

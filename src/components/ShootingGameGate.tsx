@@ -123,25 +123,59 @@ function buildDunes(): THREE.Mesh {
 
 function buildPlayer(): THREE.Group {
   const group = new THREE.Group();
-  const bodyGeo = new THREE.ConeGeometry(1.15, 2.6, 8);
-  const bodyMat = new THREE.MeshPhongMaterial({ color: PLAYER_GREEN, flatShading: true, shininess: 12 });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.rotation.x = Math.PI / 2;
-  body.add(addOutline(body, 1.1));
-  group.add(body);
+  const skin = 0xf0dcc0;
+  const cloth = PLAYER_GREEN;
 
-  const finGeo = new THREE.BoxGeometry(2.6, 0.18, 0.9);
-  const finMat = new THREE.MeshPhongMaterial({ color: ACCENT_CLAY, flatShading: true, shininess: 12 });
-  const fin = new THREE.Mesh(finGeo, finMat);
-  fin.position.set(0, -0.15, 0.55);
-  fin.add(addOutline(fin, 1.15));
-  group.add(fin);
+  const add = (mesh: THREE.Mesh, outline = 1.1) => {
+    mesh.add(addOutline(mesh, outline));
+    group.add(mesh);
+    return mesh;
+  };
 
-  const shadowGeo = new THREE.CircleGeometry(1.5, 24);
-  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22 });
-  const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+  // 頭
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.52, 14, 12),
+    new THREE.MeshPhongMaterial({ color: skin, flatShading: true, shininess: 8 })
+  );
+  head.position.y = 1.85;
+  add(head, 1.09);
+
+  // 胴
+  const torso = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.46, 0.9, 4, 10),
+    new THREE.MeshPhongMaterial({ color: cloth, flatShading: true, shininess: 10 })
+  );
+  torso.position.y = 0.92;
+  add(torso, 1.07);
+
+  // 両腕（前へ構える）
+  for (const side of [-1, 1]) {
+    const arm = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.16, 0.7, 3, 8),
+      new THREE.MeshPhongMaterial({ color: skin, flatShading: true, shininess: 8 })
+    );
+    arm.position.set(side * 0.5, 1.12, -0.34);
+    arm.rotation.x = -1.15;
+    add(arm, 1.12);
+  }
+
+  // 両脚
+  for (const side of [-1, 1]) {
+    const leg = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.19, 0.72, 3, 8),
+      new THREE.MeshPhongMaterial({ color: ACCENT_CLAY, flatShading: true, shininess: 8 })
+    );
+    leg.position.set(side * 0.22, 0.1, 0);
+    add(leg, 1.12);
+  }
+
+  // 影
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(0.8, 22),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.26 })
+  );
   shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = -1.15;
+  shadow.position.y = -0.42;
   group.add(shadow);
 
   return group;
@@ -427,10 +461,12 @@ export default function ShootingGameGate() {
       }
 
       // --- プレイヤーの見た目（アイドル中も少し揺れる） ---
-      const idleBob = Math.sin(t * 0.0025) * 0.12;
-      player.position.set(worldX(playerX.current), idleBob, worldZ(PLAYER_Y));
-      player.rotation.z = -moveDir.current * 0.28;
-      player.rotation.y = phaseRef.current === "playing" ? 0 : Math.sin(t * 0.0012) * 0.5;
+      // 動いている間は足踏み、止まっていると軽く息をする
+      const moving = moveDir.current !== 0;
+      const bob = moving ? Math.abs(Math.sin(t * 0.017)) * 0.2 : Math.sin(t * 0.0025) * 0.07;
+      player.position.set(worldX(playerX.current), bob, worldZ(PLAYER_Y));
+      player.rotation.z = -moveDir.current * 0.12;
+      player.rotation.y = moveDir.current * 0.35;
 
       // --- 敵 ---
       for (let i = 0; i < enemyGroups.length; i++) {

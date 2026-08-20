@@ -46,7 +46,7 @@ export default function SportsPage() {
 
         <div className="relative mx-auto mb-6 w-full max-w-[1120px]">
           <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
-            身体こそすべて
+            スポーツの惑星
           </h1>
           <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">大好きなスポーツ — {SPORTS_INTRO.lead}</p>
         </div>
@@ -61,31 +61,32 @@ export default function SportsPage() {
               <button
                 key={s.id}
                 onClick={() => onTile(s)}
-                className="group relative aspect-4/3 overflow-hidden rounded-md border-2 border-(--color-white)/30 bg-black/40 transition hover:-translate-y-1 hover:border-(--color-accent-light)"
+                className="group flex flex-col items-center gap-2 transition hover:-translate-y-1.5"
               >
-                {/* 未突破は写真をぼかして中身を隠す。分かるのは難易度だけ */}
-                <Image
-                  src={s.photo}
-                  alt={done ? s.name : "未突破"}
-                  fill
-                  className={`object-cover transition duration-400 group-hover:scale-[1.08] ${
-                    done ? "" : "scale-110 grayscale brightness-[0.5] blur-lg"
-                  }`}
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                />
-                {!done && (
-                  <span className="absolute inset-0 flex items-center justify-center font-display text-5xl font-extrabold text-(--color-white)/70">
-                    ?
-                  </span>
-                )}
-                <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/82 to-transparent px-4 pb-2.5 pt-3.5 text-center font-extrabold text-(--color-white)">
-                  {done ? s.name : "？？？"}
+                {/* 競技はそれぞれ小さな惑星。未突破は雲に隠れて見えない */}
+                <span className="asteroid relative block aspect-square w-full overflow-hidden rounded-full border-2 border-(--color-ember)/60">
+                  <Image
+                    src={s.photo}
+                    alt={done ? s.name : "未突破"}
+                    fill
+                    className={`object-cover transition duration-400 group-hover:scale-[1.1] ${
+                      done ? "" : "scale-110 grayscale brightness-[0.45] blur-lg"
+                    }`}
+                    sizes="(max-width: 768px) 45vw, 30vw"
+                  />
                   {!done && (
-                    <span className="mt-0.5 block text-xs tracking-[0.2em] text-(--color-accent-light)">
-                      {"★".repeat(s.level)}
-                      <span className="text-(--color-white)/25">{"★".repeat(5 - s.level)}</span>
+                    <span className="absolute inset-0 flex items-center justify-center font-display text-5xl font-extrabold text-(--color-white)/70">
+                      ?
                     </span>
                   )}
+                </span>
+
+                <span className="text-center font-display text-sm font-extrabold text-(--color-white) md:text-base">
+                  {done ? s.name : "？？？"}
+                </span>
+                <span className="text-xs tracking-[0.2em] text-(--color-ember)">
+                  {"★".repeat(s.level)}
+                  <span className="text-(--color-white)/25">{"★".repeat(5 - s.level)}</span>
                 </span>
               </button>
             );

@@ -89,39 +89,75 @@ export default function FlightGame({
     const ground = lowPolyGround({ color: 0xc9a877, size: 200, amp: 2.6, y: -12, z: -60 });
     scene.add(ground);
 
-    // --- 自機（低ポリの飛行機） ---
+    // --- 自機（デルタ翼の戦闘機） ---
     const plane = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.ConeGeometry(0.42, 2.1, 7), toonMat(PAL.white, 16));
-    body.rotation.x = -Math.PI / 2;
-    body.add(outlineFor(body, 1.1));
-    plane.add(body);
+    const skin = toonMat(0xe9e5d8, 22);
 
-    const wing = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.12, 0.62), toonMat(PAL.accent, 12));
-    wing.position.z = 0.15;
-    wing.add(outlineFor(wing, 1.08));
-    plane.add(wing);
+    // 胴体（細長く、機首を尖らせる）
+    const fuse = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.16, 3.1, 8), skin);
+    fuse.rotation.x = Math.PI / 2;
+    fuse.add(outlineFor(fuse, 1.07));
+    plane.add(fuse);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.3, 1.2, 8), skin);
+    nose.rotation.x = -Math.PI / 2;
+    nose.position.z = -2.1;
+    nose.add(outlineFor(nose, 1.09));
+    plane.add(nose);
 
-    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.1, 0.36), toonMat(PAL.clay, 12));
-    tail.position.set(0, 0.28, 0.95);
-    tail.add(outlineFor(tail, 1.12));
-    plane.add(tail);
+    // 主翼: 後退角のついた三角形
+    const wingShape = new THREE.Shape();
+    wingShape.moveTo(0, -0.9);
+    wingShape.lineTo(2.5, 0.9);
+    wingShape.lineTo(0.5, 1.05);
+    wingShape.lineTo(0, 0.2);
+    const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.1, bevelEnabled: false });
+    for (const side of [1, -1]) {
+      const wing = new THREE.Mesh(wingGeo, toonMat(PAL.accent, 14));
+      wing.scale.x = side;
+      wing.rotation.x = -Math.PI / 2;
+      wing.position.set(0, -0.04, 0.35);
+      wing.add(outlineFor(wing, 1.04));
+      plane.add(wing);
+    }
+
+    // 双尾翼
+    for (const side of [1, -1]) {
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.62, 0.5), toonMat(PAL.clay, 12));
+      fin.position.set(side * 0.38, 0.34, 1.2);
+      fin.rotation.z = side * 0.24;
+      fin.add(outlineFor(fin, 1.14));
+      plane.add(fin);
+    }
+
+    // 排気の炎
+    const burner = new THREE.Mesh(
+      new THREE.ConeGeometry(0.22, 1.1, 8),
+      new THREE.MeshBasicMaterial({ color: 0xffc266, transparent: true, opacity: 0.9 })
+    );
+    burner.rotation.x = Math.PI / 2;
+    burner.position.z = 2.1;
+    plane.add(burner);
 
     plane.position.set(0, 0.8, PLAYER_Z);
     scene.add(plane);
 
-    // --- 雲（低ポリの板を流す） ---
-    const clouds: THREE.Mesh[] = [];
-    const cloudGeo = new THREE.BoxGeometry(1, 1, 1);
-    for (let i = 0; i < 22; i++) {
-      const m = new THREE.Mesh(cloudGeo, toonMat(0xfdfaf2, 2));
-      m.scale.set(3 + Math.random() * 4, 0.5 + Math.random() * 0.5, 2 + Math.random() * 3);
-      m.position.set(
-        (Math.random() - 0.5) * 44,
-        -4 + Math.random() * 12,
-        -Math.random() * 120
-      );
-      clouds.push(m);
-      scene.add(m);
+    // --- 雲（球をいくつも寄せた塊。板だと嘘っぽい） ---
+    const clouds: THREE.Group[] = [];
+    const puffGeo = new THREE.SphereGeometry(1, 9, 7);
+    const puffMat = toonMat(0xfdfbf4, 2);
+    for (let i = 0; i < 16; i++) {
+      const g = new THREE.Group();
+      const puffs = 4 + Math.floor(Math.random() * 4);
+      for (let j = 0; j < puffs; j++) {
+        const m = new THREE.Mesh(puffGeo, puffMat);
+        const r = 1.1 + Math.random() * 1.5;
+        m.scale.set(r, r * 0.72, r);
+        m.position.set((j - puffs / 2) * 1.5 + Math.random(), Math.random() * 0.8, Math.random() * 1.2);
+        g.add(m);
+      }
+      g.position.set((Math.random() - 0.5) * 46, -5 + Math.random() * 14, -Math.random() * 130);
+      clouds.push(g);
+      scene.add(g);
     }
 
     // --- リング（くぐる目標） ---
@@ -177,6 +213,19 @@ export default function FlightGame({
     window.addEventListener("keyup", onKeyUp);
     renderer.domElement.addEventListener("pointermove", onPointer);
     renderer.domElement.addEventListener("pointerdown", onPointer);
+
+    // 抜けた瞬間に弾けるリング
+    const burstGeo = new THREE.RingGeometry(RING_RADIUS * 0.8, RING_RADIUS * 1.05, 30);
+    const burstMat = new THREE.MeshBasicMaterial({
+      color: 0xffe9b8,
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const burst = new THREE.Mesh(burstGeo, burstMat);
+    burst.visible = false;
+    scene.add(burst);
+    let burstAge = -1;
 
     let raf = 0;
     let lastSpawn = 0;
@@ -237,6 +286,9 @@ export default function FlightGame({
             if (through) {
               passedRef.current += 1;
               setPassed(passedRef.current);
+              burst.position.copy(r.mesh.position);
+              burst.visible = true;
+              burstAge = 0;
             } else {
               missRef.current += 1;
               setMiss(missRef.current);
@@ -267,6 +319,22 @@ export default function FlightGame({
       plane.rotation.x = THREE.MathUtils.clamp(dy * 0.12, -0.3, 0.3);
       if (!playing) plane.position.y = 0.8 + Math.sin(t * 0.0022) * 0.28;
 
+      // 通過の余韻
+      if (burstAge >= 0) {
+        burstAge += 16;
+        const k = burstAge / 480;
+        burst.scale.setScalar(1 + k * 2.2);
+        burst.position.z += 0.55;
+        burstMat.opacity = Math.max(0, 1 - k);
+        if (k >= 1) {
+          burstAge = -1;
+          burst.visible = false;
+        }
+      }
+
+      // 排気は常にゆらぐ
+      burner.scale.setScalar(playing ? 0.85 + Math.sin(t * 0.03) * 0.25 : 0.5);
+
       camera.position.x += (plane.position.x * 0.28 - camera.position.x) * 0.06;
 
       renderer.render(scene, camera);
@@ -280,7 +348,8 @@ export default function FlightGame({
       renderer.domElement.removeEventListener("pointermove", onPointer);
       renderer.domElement.removeEventListener("pointerdown", onPointer);
       ringGeo.dispose();
-      cloudGeo.dispose();
+      puffGeo.dispose();
+      burstGeo.dispose();
       stage.dispose();
     };
   }, [level]);
