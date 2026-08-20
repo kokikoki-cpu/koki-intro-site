@@ -19,7 +19,6 @@ export default function Home() {
 
       <CosmosHome
         name={PROFILE.name}
-        meta={PROFILE.meta}
         sunPhoto={self.photo}
         photos={SKY_PHOTOS}
         strengths={PROFILE.strengths}

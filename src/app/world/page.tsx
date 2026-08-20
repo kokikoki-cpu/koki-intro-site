@@ -66,7 +66,6 @@ export default function WorldPage() {
           <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
             あぁ素晴らしき地球
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">{WORLD_INTRO.lead}（{WORLD_INTRO.sub}）</p>
         </div>
         <p className="relative mx-auto mb-3 w-full max-w-[760px] text-sm font-bold text-(--color-accent-light)">
           到達 {open.size} / {COUNTRIES.length}

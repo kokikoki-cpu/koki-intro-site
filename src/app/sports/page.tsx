@@ -48,7 +48,6 @@ export default function SportsPage() {
           <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
             スポーツの惑星
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">大好きなスポーツ — {SPORTS_INTRO.lead}</p>
         </div>
         <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
           突破 {cleared.size} / {SPORTS.length}

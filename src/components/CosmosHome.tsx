@@ -4,7 +4,6 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import WarpLink from "@/components/WarpLink";
-import GalaxyBackdrop from "@/components/GalaxyBackdrop";
 import dynamic from "next/dynamic";
 import { COUNTRIES, PEOPLE, SPORTS, type Hobby } from "@/lib/data";
 import { unlock, useIsUnlocked, useUnlockedFrom } from "@/lib/unlock";
@@ -13,6 +12,13 @@ import { unlock, useIsUnlocked, useUnlockedFrom } from "@/lib/unlock";
 const COUNTRY_IDS = COUNTRIES.map((c) => c.id);
 const PEOPLE_IDS = PEOPLE.map((p) => p.id);
 const SPORT_IDS = SPORTS.map((s) => s.id);
+
+/** 惑星の顔になる実写。CSSで描いた飾りではなく写真を主役にする */
+const PLANET_PHOTO: Record<string, string> = {
+  action: "/images/countries/namibia.jpg",
+  curiosity: "/images/people/p3-india.jpg",
+  body: "/images/sports/marathon.jpg",
+};
 
 const CareerRunGame = dynamic(() => import("@/components/games/CareerRunGame"), { ssr: false });
 
@@ -73,7 +79,6 @@ type Strength = { key: string; title: string; desc: string; link: string; linkLa
 
 type Props = {
   name: string;
-  meta: string;
   sunPhoto: string;
   photos: string[];
   strengths: Strength[];
@@ -84,7 +89,6 @@ type Props = {
 
 export default function CosmosHome({
   name,
-  meta,
   sunPhoto,
   photos,
   strengths,
@@ -111,17 +115,12 @@ export default function CosmosHome({
   const collectTotal = COUNTRY_IDS.length + PEOPLE_IDS.length + SPORT_IDS.length + 1;
 
   const planetClass =
-    "planet starball block h-[clamp(64px,13vw,98px)] w-[clamp(64px,13vw,98px)] transition hover:scale-110";
-  /* 白熱した星の上なので、文字は黒でないと読めない */
-  const faceClass =
-    "relative z-1 flex h-full w-full flex-col items-center justify-center px-1.5 text-center text-[clamp(11px,2.3vw,13px)] font-extrabold leading-tight text-(--color-ink)";
+    "planet block h-[clamp(72px,14vw,112px)] w-[clamp(72px,14vw,112px)] transition hover:scale-105";
 
   return (
     /* globals.css の `a { color: inherit }` はレイヤー外で Tailwind より強いので、
        暗い背景の上のリンク色はここで継承させる */
     <section className="space flex min-h-[calc(100vh-60px)] flex-col justify-center px-5 pb-10 pt-[clamp(28px,6vh,64px)] text-(--color-white) md:px-14">
-      <GalaxyBackdrop />
-
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         {STARS.map((s, i) => (
           <span
@@ -179,10 +178,9 @@ export default function CosmosHome({
           <h1 className="font-display text-[clamp(2.8rem,9vw,6rem)] font-extrabold leading-[0.98] tracking-tight">
             Who am I ?
           </h1>
-          <p className="mt-2 text-sm text-(--color-bg-soft)/60">{meta}</p>
           <button
             onClick={() => setPanel("memory")}
-            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-ember) bg-(--color-crystal-deep)/75 px-6 py-3 text-left transition hover:scale-105 hover:bg-(--color-nebula)/70"
+            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-ember) bg-(--color-ink)/85 px-6 py-3 text-left transition hover:scale-105 hover:border-(--color-white)"
           >
             <span className="font-display text-3xl font-extrabold leading-none text-(--color-white)">
               {collected}
@@ -213,20 +211,22 @@ export default function CosmosHome({
           {/* 惑星: 強み3つ → 各ページへ、職歴と趣味 → その場で開く */}
           {strengths.map((s, i) => {
             const p = progress[s.key];
-            const complete = p && p.got === p.total;
             return (
               <Orbit key={s.key} {...ORBITS[i]}>
-                <WarpLink href={s.link} className={planetClass} title={`${s.title} — ${s.desc}`}>
-                  <span className={faceClass} style={{ "--shine": `${i * 0.9}s` } as CSSProperties}>
+                <WarpLink href={s.link} className={planetClass} title={s.title}>
+                  <span className="orb block h-full w-full">
+                    <Image
+                      src={PLANET_PHOTO[s.key]}
+                      alt={s.title}
+                      fill
+                      sizes="120px"
+                      className="object-cover"
+                    />
+                  </span>
+                  <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
                     {s.title}
                     {p && (
-                      <span
-                        className={
-                          complete
-                            ? "text-[0.85em] text-(--color-accent-dark)"
-                            : "text-[0.85em] text-(--color-ink)/55"
-                        }
-                      >
+                      <span className="ml-1 text-(--color-ember)">
                         {p.got}/{p.total}
                       </span>
                     )}
@@ -242,21 +242,24 @@ export default function CosmosHome({
               className={planetClass}
               title={careerOpen ? "職歴" : "職歴（未解錠）"}
             >
-              <span className={faceClass} style={{ "--shine": "2.7s" } as CSSProperties}>
-                職歴
-                <span className={careerOpen ? "text-[0.85em] text-(--color-accent-dark)" : "text-(--color-clay)"}>
-                  {careerOpen ? "1/1" : "？"}
+              <span className="orb flex h-full w-full items-center justify-center bg-(--color-ink)">
+                <span className="font-display text-2xl font-extrabold text-(--color-white)">
+                  {careerOpen ? "歴" : "？"}
                 </span>
+              </span>
+              <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
+                職歴
               </span>
             </button>
           </Orbit>
 
           <Orbit {...ORBITS[4]}>
             <button onClick={() => setPanel("hobby")} className={planetClass} title="趣味・活動">
-              <span className={faceClass} style={{ "--shine": "3.6s" } as CSSProperties}>
-                趣味
-                <br />
-                活動
+              <span className="orb flex h-full w-full items-center justify-center bg-(--color-ink)">
+                <span className="font-display text-2xl font-extrabold text-(--color-white)">趣</span>
+              </span>
+              <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
+                趣味・活動
               </span>
             </button>
           </Orbit>

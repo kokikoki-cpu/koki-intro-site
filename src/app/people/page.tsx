@@ -102,7 +102,6 @@ export default function PeoplePage() {
           <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight">
             世界のクセ強人類
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-(--color-bg-soft)/70">人図鑑 — 好奇心の先で出会った、忘れられない人たち</p>
         </div>
         <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
           発見 {found.size} / {PEOPLE.length}
