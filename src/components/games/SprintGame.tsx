@@ -24,12 +24,15 @@ const HIT_PENALTY = 9;
 
 export default function SprintGame({
   sportName,
+  itemId,
   level,
   onReveal,
   onClose,
   onUnlockAll,
 }: {
   sportName: string;
+  /** 解錠キー。初回クリア率の表示に使う */
+  itemId: string;
   level: 1 | 2 | 3 | 4 | 5;
   onReveal: () => void;
   onClose: () => void;
@@ -183,6 +186,7 @@ export default function SprintGame({
         </>
       }
       difficulty={level}
+      itemId={itemId}
       phase={phase}
       hud={
         <>
@@ -280,7 +284,7 @@ export default function SprintGame({
           <div className="absolute inset-x-3 bottom-3 flex gap-3">
             <button
               onPointerDown={run}
-              className="flex-1 rounded-lg border-2 border-(--color-white)/70 bg-(--color-ink)/70 py-3 font-display text-lg font-bold text-(--color-white) active:bg-(--color-accent-dark)"
+              className="flex-1 rounded-lg border-2 border-(--color-white)/70 bg-(--color-ink)/70 py-3 font-display text-lg font-bold text-(--color-white) active:bg-(--color-nebula)"
             >
               走る
             </button>

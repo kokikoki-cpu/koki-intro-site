@@ -5,11 +5,11 @@ import * as THREE from "three";
 import GameShell from "./GameShell";
 import {
   PAL,
-  addLights,
+  addNightLights,
   createStage,
   lowPolyGround,
   outlineFor,
-  skyTexture,
+  nightSkyTexture,
   toonMat,
   type GamePhase,
 } from "./three-kit";
@@ -71,20 +71,16 @@ export default function CareerRunGame({
     const stage = createStage(mount, { fov: 60, far: 240 });
     const { scene, camera, renderer } = stage;
 
-    scene.background = skyTexture({
-      top: "#3d4657",
-      mid: "#9c8672",
-      bottom: "#e9dec8",
-      sun: { y: 0.84, color: "rgba(255,236,205,0.9)" },
-    });
-    scene.fog = new THREE.Fog(0xc2b39c, 40, 96);
-    addLights(scene, 0xffeed8, 0x4a3c30);
+    /* 夜の空へ統一（2026-08-20）。空・光は全ゲーム共通の three-kit を使う */
+    scene.background = nightSkyTexture({ glow: 0.5, seed: 90211 });
+    scene.fog = new THREE.Fog(0x131b25, 40, 96);
+    addNightLights(scene);
 
     camera.position.set(0, 3.4, 8.2);
     camera.lookAt(0, 1.2, -20);
 
     // --- 地面と道 ---
-    scene.add(lowPolyGround({ color: 0xb59a76, size: 220, amp: 1.1, y: -1.6, z: -70 }));
+    scene.add(lowPolyGround({ color: PAL.sandNight, size: 220, amp: 1.1, y: -1.6, z: -70 }));
 
     const road = new THREE.Mesh(
       new THREE.PlaneGeometry(ROAD_HALF * 2 + 1.4, 240),
@@ -322,6 +318,7 @@ export default function CareerRunGame({
         </>
       }
       difficulty={5}
+      itemId="career"
       phase={phase}
       hud={
         <>

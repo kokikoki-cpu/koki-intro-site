@@ -44,12 +44,12 @@ export default function PeoplePage() {
                   key={i}
                   className="relative ml-1 border-l-2 border-(--color-line) py-1.5 pl-5 text-sm"
                 >
-                  <span className="absolute -left-[5px] top-3.5 h-2 w-2 rounded-full bg-(--color-accent)" />
+                  <span className="absolute -left-[5px] top-3.5 h-2 w-2 rounded-full bg-(--color-ember)" />
                   {step}
                 </li>
               ))}
             </ul>
-            <p className="mt-3 mb-2 text-left text-sm font-extrabold text-(--color-accent-dark)">
+            <p className="mt-3 mb-2 text-left text-sm font-extrabold text-(--color-nebula)">
               今後の目標
             </p>
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-left text-sm">
@@ -103,7 +103,7 @@ export default function PeoplePage() {
             世界のクセ強人類
           </h1>
         </div>
-        <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
+        <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-ember)">
           発見 {found.size} / {PEOPLE.length}
         </p>
 
@@ -111,7 +111,7 @@ export default function PeoplePage() {
           <button
             onClick={() => scrollByCard(-1)}
             aria-label="前へ"
-            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-accent-dark) md:block"
+            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-nebula) md:block"
           >
             &#8592;
           </button>
@@ -126,7 +126,7 @@ export default function PeoplePage() {
                   key={p.id}
                   data-card
                   onClick={() => onCard(p)}
-                  className="w-[min(72vw,300px)] flex-none cursor-pointer rounded-md border-2 border-(--color-white)/30 bg-(--color-ink)/80 backdrop-blur-sm [scroll-snap-align:start] transition hover:-translate-y-1 hover:border-(--color-accent-light)"
+                  className="w-[min(72vw,300px)] flex-none cursor-pointer rounded-md border-2 border-(--color-white)/30 bg-(--color-ink)/80 backdrop-blur-sm [scroll-snap-align:start] transition hover:-translate-y-1 hover:border-(--color-ember)"
                 >
                   <div className="relative aspect-square w-full overflow-hidden rounded-t-[4px] bg-black/40">
                     <Image
@@ -151,7 +151,7 @@ export default function PeoplePage() {
                       {done ? (p.isSelf ? p.goals![0] : p.story) : "押して捕まえると正体がわかる"}
                     </p>
                     {!done && (
-                      <p className="mt-2 text-sm tracking-[0.2em] text-(--color-accent-light)">
+                      <p className="mt-2 text-sm tracking-[0.2em] text-(--color-ember)">
                         {"★".repeat(p.level)}
                         <span className="text-(--color-white)/25">{"★".repeat(5 - p.level)}</span>
                       </p>
@@ -164,7 +164,7 @@ export default function PeoplePage() {
           <button
             onClick={() => scrollByCard(1)}
             aria-label="次へ"
-            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-accent-dark) md:block"
+            className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-nebula) md:block"
           >
             &#8594;
           </button>
@@ -174,6 +174,7 @@ export default function PeoplePage() {
       {pending && (
         <MemoryGame
           personName="？？？"
+          itemId={pending.id}
           level={pending.level}
           cells={MEMORY_CELLS}
           onReveal={reveal}

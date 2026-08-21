@@ -116,7 +116,7 @@ export default function BgmPlayer() {
           aria-label={muted ? `BGMを鳴らす（${TRACK.title} / ${TRACK.artist}）` : "BGMを止める"}
           aria-pressed={!muted}
           title={`${TRACK.title} / ${TRACK.artist}`}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-(--color-white)/25 bg-(--color-ink)/85 text-(--color-white) backdrop-blur-sm transition hover:border-(--color-accent-light) hover:bg-(--color-accent-dark)"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-(--color-white)/25 bg-(--color-ink)/85 text-(--color-white) backdrop-blur-sm transition hover:border-(--color-ember) hover:bg-(--color-nebula)"
         >
           {muted ? <IconMuted /> : <IconSound />}
         </button>

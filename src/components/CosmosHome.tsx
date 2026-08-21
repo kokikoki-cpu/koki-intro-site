@@ -68,12 +68,36 @@ const SHOOTERS = [
  * 最内周は「その半径 − 惑星の半径 > 太陽の半径」を満たす大きさが下限。
  */
 const ORBITS = [
-  { d: "46%", dur: 26, delay: 0 },
-  { d: "57%", dur: 34, delay: -6.8 },
-  { d: "68%", dur: 44, delay: -17.6 },
-  { d: "79%", dur: 56, delay: -33.6 },
-  { d: "90%", dur: 72, delay: -57.6 },
+  /* 最内周は「半径 − 惑星の半径 − ラベルの高さ > 太陽の半径」まで広げてある。
+     ここを詰めると、内周の惑星のラベルが太陽の写真に乗る */
+  { d: "58%", dur: 26, delay: 0 },
+  { d: "67%", dur: 34, delay: -6.8 },
+  { d: "76%", dur: 44, delay: -17.6 },
+  { d: "85%", dur: 56, delay: -33.6 },
+  { d: "94%", dur: 72, delay: -57.6 },
 ];
+
+/**
+ * 惑星の直径。中身の数から決めるので、国を1つ追加すればその惑星が育つ。
+ * 「なんとなく大きい」を作らないためのルール（1件=65px 〜 9件=121px）。
+ */
+function planetSize(count: number): string {
+  const d = Math.round(56 + count * 6.5);
+  const min = Math.max(54, Math.round(d * 0.6));
+  return `clamp(${min}px, ${(d / 6.4).toFixed(1)}vw, ${d}px)`;
+}
+
+/** 中身の多い惑星にだけ輪を付ける。輪は「ここが本体だ」という重み付けの記号 */
+function PlanetRings({ double }: { double?: boolean }) {
+  return (
+    <>
+      <span className="planet-ring" aria-hidden />
+      {double && <span className="planet-ring planet-ring--outer" aria-hidden />}
+      <span className="planet-ring planet-ring--front" aria-hidden />
+      {double && <span className="planet-ring planet-ring--outer planet-ring--front" aria-hidden />}
+    </>
+  );
+}
 
 type Strength = { key: string; title: string; desc: string; link: string; linkLabel: string };
 
@@ -114,8 +138,20 @@ export default function CosmosHome({
     foundCountries.size + foundPeople.size + foundSports.size + (careerOpen ? 1 : 0);
   const collectTotal = COUNTRY_IDS.length + PEOPLE_IDS.length + SPORT_IDS.length + 1;
 
-  const planetClass =
-    "planet block h-[clamp(72px,14vw,112px)] w-[clamp(72px,14vw,112px)] transition hover:scale-105";
+  const planetClass = "planet relative block transition hover:scale-105";
+
+  /* 惑星の並び順は「抱えているコンテンツの数」で決める。
+     数が多い惑星ほど大きく、外側の軌道をゆっくり回る（質量が大きいものは外周、という見立て）。
+     内側から: 職歴1 → 趣味3 → 人4 → スポーツ6 → 国9。
+     最内周に大きい惑星を置くと太陽に食い込む（最内周の半径 − 惑星の半径 > 太陽の半径）ため、
+     この順番自体が制約を満たすための設計でもある。 */
+  const orbitFor: Record<string, number> = {
+    career: 0,
+    hobby: 1,
+    curiosity: 2,
+    body: 3,
+    action: 4,
+  };
 
   return (
     /* globals.css の `a { color: inherit }` はレイヤー外で Tailwind より強いので、
@@ -180,24 +216,24 @@ export default function CosmosHome({
           </h1>
           <button
             onClick={() => setPanel("memory")}
-            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-ember) bg-(--color-ink)/85 px-6 py-3 text-left transition hover:scale-105 hover:border-(--color-white)"
+            className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-ember) bg-(--color-space)/85 px-6 py-3 text-left transition hover:scale-105 hover:border-(--color-white)"
           >
             <span className="font-display text-3xl font-extrabold leading-none text-(--color-white)">
               {collected}
               <span className="text-lg text-(--color-ember)/75"> / {collectTotal}</span>
             </span>
-            <span className="leading-tight">
-              <span className="block text-[11px] tracking-widest text-(--color-ember)">
-                COLLECTION
-              </span>
-              <span className="block text-sm font-bold text-(--color-white)">集めた記憶を見る</span>
-            </span>
+            {/* 装飾的な英語ラベル（旧 "COLLECTION"）は使わない。日本語の見出しだけで足りる */}
+            <span className="text-sm font-bold leading-tight text-(--color-white)">集めた記憶を見る</span>
           </button>
         </header>
 
-        <div className="system mt-6 aspect-square w-[min(88vw,560px)]">
+        {/* 高さも制約に入れる。惑星が中身の数で育つようになったので、幅だけで決めると
+            外周の惑星が画面の下で切れる（実際に切れた） */}
+        <div className="system mt-6 aspect-square w-[min(86vw,52vh,520px)]">
           {/* 太陽 = こうき本人 */}
-          <div className="sun h-[clamp(74px,20vw,144px)] w-[clamp(74px,20vw,144px)]">
+          {/* 太陽の大きさは系に対する比率で決める。px固定だと系が縮んだときだけ太陽が
+              相対的に大きくなり、最内周の惑星とラベルが太陽に乗る（実際に乗った） */}
+          <div className="sun aspect-square w-[25%]">
             <Image
               src={sunPhoto}
               alt={name}
@@ -209,11 +245,20 @@ export default function CosmosHome({
           </div>
 
           {/* 惑星: 強み3つ → 各ページへ、職歴と趣味 → その場で開く */}
-          {strengths.map((s, i) => {
+          {strengths.map((s) => {
             const p = progress[s.key];
+            const size = planetSize(p?.total ?? 1);
             return (
-              <Orbit key={s.key} {...ORBITS[i]}>
-                <WarpLink href={s.link} className={planetClass} title={s.title}>
+              <Orbit key={s.key} {...ORBITS[orbitFor[s.key] ?? 2]}>
+                <WarpLink
+                  href={s.link}
+                  className={planetClass}
+                  title={s.title}
+                  style={{ width: size, height: size }}
+                >
+                  {/* 国が9つで最多 → 二重の輪。スポーツは6つ → 一重 */}
+                  {s.key === "action" && <PlanetRings double />}
+                  {s.key === "body" && <PlanetRings />}
                   <span className="orb block h-full w-full">
                     <Image
                       src={PLANET_PHOTO[s.key]}
@@ -236,13 +281,14 @@ export default function CosmosHome({
             );
           })}
 
-          <Orbit {...ORBITS[3]}>
+          <Orbit {...ORBITS[orbitFor.career]}>
             <button
               onClick={() => (careerOpen ? setPanel("career") : setPlaying(true))}
               className={planetClass}
+              style={{ width: planetSize(1), height: planetSize(1) }}
               title={careerOpen ? "職歴" : "職歴（未解錠）"}
             >
-              <span className="orb flex h-full w-full items-center justify-center bg-(--color-ink)">
+              <span className="orb flex h-full w-full items-center justify-center bg-(--color-space)">
                 <span className="font-display text-2xl font-extrabold text-(--color-white)">
                   {careerOpen ? "歴" : "？"}
                 </span>
@@ -253,9 +299,14 @@ export default function CosmosHome({
             </button>
           </Orbit>
 
-          <Orbit {...ORBITS[4]}>
-            <button onClick={() => setPanel("hobby")} className={planetClass} title="趣味・活動">
-              <span className="orb flex h-full w-full items-center justify-center bg-(--color-ink)">
+          <Orbit {...ORBITS[orbitFor.hobby]}>
+            <button
+              onClick={() => setPanel("hobby")}
+              className={planetClass}
+              style={{ width: planetSize(hobbies.length), height: planetSize(hobbies.length) }}
+              title="趣味・活動"
+            >
+              <span className="orb flex h-full w-full items-center justify-center bg-(--color-space)">
                 <span className="font-display text-2xl font-extrabold text-(--color-white)">趣</span>
               </span>
               <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
@@ -274,7 +325,7 @@ export default function CosmosHome({
                 key={i}
                 className="relative ml-1 border-l-2 border-(--color-line) py-1.5 pl-5 text-sm"
               >
-                <span className="absolute -left-[5px] top-3.5 h-2 w-2 rounded-full bg-(--color-accent)" />
+                <span className="absolute -left-[5px] top-3.5 h-2 w-2 rounded-full bg-(--color-ember)" />
                 {step}
               </li>
             ))}
@@ -285,7 +336,7 @@ export default function CosmosHome({
       {panel === "hobby" && (
         <Panel title="趣味・活動" onClose={() => setPanel(null)}>
           <p className="my-1 mb-4 flex items-baseline gap-2">
-            <strong className="font-display text-4xl font-extrabold leading-none text-(--color-accent-dark)">
+            <strong className="font-display text-4xl font-extrabold leading-none text-(--color-nebula)">
               {visited}
             </strong>
             <span className="text-sm text-(--color-ink-soft)">カ国制覇</span>
@@ -300,7 +351,7 @@ export default function CosmosHome({
                   href={h.href}
                   target="_blank"
                   rel="noopener"
-                  className="jiggle inline-flex items-center gap-2 rounded-full bg-(--color-accent) px-5 py-3 text-sm font-extrabold !text-(--color-white) shadow-[0_4px_0_0_var(--color-accent-dark)] transition hover:scale-105 hover:bg-(--color-accent-dark) active:translate-y-1 active:shadow-none"
+                  className="jiggle inline-flex items-center gap-2 btn-ember btn-ember--solid px-5 py-3 text-sm !font-extrabold transition hover:scale-105"
                 >
                   <span className="underline decoration-2 underline-offset-2">{h.label}</span>
                   <svg
@@ -333,6 +384,20 @@ export default function CosmosHome({
       {panel === "memory" && (
         <Panel title={`集めた記憶 ${collected} / ${collectTotal}`} onClose={() => setPanel(null)}>
           <div className="flex flex-col gap-4 text-left">
+            {/* 賞品の告知は、集めた数のすぐ隣に置く（「続けるか」を決める場所だから）。
+                集めきったあとは告知ではなく祝いの文になる */}
+            {collected >= collectTotal ? (
+              <p className="m-0 rounded-md border-2 border-(--color-clay) bg-(--color-clay)/10 px-4 py-3 text-center font-display text-base font-extrabold">
+                全記憶を回収。こうきから豪華賞品を進呈します
+              </p>
+            ) : (
+              <p className="m-0 rounded-md border-2 border-(--color-clay) bg-(--color-clay)/10 px-4 py-3 text-center font-display text-base font-extrabold">
+                全部クリアして豪華賞品をゲット！！
+                <span className="ml-2 text-sm font-bold text-(--color-ink-soft)">
+                  あと{collectTotal - collected}個
+                </span>
+              </p>
+            )}
             <MemoryGroup
               title="あぁ素晴らしき地球"
               href="/world"
@@ -387,11 +452,11 @@ function MemoryGroup({
     <div>
       <p className="mb-1.5 flex items-baseline gap-2 text-sm font-bold">
         {title}
-        <span className="text-(--color-accent-dark)">
+        <span className="text-(--color-nebula)">
           {got} / {items.length}
         </span>
         {href && got < items.length && (
-          <Link href={href} className="ml-auto text-xs font-bold text-(--color-accent-dark) underline">
+          <Link href={href} className="ml-auto text-xs font-bold text-(--color-nebula) underline">
             集めにいく →
           </Link>
         )}
@@ -402,7 +467,7 @@ function MemoryGroup({
             key={i}
             className={`rounded-full px-3 py-1 text-xs font-semibold ${
               it.got
-                ? "bg-(--color-accent) text-(--color-white)"
+                ? "bg-(--color-ember) text-(--color-space)"
                 : "bg-(--color-bg-soft) text-(--color-ink-soft)/50"
             }`}
           >

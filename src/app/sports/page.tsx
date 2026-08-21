@@ -49,7 +49,7 @@ export default function SportsPage() {
             スポーツの惑星
           </h1>
         </div>
-        <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-accent-light)">
+        <p className="relative mx-auto mb-3 w-full max-w-[1120px] text-sm font-bold text-(--color-ember)">
           突破 {cleared.size} / {SPORTS.length}
         </p>
 
@@ -96,6 +96,7 @@ export default function SportsPage() {
       {pending && (
         <SprintGame
           sportName="？？？"
+          itemId={pending.id}
           level={pending.level}
           onReveal={reveal}
           onClose={() => setPending(null)}

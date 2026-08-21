@@ -16,11 +16,12 @@ function mulberry32(seed: number) {
   };
 }
 
-function makeStars(seed: number, count: number) {
+/** spread は星を散らす高さ(%)。地平線のある場面は上側だけ、宇宙だけの場面は全面 */
+function makeStars(seed: number, count: number, spread = 62) {
   const rnd = mulberry32(seed);
   return Array.from({ length: count }, () => ({
     left: `${(rnd() * 100).toFixed(2)}%`,
-    top: `${(rnd() * 62).toFixed(2)}%`,
+    top: `${(rnd() * spread).toFixed(2)}%`,
     size: Number((rnd() * 1.9 + 0.7).toFixed(2)),
     dur: Number((rnd() * 4 + 2.4).toFixed(2)),
     delay: Number((-rnd() * 6).toFixed(2)),
@@ -32,9 +33,11 @@ const STARS = {
   sun: makeStars(4801, 110),
   desert: makeStars(9137, 110),
   steppe: makeStars(2264, 110),
+  /* 地平線のない、星だけの空（オープニング用） */
+  void: makeStars(7717, 140, 100),
 };
 
-export type Scenery = "sun" | "desert" | "steppe";
+export type Scenery = "sun" | "desert" | "steppe" | "void";
 
 export default function SpaceBackdrop({ scenery }: { scenery: Scenery }) {
   return (

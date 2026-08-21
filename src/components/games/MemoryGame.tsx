@@ -18,6 +18,7 @@ type Cell = { photo: string; label: string };
 
 export default function MemoryGame({
   personName,
+  itemId,
   level,
   cells,
   onReveal,
@@ -25,6 +26,8 @@ export default function MemoryGame({
   onUnlockAll,
 }: {
   personName: string;
+  /** 解錠キー。初回クリア率の表示に使う */
+  itemId: string;
   level: 1 | 2 | 3 | 4 | 5;
   cells: Cell[];
   onReveal: () => void;
@@ -119,13 +122,14 @@ export default function MemoryGame({
         </>
       }
       difficulty={level}
+      itemId={itemId}
       phase={phase}
       hud={
         <>
           <span>
             {round + 1} / {ROUNDS} 回目
           </span>
-          <span className={showing ? "text-(--color-clay)" : "text-(--color-accent-light)"}>
+          <span className={showing ? "text-(--color-clay)" : "text-(--color-ember)"}>
             {showing ? "見て覚える" : "押す番"}
           </span>
         </>
@@ -134,7 +138,7 @@ export default function MemoryGame({
       canvas={
         <div
           ref={mountRef}
-          className="grid h-full w-full grid-cols-3 grid-rows-2 gap-2 bg-(--color-ink) p-2"
+          className="grid h-full w-full grid-cols-3 grid-rows-2 gap-2 bg-(--color-space) p-2"
         >
           {cells.map((c, i) => (
             <button
@@ -144,7 +148,7 @@ export default function MemoryGame({
               aria-label={c.label}
               className={`relative overflow-hidden rounded-md border-2 transition ${
                 lit === i
-                  ? "scale-[1.04] border-(--color-accent-light) brightness-150"
+                  ? "scale-[1.04] border-(--color-ember) brightness-150"
                   : "border-(--color-white)/20 brightness-[0.45]"
               } ${showing ? "cursor-default" : "cursor-pointer"}`}
             >

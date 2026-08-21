@@ -39,6 +39,27 @@ export const PROFILE = {
 /** ゲームの難易度（1=やさしい 〜 5=最難関）。項目ごとに変える */
 export type Level = 1 | 2 | 3 | 4 | 5;
 
+/** どのゲームでその国を解錠するか。地図の9カ国が全部フライトで「飽きた」ため分けた */
+export type CountryGame = "battle" | "balloon" | "iceflow";
+
+/**
+ * バトルのコマンド。
+ * - `weak`  … その相手に効く一手。**実際に清水さんがその国でやったこと**を当てる
+ * - `normal`… 通る。ダメージは小さい
+ * - `guard` … 受け。敵の予告が出ている間に選ぶと無効化できる（他の時に選ぶと無駄）
+ */
+export type BattleCommand = { label: string; kind: "weak" | "normal" | "guard" };
+
+export type Battle = {
+  /** 相手。story に書かれている実際の出来事から取る（作り話を足さない） */
+  enemy: string;
+  /** 攻撃の予告に出す一言 */
+  telegraph: string;
+  /** 決着の一言 */
+  finish: string;
+  commands: [BattleCommand, BattleCommand, BattleCommand];
+};
+
 export type Country = {
   id: string;
   level: Level;
@@ -48,6 +69,9 @@ export type Country = {
   photo: string;
   x: number;
   y: number;
+  game: CountryGame;
+  /** game が "battle" のときだけ持つ */
+  battle?: Battle;
 };
 
 /* x/y は /images/world-map.svg (Wikimedia Commons "BlankMap-World-Equirectangular",
@@ -63,6 +87,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/argentina.jpg",
     x: 28.48,
     y: 68.76,
+    game: "battle",
+    battle: {
+      enemy: "タトゥー軍団",
+      telegraph: "取り囲まれる",
+      finish: "ユニフォームは脱げばただの旅人",
+      commands: [
+        { label: "脱ぐ", kind: "weak" },
+        { label: "走る", kind: "normal" },
+        { label: "謝る", kind: "guard" },
+      ],
+    },
   },
   {
     id: "brazil",
@@ -74,6 +109,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/brazil.jpg",
     x: 31.05,
     y: 56.57,
+    game: "battle",
+    battle: {
+      enemy: "地球の裏側のホームシック",
+      telegraph: "郷愁が押し寄せる",
+      finish: "裏側で食う松屋は贅沢of贅沢",
+      commands: [
+        { label: "松屋を食う", kind: "weak" },
+        { label: "歩く", kind: "normal" },
+        { label: "深呼吸", kind: "guard" },
+      ],
+    },
   },
   {
     id: "peru",
@@ -85,6 +131,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/peru.jpg",
     x: 25.32,
     y: 54.03,
+    game: "battle",
+    battle: {
+      enemy: "樹液の幻覚",
+      telegraph: "幻が濃くなる",
+      finish: "三日三晩、耐えきった",
+      commands: [
+        { label: "耐える", kind: "weak" },
+        { label: "吐く", kind: "normal" },
+        { label: "目を閉じる", kind: "guard" },
+      ],
+    },
   },
   {
     id: "antarctica",
@@ -95,6 +152,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/antarctica.jpg",
     x: 48.93,
     y: 84.35,
+    game: "iceflow",
   },
   {
     id: "india",
@@ -106,6 +164,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/india.jpg",
     x: 69.14,
     y: 38.75,
+    game: "battle",
+    battle: {
+      enemy: "人間の森",
+      telegraph: "人波が来る",
+      finish: "常識が崩れる音がした",
+      commands: [
+        { label: "流れに乗る", kind: "weak" },
+        { label: "値切る", kind: "normal" },
+        { label: "立ち止まる", kind: "guard" },
+      ],
+    },
   },
   {
     id: "jordan",
@@ -117,6 +186,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/jordan.jpg",
     x: 56.46,
     y: 33.62,
+    game: "battle",
+    battle: {
+      enemy: "サンダル泥棒",
+      telegraph: "足音が近づく",
+      finish: "サンダルは戻らなかった",
+      commands: [
+        { label: "追う", kind: "weak" },
+        { label: "叫ぶ", kind: "normal" },
+        { label: "抱える", kind: "guard" },
+      ],
+    },
   },
   {
     id: "turkey",
@@ -127,6 +207,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/turkey.jpg",
     x: 55.99,
     y: 29.76,
+    game: "balloon",
   },
   {
     id: "kenya",
@@ -137,6 +218,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/kenya.jpg",
     x: 56.68,
     y: 49.41,
+    game: "battle",
+    battle: {
+      enemy: "半日ついてくる物乞い",
+      telegraph: "距離を詰めてくる",
+      finish: "別れ際に千円あげた",
+      commands: [
+        { label: "仲良くなる", kind: "weak" },
+        { label: "無視する", kind: "normal" },
+        { label: "財布を守る", kind: "guard" },
+      ],
+    },
   },
   {
     id: "namibia",
@@ -148,6 +240,17 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/namibia.jpg",
     x: 51.29,
     y: 60.97,
+    game: "battle",
+    battle: {
+      enemy: "猿の群れ",
+      telegraph: "荷台を狙ってくる",
+      finish: "アフリカで強制ラマダン開始",
+      commands: [
+        { label: "諦める", kind: "weak" },
+        { label: "追い払う", kind: "normal" },
+        { label: "荷台を閉める", kind: "guard" },
+      ],
+    },
   },
 ];
 

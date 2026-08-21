@@ -5,11 +5,11 @@ import * as THREE from "three";
 import GameShell from "./GameShell";
 import {
   PAL,
-  addLights,
+  addNightLights,
   createStage,
   lowPolyGround,
   outlineFor,
-  skyTexture,
+  nightSkyTexture,
   toonMat,
   type GamePhase,
 } from "./three-kit";
@@ -35,12 +35,15 @@ type Ring = { mesh: THREE.Group; prevZ: number; speed: number };
 
 export default function FlightGame({
   countryName,
+  itemId,
   level,
   onReveal,
   onClose,
   onUnlockAll,
 }: {
   countryName: string;
+  /** 解錠キー。初回クリア率の表示に使う */
+  itemId: string;
   level: 1 | 2 | 3 | 4 | 5;
   onReveal: () => void;
   onClose: () => void;
@@ -73,20 +76,16 @@ export default function FlightGame({
     const stage = createStage(mount, { fov: 62, far: 220 });
     const { scene, camera, renderer } = stage;
 
-    scene.background = skyTexture({
-      top: "#3b5668",
-      mid: "#88a1a8",
-      bottom: "#e0d9c6",
-      sun: { y: 0.82 },
-    });
-    scene.fog = new THREE.Fog(0xc9c6b4, 34, 78);
-    addLights(scene, 0xe8f0f4, 0x6b5540);
+    /* 夜の空へ統一（2026-08-20）。空・光は全ゲーム共通の three-kit を使う */
+    scene.background = nightSkyTexture({ glow: 0.54, seed: 31771 });
+    scene.fog = new THREE.Fog(0x121a24, 34, 78);
+    addNightLights(scene);
 
     camera.position.set(0, 1.9, 7.4);
     camera.lookAt(0, 1.0, -22);
 
     // --- 地面（はるか下を流れる大地） ---
-    const ground = lowPolyGround({ color: 0xc9a877, size: 200, amp: 2.6, y: -12, z: -60 });
+    const ground = lowPolyGround({ color: PAL.sandNight, size: 200, amp: 2.6, y: -12, z: -60 });
     scene.add(ground);
 
     // --- 自機（デルタ翼の戦闘機） ---
@@ -376,6 +375,7 @@ export default function FlightGame({
         </>
       }
       difficulty={level}
+      itemId={itemId}
       phase={phase}
       hud={
         <>

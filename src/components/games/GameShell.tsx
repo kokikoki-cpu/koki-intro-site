@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ReactNode, type RefObject } from "react";
 import { tryPassphrase } from "@/lib/unlock";
+import { clearRate } from "@/lib/difficulty";
+import { preloadSfx, sfx } from "@/lib/sfx";
 import type { GamePhase } from "./three-kit";
 
 type Props = {
@@ -13,6 +15,8 @@ type Props = {
   rule: ReactNode;
   /** 難易度（1〜5）。挑戦前に★で示す */
   difficulty: 1 | 2 | 3 | 4 | 5;
+  /** 解錠キー。初回クリア率の実測値を引くのに使う（無ければ level からの想定値） */
+  itemId?: string;
   phase: GamePhase;
   /** プレイ中に出すスコア等 */
   hud?: ReactNode;
@@ -37,6 +41,7 @@ export default function GameShell({
   target,
   rule,
   difficulty,
+  itemId,
   phase,
   hud,
   overlay,
@@ -51,6 +56,16 @@ export default function GameShell({
   const [showPass, setShowPass] = useState(false);
   const [passInput, setPassInput] = useState("");
   const [passError, setPassError] = useState(false);
+
+  /* 開いた時点で効果音を先読みする。押した瞬間に鳴らないと手応えが消える */
+  useEffect(() => {
+    preloadSfx();
+  }, []);
+
+  /* クリアの音はここ1箇所。全ゲームがこのシェルを通るので、各ゲームに書かなくてよい */
+  useEffect(() => {
+    if (phase === "won") sfx("clear");
+  }, [phase]);
 
   // 開いている間は背面のスクロールを止める
   useEffect(() => {
@@ -78,7 +93,7 @@ export default function GameShell({
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
+    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 overflow-y-auto bg-(--color-space) px-4 py-6 text-(--color-white)">
       <div className="text-center">
         <p className="text-xs tracking-widest text-(--color-bg-soft)/60">{target}</p>
         <h2 className="font-display text-2xl font-bold md:text-3xl">{title}</h2>
@@ -86,14 +101,15 @@ export default function GameShell({
 
       {phase === "intro" && (
         <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-lg tracking-[0.3em] text-(--color-accent-light)" aria-label={`難易度 ${difficulty} / 5`}>
+          <p className="text-lg tracking-[0.3em] text-(--color-ember)" aria-label={`難易度 ${difficulty} / 5`}>
             {"★".repeat(difficulty)}
             <span className="text-(--color-white)/25">{"★".repeat(5 - difficulty)}</span>
           </p>
+          <ClearRate id={itemId ?? ""} level={difficulty} />
           <div className="max-w-sm text-sm text-(--color-bg-soft)">{rule}</div>
           <button
             onClick={onStart}
-            className="rounded-full bg-(--color-accent) px-8 py-3 font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+            className="btn-ember btn-ember--solid px-8 py-3"
           >
             挑戦する
           </button>
@@ -121,7 +137,7 @@ export default function GameShell({
             <div className="flex gap-2">
               <button
                 onClick={onRetry}
-                className="rounded-full bg-(--color-accent) px-6 py-2 text-sm font-bold transition hover:bg-(--color-accent-dark)"
+                className="btn-ember px-6 py-2 text-sm"
               >
                 もう一度
               </button>
@@ -136,7 +152,7 @@ export default function GameShell({
         )}
 
         {phase === "won" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-(--color-accent-dark)/90 text-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-(--color-space)/88 text-center">
             <p className="font-display text-3xl font-bold">解錠</p>
             <p className="text-sm text-(--color-bg-soft)">{target} の中身が見られるようになった</p>
             <button
@@ -172,7 +188,7 @@ export default function GameShell({
               />
               <button
                 onClick={checkPass}
-                className="rounded-full bg-(--color-accent) px-4 py-2 text-sm font-bold"
+                className="btn-ember px-4 py-2 text-sm"
               >
                 入る
               </button>
@@ -189,5 +205,22 @@ export default function GameShell({
         </button>
       </div>
     </div>
+  );
+}
+
+/**
+ * 「初回クリア率 ○○%」。★を体に来る数字に翻訳して、挑戦前の高揚を作るための表示。
+ * 数字の出どころは lib/difficulty.ts（実測が無い項目は level からの想定値）。
+ */
+function ClearRate({ id, level }: { id: string; level: 1 | 2 | 3 | 4 | 5 }) {
+  const { percent } = clearRate(id, level);
+  return (
+    <p className="m-0 flex items-baseline gap-1.5">
+      <span className="text-xs font-bold text-(--color-bg-soft)/70">初回クリア率</span>
+      <span className="font-display text-2xl font-extrabold leading-none text-(--color-ember)">
+        {percent}
+        <span className="text-sm">%</span>
+      </span>
+    </p>
   );
 }

@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { tryPassphrase, unlock, useIsUnlocked } from "@/lib/unlock";
+import { clearRate } from "@/lib/difficulty";
+import { preloadSfx, sfx } from "@/lib/sfx";
 import StampedeTransition from "@/components/StampedeTransition";
+import SpaceBackdrop from "@/components/SpaceBackdrop";
+import { PAL, addNightLights, nightSkyTexture } from "@/components/games/three-kit";
 
 /** 解錠キー。合言葉で全解錠した場合もこれを満たす */
 const GATE_ID = "gate";
@@ -59,37 +63,17 @@ const DEPTH = 46;
 const worldX = (cx: number) => (cx / CANVAS_W - 0.5) * LANE_WIDTH;
 const worldZ = (cy: number) => -DEPTH * (1 - cy / CANVAS_H);
 
-const SKY_TOP = "#ff8a4c";
-const SKY_MID = "#ffb457";
-const SKY_BOTTOM = "#ffe08a";
-const DUNE_COLOR = 0xe3a75c;
-const PLAYER_GREEN = 0x39a862;
-const ACCENT_CLAY = 0xff6f45;
-const BULLET_YELLOW = 0xffe066;
+/* 夜の砂漠。サイト全体が夜空になったので、ここも夜に揃える（2026-08-20の決定）。
+   色は globals.css のトークン / three-kit の PAL から外さない:
+   以前は空 #ff8a4c〜#ffe08a・砂 #e3a75c・弾 #ffe066（黄）・目印 #ff6f45 という
+   パレット外の原色で、サイトで唯一「昼」の画面になっていた。 */
+const DUNE_COLOR = PAL.sandNight;
+/* 自機は人。夜の砂の上で沈まないよう、服は生成り側に置く */
+const PLAYER_CLOTH = 0xe8dcc6;
+const MARKER_CLAY = PAL.clay;
+/* 弾は ember。この画面の光源と同じ色にして「光り物を増やさない」 */
+const BULLET_EMBER = PAL.ember;
 const OUTLINE_INK = 0x241608;
-
-function makeSkyTexture(): THREE.Texture {
-  const size = 256;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  const grad = ctx.createLinearGradient(0, 0, 0, size);
-  grad.addColorStop(0, SKY_TOP);
-  grad.addColorStop(0.55, SKY_MID);
-  grad.addColorStop(1, SKY_BOTTOM);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-  // ぼんやり太陽
-  const sunGrad = ctx.createRadialGradient(size * 0.5, size * 0.72, 4, size * 0.5, size * 0.72, size * 0.4);
-  sunGrad.addColorStop(0, "rgba(255,255,235,0.95)");
-  sunGrad.addColorStop(1, "rgba(255,255,235,0)");
-  ctx.fillStyle = sunGrad;
-  ctx.fillRect(0, 0, size, size);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
 
 function addOutline(mesh: THREE.Mesh, scale = 1.08): THREE.Mesh {
   const outlineMat = new THREE.MeshBasicMaterial({ color: OUTLINE_INK, side: THREE.BackSide });
@@ -124,7 +108,7 @@ function buildDunes(): THREE.Mesh {
 function buildPlayer(): THREE.Group {
   const group = new THREE.Group();
   const skin = 0xf0dcc0;
-  const cloth = PLAYER_GREEN;
+  const cloth = PLAYER_CLOTH;
 
   const add = (mesh: THREE.Mesh, outline = 1.1) => {
     mesh.add(addOutline(mesh, outline));
@@ -163,7 +147,7 @@ function buildPlayer(): THREE.Group {
   for (const side of [-1, 1]) {
     const leg = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.19, 0.72, 3, 8),
-      new THREE.MeshPhongMaterial({ color: ACCENT_CLAY, flatShading: true, shininess: 8 })
+      new THREE.MeshPhongMaterial({ color: MARKER_CLAY, flatShading: true, shininess: 8 })
     );
     leg.position.set(side * 0.22, 0.1, 0);
     add(leg, 1.12);
@@ -198,7 +182,7 @@ function buildEnemyPool(): { groups: THREE.Group[]; sphereMat: THREE.MeshToonMat
 
 function buildBulletPool(): THREE.Mesh[] {
   const geo = new THREE.CapsuleGeometry(0.16, 0.5, 4, 8);
-  const mat = new THREE.MeshBasicMaterial({ color: BULLET_YELLOW });
+  const mat = new THREE.MeshBasicMaterial({ color: BULLET_EMBER });
   const meshes: THREE.Mesh[] = [];
   for (let i = 0; i < MAX_BULLETS; i++) {
     const m = new THREE.Mesh(geo, mat);
@@ -212,7 +196,7 @@ function buildBulletPool(): THREE.Mesh[] {
 function buildBurstPool(): THREE.Mesh[] {
   const geo = new THREE.RingGeometry(0.4, 0.62, 20);
   const mat = new THREE.MeshBasicMaterial({
-    color: ACCENT_CLAY,
+    color: MARKER_CLAY,
     transparent: true,
     side: THREE.DoubleSide,
     depthWrite: false,
@@ -232,7 +216,7 @@ function buildMarkers(): THREE.Mesh[] {
   const count = 16;
   for (let i = 0; i < count; i++) {
     const side = i % 2 === 0 ? -1 : 1;
-    const color = i % 4 < 2 ? PLAYER_GREEN : ACCENT_CLAY;
+    const color = i % 4 < 2 ? PAL.nebula : MARKER_CLAY;
     const mat = new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 6 });
     const m = new THREE.Mesh(geo, mat);
     m.position.set(side * (LANE_WIDTH / 2 + 1.4), -1.6, -((i * (DEPTH * 2.2)) / count));
@@ -254,6 +238,8 @@ export default function ShootingGameGate() {
   const [transitioning, setTransitioning] = useState(false);
   /** 入口の文字だけの画面を抜けたか */
   const [welcomed, setWelcomed] = useState(false);
+  /* 前口上を最後まで見なくても入れるように、どこかを押したら手前のボタンを即出す */
+  const [openingRushed, setOpeningRushed] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -275,9 +261,10 @@ export default function ShootingGameGate() {
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    const skyTex = makeSkyTexture();
+    const skyTex = nightSkyTexture({ glow: 0.46 });
     scene.background = skyTex;
-    scene.fog = new THREE.Fog(0xffb457, DEPTH * 0.55, DEPTH * 1.35);
+    /* 霧の色は空の地平線側と同じ。ここだけ明るいと奥に膜が張ったように見える */
+    scene.fog = new THREE.Fog(0x141c26, DEPTH * 0.5, DEPTH * 1.4);
 
     const camera = new THREE.PerspectiveCamera(52, CANVAS_W / CANVAS_H, 0.1, 200);
     camera.position.set(0, 7.6, 11);
@@ -291,11 +278,7 @@ export default function ShootingGameGate() {
     renderer.domElement.style.display = "block";
     mount.appendChild(renderer.domElement);
 
-    const hemi = new THREE.HemisphereLight(0xfff2d6, 0x7a4a2c, 1.05);
-    scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xfff0d0, 1.15);
-    sun.position.set(-6, 10, 6);
-    scene.add(sun);
+    addNightLights(scene);
 
     const dunes = buildDunes();
     scene.add(dunes);
@@ -426,6 +409,7 @@ export default function ShootingGameGate() {
           });
           if (hit) {
             scoreRef.current += 1;
+            sfx("hit");
             setScore(scoreRef.current);
             bursts.current.push({ x: enX, y: en.y, born: t });
           } else {
@@ -571,6 +555,19 @@ export default function ShootingGameGate() {
     }
   };
 
+  /* ゲートは GameShell を通らないので、効果音の先読みはここでやる */
+  useEffect(() => {
+    preloadSfx();
+  }, []);
+
+  /* キーボードでも前口上を飛ばせるようにする（クリックと同じ扱い） */
+  useEffect(() => {
+    if (welcomed || openingRushed) return;
+    const onKey = () => setOpeningRushed(true);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [welcomed, openingRushed]);
+
   /** 入口からそのままゲームへ入る（説明画面は挟まない） */
   const startFromWelcome = () => {
     setWelcomed(true);
@@ -594,7 +591,7 @@ export default function ShootingGameGate() {
 
     return (
       <>
-        <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
+        <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-space) px-4 py-6 text-(--color-white)">
           <p className="font-display text-2xl font-bold">CLEAR!</p>
           <p className="text-center text-sm text-(--color-bg-soft)">
             へぇ 案外やるじゃん
@@ -612,7 +609,7 @@ export default function ShootingGameGate() {
           />
           <button
             onClick={startTransition}
-            className="rounded-full bg-(--color-accent) px-8 py-3 font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+            className="btn-ember btn-ember--solid px-8 py-3"
           >
             {videoEnded ? "サイトへ進む →" : "スキップしてサイトへ →"}
           </button>
@@ -626,45 +623,86 @@ export default function ShootingGameGate() {
      Three.js の初期化が走り、二度と作られなくなる（実際にゲームが動かなくなった）。
      必ず本体を描いたうえで、その「上に重ねる」こと。 */
   const welcomeOverlay = !welcomed ? (
-      <div className="fixed inset-0 z-110 flex flex-col items-center justify-center gap-8 overflow-y-auto bg-(--color-ink) px-6 py-10 text-center text-(--color-white)">
-        <div className="flex max-w-lg flex-col gap-5">
-          <p
-            className="welcome__line font-display text-xl font-bold leading-relaxed md:text-2xl"
-            style={{ animationDelay: "0.25s" }}
-          >
-            こうきの自己紹介サイトへようこそ
-          </p>
-          <p
-            className="welcome__line font-display text-xl font-bold leading-relaxed md:text-2xl"
-            style={{ animationDelay: "1.5s" }}
-          >
-            まずは、肩慣らし、
-            <br className="md:hidden" />
-            エチオピアの詐欺師を撃退しよう
-          </p>
+      <div
+        className="opening fixed inset-0 z-110 overflow-hidden text-center text-(--color-white)"
+        onClick={() => setOpeningRushed(true)}
+      >
+        <SpaceBackdrop scenery="void" />
+
+        <p className="opening__prologue font-display text-base font-bold tracking-[0.18em] md:text-lg">
+          ずっと前、はるか遠くの国で──
+        </p>
+
+        <p className="opening__mark font-display text-5xl font-extrabold tracking-wide md:text-7xl">
+          Who am I ?
+        </p>
+
+        <div className="opening__stage" aria-hidden="true">
+          <div className="opening__plane">
+          <div className="opening__crawl font-display text-base font-extrabold leading-loose md:text-3xl">
+            <p>これは、四十の国を歩いた男の話。</p>
+            <p className="pt-[1.2em]">
+              砂漠では詐欺師に囲まれ、
+              <br />
+              草原では牛の群れに追われ、
+              <br />
+              それでもまだ、
+              <br className="md:hidden" />
+              次の地図を広げている。
+            </p>
+            <p className="pt-[1.2em]">
+              彼が何者かは、
+              <br />
+              勝ち取らないと分からない。
+            </p>
+            <p className="pt-[1.2em]">
+              すべての記憶を集めた者には、
+              <br />
+              こうきから豪華賞品が贈られる。
+            </p>
+            <p className="pt-[1.2em]">
+              まずは肩慣らし。
+              <br />
+              エチオピアの詐欺師を撃退せよ。
+            </p>
+          </div>
+          </div>
         </div>
 
-        <button
-          onClick={startFromWelcome}
-          className="welcome__hint rounded-full bg-(--color-accent) px-12 py-4 text-lg font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
-          style={{ animationDelay: "2.9s" }}
-        >
-          ゲームスタート
-        </button>
+        <div className="opening__veil" aria-hidden="true" />
+
+        <div className="absolute inset-x-0 bottom-[12vh] flex justify-center">
+          <button
+            onClick={startFromWelcome}
+            className={`opening__start rounded-md border-2 border-(--color-ember) px-10 py-3.5 font-display text-lg font-bold text-(--color-ember) transition hover:bg-(--color-ember) hover:text-(--color-space) ${
+              openingRushed ? "opening__start--now" : ""
+            }`}
+          >
+            ゲームスタート
+          </button>
+        </div>
       </div>
   ) : null;
 
   return (
     <>
-    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-ink) px-4 py-6 text-(--color-white)">
+    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-space) px-4 py-6 text-(--color-white)">
       <p className="text-center font-display text-2xl font-bold">Who am I ?</p>
 
       {phase === "intro" && (
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
-          <p className="text-lg tracking-[0.3em] text-(--color-accent-light)" aria-label="難易度 3 / 5">
+          <p className="text-lg tracking-[0.3em] text-(--color-ember)" aria-label="難易度 3 / 5">
             ★★★<span className="text-(--color-white)/25">★★</span>
           </p>
-          <div className="w-full rounded-lg border-2 border-(--color-accent) bg-(--color-accent-dark)/25 px-5 py-4">
+          {/* ここだけは実測値。tools/sim-gate.mjs の初心者モデルで計測してある */}
+          <p className="m-0 flex items-baseline gap-1.5">
+            <span className="text-xs font-bold text-(--color-bg-soft)/70">初回クリア率</span>
+            <span className="font-display text-2xl font-extrabold leading-none text-(--color-ember)">
+              {clearRate(GATE_ID, 3).percent}
+              <span className="text-sm">%</span>
+            </span>
+          </p>
+          <div className="w-full rounded-md border-2 border-(--color-nebula) bg-(--color-space)/70 px-5 py-4">
             <p className="text-sm text-(--color-bg-soft)">
               {WIN_SCORE}体撃退でクリア（残機{START_LIVES}）
               <br />
@@ -675,7 +713,7 @@ export default function ShootingGameGate() {
           </div>
           <button
             onClick={resetGame}
-            className="rounded-full bg-(--color-accent) px-10 py-3.5 text-lg font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+            className="btn-ember btn-ember--solid px-10 py-3.5 text-lg"
           >
             ゲームスタート
           </button>
@@ -707,7 +745,7 @@ export default function ShootingGameGate() {
             <p className="font-display text-2xl font-bold text-(--color-white)">GAME OVER</p>
             <button
               onClick={resetGame}
-              className="rounded-full bg-(--color-accent) px-6 py-2 text-sm font-bold text-(--color-white) transition hover:bg-(--color-accent-dark)"
+              className="btn-ember px-6 py-2 text-sm"
             >
               もう一度
             </button>
@@ -738,7 +776,7 @@ export default function ShootingGameGate() {
               />
               <button
                 onClick={checkPassphrase}
-                className="rounded-full bg-(--color-accent) px-4 py-2 text-sm font-bold text-(--color-white)"
+                className="btn-ember px-4 py-2 text-sm"
               >
                 入る
               </button>

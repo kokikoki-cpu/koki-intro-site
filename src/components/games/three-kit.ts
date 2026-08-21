@@ -9,6 +9,16 @@ export const PAL = {
   accentDark: 0x2c4230,
   clay: 0xa85630,
   white: 0xfffdf8,
+  /* 夜側。サイト全体が夜空になったので、ゲームの中もこの色域で組む */
+  space: 0x090a09,
+  ember: 0xd9a86a,
+  nebula: 0x6f5a44,
+  /* 夜の砂。奥（暗い）と手前（月光が当たる）で2段持つ。
+     暗い方だけだと地形の起伏が読めず、ただの黒い画面になる */
+  sandNight: 0x4d3b26,
+  sandNightFar: 0x3a2c1c,
+  sandNightDeep: 0x241a10,
+  moon: 0xcfd8e8,
 } as const;
 
 /** アウトライン（法線反転メッシュ）の色。全ゲームで共通のアニメ調の線 */
@@ -49,6 +59,93 @@ export function skyTexture(opts: {
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
+}
+
+/**
+ * 夜空のテクスチャ。全ゲーム共通。
+ * サイト本編（`.space` の #090a09 + 地平線ぎわの暖色ひとつ）と同じ組み立てにしてある:
+ * 星は白の点だけ、光源は地平線の ember ひとつだけ。ここを各ゲームで自作すると
+ * 「ゲームだけ別の空」になるので、必ずこれを使う。
+ */
+/** 2つの #rrggbb を混ぜる。夜 → 夜明け の補間に使う */
+function mixHex(a: string, b: string, t: number): string {
+  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
+  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
+  const m = pa.map((v, i) => Math.round(v + (pb[i] - v) * t));
+  return `#${m.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
+export function nightSkyTexture(
+  opts: { glow?: number; stars?: number; seed?: number; dawn?: number } = {}
+): THREE.Texture {
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+
+  /* dawn: 0=夜 / 1=夜明け。カッパドキアの気球は日の出前に離陸するので、
+     進むほどこの値を上げて空を明るくする＝進捗が空の色で分かる。
+     混ぜ先の色も土とemberの色域から出さない（紫やピンクは入れない）。 */
+  const d = Math.max(0, Math.min(1, opts.dawn ?? 0));
+  const grad = ctx.createLinearGradient(0, 0, 0, size);
+  grad.addColorStop(0, mixHex("#05060a", "#223047", d));
+  grad.addColorStop(0.52, mixHex("#0a1017", "#6a4a30", d));
+  grad.addColorStop(1, mixHex("#1b2530", "#d09a5c", d));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  /* 星。位置は種を固定した乱数（同じ空が毎回出る方が世界として信用できる） */
+  let a = opts.seed ?? 20260820;
+  const rnd = () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const count = opts.stars ?? 190;
+  for (let i = 0; i < count; i++) {
+    const x = rnd() * size;
+    /* 地平線側には星を置かない（下ほど大気で見えない、という素直な理屈） */
+    const y = rnd() * size * 0.72;
+    const r = rnd() * 1.5 + 0.4;
+    /* 明るくなるほど星は見えなくなる */
+    ctx.globalAlpha = (0.25 + rnd() * 0.62) * (1 - d * 0.92);
+    ctx.fillStyle = "#fffdf8";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  /* 地平線ぎわの残光。これがこの空の唯一の光源 */
+  const gy = size * (opts.glow ?? 0.5);
+  const glow = ctx.createRadialGradient(size * 0.5, gy, 6, size * 0.5, gy, size * 0.5);
+  glow.addColorStop(0, `rgba(217,168,106,${(0.5 + d * 0.38).toFixed(2)})`);
+  glow.addColorStop(0.45, `rgba(160,110,64,${(0.16 + d * 0.3).toFixed(2)})`);
+  glow.addColorStop(1, "rgba(160,110,64,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, size, size);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/**
+ * 夜のライティング。月光（淡い青白）を主光源にし、
+ * 地平線の残光を弱い暖色のフィルとして反対側から1灯だけ入れる。
+ * 「光は原則ひとつ」を守りつつ、被写体が真っ黒に潰れないようにするための最小構成。
+ */
+export function addNightLights(scene: THREE.Scene): void {
+  scene.add(new THREE.HemisphereLight(0x2b3a4d, 0x1a130a, 0.85));
+  const moon = new THREE.DirectionalLight(PAL.moon, 0.9);
+  moon.position.set(-6, 11, 5);
+  scene.add(moon);
+  const ember = new THREE.DirectionalLight(PAL.ember, 0.45);
+  ember.position.set(4, 1.6, -8);
+  scene.add(ember);
 }
 
 /**

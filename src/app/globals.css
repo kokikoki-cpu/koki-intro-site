@@ -16,6 +16,9 @@
   --color-clay: #a85630;
   --color-white: #fffdf8;
   --color-line: rgba(26, 28, 22, 0.14);
+  /* 夜空の黒。--color-ink(#1a1c16) は本文用で緑に寄っているため、
+     宇宙の全面塗りには使わない（オープニングと本編で空の色が違う原因になっていた） */
+  --color-space: #090a09;
 }
 
 @theme inline {
@@ -31,6 +34,7 @@
   --color-clay: var(--color-clay);
   --color-white: var(--color-white);
   --color-line: var(--color-line);
+  --color-space: var(--color-space);
   --font-display: var(--font-shippori-mincho-b1);
   --font-body: var(--font-noto-sans-jp);
 }
@@ -167,7 +171,7 @@ h1, h2, h3, h4 {
   /* 光源はひとつだけ。複数の色を重ねると、途端に量産の宇宙イラストになる */
   background:
     radial-gradient(ellipse 74% 46% at 50% 96%, rgba(150, 112, 68, 0.3) 0%, rgba(9, 10, 9, 0) 70%),
-    #090a09;
+    var(--color-space);
 }
 
 .space__star {
@@ -501,7 +505,7 @@ h1, h2, h3, h4 {
   height: var(--d);
   margin-top: calc(var(--d) / -2);
   margin-left: calc(var(--d) / -2);
-  border: 1px solid rgba(150, 196, 226, 0.2);
+  border: 1px solid rgba(217, 168, 106, 0.16);
   border-radius: 50%;
   pointer-events: none;
   animation: orbit-spin var(--dur) linear infinite;
@@ -591,9 +595,48 @@ h1, h2, h3, h4 {
   animation: planet-breathe 3.2s ease-in-out infinite;
 }
 
+/* 「押せる」ことを伝える唯一の光。色は夜空の光源と同じ ember に揃えた
+   （以前は青白 rgba(146,190,224) で、パレットに無い色だった） */
 @keyframes planet-breathe {
-  0%, 100% { filter: drop-shadow(0 0 12px rgba(146, 190, 224, 0.35)); }
-  50%      { filter: drop-shadow(0 0 24px rgba(182, 227, 242, 0.7)); }
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(217, 168, 106, 0.3)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(217, 168, 106, 0.62)); }
+}
+
+/* ==========================================================================
+   惑星の輪（土星型）
+   中身の多い惑星にだけ付ける「重み」の記号。国(9件)は二重、スポーツ(6件)は一重。
+   輪は planet の子として絶対配置し、惑星の直径に対する % で描くので、
+   惑星が大きくなれば輪も一緒に育つ。
+   奥半分を惑星の後ろ、手前半分を惑星の前に置くことで、本当に貫通して見せている
+   （全部を前に描くと、ただ輪をかぶせただけの絵になる）。
+   ========================================================================== */
+.planet-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 176%;
+  aspect-ratio: 1;
+  margin-left: -88%;
+  margin-top: -88%;
+  border: 2px solid rgba(217, 168, 106, 0.5);
+  border-radius: 50%;
+  transform: rotateX(74deg) rotate(-16deg);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.planet-ring--outer {
+  width: 198%;
+  margin-left: -99%;
+  margin-top: -99%;
+  border-color: rgba(217, 168, 106, 0.26);
+  border-width: 1px;
+}
+
+/* 手前半分。奥半分と同じ図形を、下側だけ残して惑星の前に重ねる */
+.planet-ring--front {
+  z-index: 1;
+  clip-path: inset(50% 0 0 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -656,34 +699,442 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
-   入口のウェルカム画面（文字だけを順に浮かび上がらせて引き込む）
+   エンカウントバトル（世界地図の7カ国）
+   主役は実写。CSSで描いた飾りは足さない。色は夜のパレット内で、
+   ember = 自分の一手 / clay = 危険（予告・被弾）と役割を分けている。
    ========================================================================== */
-.welcome__line {
-  opacity: 0;
-  animation: welcome-rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+.battle {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-space);
 }
 
-@keyframes welcome-rise {
-  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+.battle__bg {
+  object-fit: cover;
+  /* 空より地面側を見せる。ここは登場人物が立つ舞台なので、
+     真ん中で切ると空だけが写って何の場所か分からなくなる（ケニアの象がそうなった） */
+  object-position: 50% 62%;
+  /* 背景は「舞台」であって主役ではない。もらった写真は自撮りも混じっていて、
+     明るいままだと写真の中の顔が主役に見えて、敵と自分が「写真に貼ったシール」になる。
+     ぼかして誤魔化さず、暗さと彩度だけで奥に下げる */
+  filter: brightness(0.34) saturate(0.62);
 }
 
-/* 「まだ何か出てくる」と思わせるための、ゆっくり明滅する促し */
-.welcome__hint {
-  opacity: 0;
-  animation: welcome-rise 900ms ease-out forwards, welcome-pulse 2.4s ease-in-out 1s infinite;
+.battle__scrim {
+  position: absolute;
+  inset: 0;
+  /* 下から闇を上げて足元を作り（登場人物が立つ床になる）、四隅を落として中央に目を集める */
+  background:
+    radial-gradient(ellipse 78% 62% at 50% 44%, rgba(9, 10, 9, 0) 0%, rgba(9, 10, 9, 0.72) 100%),
+    linear-gradient(to top, var(--color-space) 10%, rgba(9, 10, 9, 0.72) 34%, rgba(9, 10, 9, 0.2) 100%);
 }
 
-@keyframes welcome-pulse {
-  0%, 100% { opacity: 0.45; }
-  50%      { opacity: 1; }
+/* --- 相手 ------------------------------------------------------------- */
+.battle__enemy {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: min(64%, 260px);
+}
+
+.battle__face {
+  position: relative;
+  width: clamp(82px, 23%, 138px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 253, 248, 0.82);
+  animation: battle-breathe 3.4s ease-in-out infinite;
+}
+
+/* 予告中。危険はクレイ色で示す（光らせない） */
+.battle__face--tell {
+  border-color: var(--color-clay);
+  animation: battle-tell 420ms steps(2, jump-none) infinite;
+}
+
+.battle__name {
+  margin: 0;
+  font-size: clamp(11px, 2.6vw, 14px);
+  font-weight: 800;
+  color: var(--color-white);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.battle__bar {
+  width: 100%;
+  height: 7px;
+  border: 1px solid rgba(255, 253, 248, 0.5);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.battle__bar > span {
+  display: block;
+  height: 100%;
+  background: var(--color-ember);
+  transition: width 220ms ease-out;
+}
+
+.battle__tell {
+  margin: 0;
+  font-size: clamp(12px, 3vw, 15px);
+  font-weight: 800;
+  color: var(--color-clay);
+  letter-spacing: 0.08em;
+}
+
+/* --- 自分（立ち姿の札） ----------------------------------------------- */
+/* 立ち姿の写真は風景ごと写っているので、そのまま置くと「額に入った写真」に見える。
+   枠の中で寄せて、人物だけが見えるようにする（切り抜きの粗が出ない範囲で人物にする） */
+.battle__me img {
+  transform: scale(1.6);
+  transform-origin: 50% 44%;
+}
+
+.battle__me {
+  position: absolute;
+  left: 5%;
+  bottom: 27%;
+  width: clamp(92px, 25%, 152px);
+  aspect-ratio: 3 / 4;
+  border: 2px solid var(--color-white);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* --- ダメージ数字 ------------------------------------------------------ */
+.battle__floaters {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.battle__pop {
+  position: absolute;
+  top: 38%;
+  font-size: clamp(26px, 7vw, 44px);
+  font-weight: 800;
+  animation: battle-pop 900ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.battle__pop--hit   { color: var(--color-ember); }
+.battle__pop--hurt  { color: var(--color-clay); }
+.battle__pop--guard { color: var(--color-white); font-size: clamp(18px, 4.4vw, 26px); }
+
+/* --- コマンド枠（スマホで触るのはここだけ） --------------------------- */
+.battle__panel {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 8px clamp(8px, 2vw, 14px) clamp(8px, 2vw, 12px);
+  background: linear-gradient(to top, var(--color-space) 40%, rgba(9, 10, 9, 0.72) 100%);
+  border-top: 1px solid rgba(217, 168, 106, 0.28);
+}
+
+.battle__msg {
+  margin: 0 0 4px;
+  text-align: center;
+  font-size: clamp(11px, 2.6vw, 13px);
+  font-weight: 800;
+  color: var(--color-bg-soft);
+}
+
+.battle__atb {
+  height: 4px;
+  margin-bottom: 8px;
+  background: rgba(255, 253, 248, 0.14);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.battle__atb > span {
+  display: block;
+  height: 100%;
+  background: var(--color-ember);
+}
+
+.battle__cmds {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(5px, 1.4vw, 9px);
+}
+
+/* サイト共通のボタン言語（2px枠線 + 6px角丸）。指で押せる高さを確保する */
+.battle__cmd {
+  min-height: 44px;
+  padding: 6px 4px;
+  border: 2px solid var(--color-ember);
+  border-radius: 6px;
+  background: rgba(9, 10, 9, 0.6);
+  color: var(--color-ember);
+  font-size: clamp(12px, 3vw, 15px);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+
+.battle__cmd:hover:not(:disabled) {
+  background: var(--color-ember);
+  color: var(--color-space);
+}
+
+/* ゲージが溜まるまでは押せない。押せないことは薄さで伝える（文字で説明しない） */
+.battle__cmd:disabled {
+  opacity: 0.32;
+  cursor: default;
+  border-color: rgba(217, 168, 106, 0.45);
+}
+
+@keyframes battle-pop {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.9); }
+  22%  { opacity: 1; transform: translateY(-6px) scale(1.06); }
+  100% { opacity: 0; transform: translateY(-42px) scale(1); }
+}
+
+@keyframes battle-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.035); }
+}
+
+@keyframes battle-tell {
+  0%   { transform: translateX(-2px); }
+  100% { transform: translateX(2px); }
+}
+
+/* 被弾。画面が揺れる */
+.battle--shake {
+  animation: battle-shake 340ms ease-in-out;
+}
+
+@keyframes battle-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20%      { transform: translate(-5px, 2px); }
+  40%      { transform: translate(4px, -3px); }
+  60%      { transform: translate(-3px, 3px); }
+  80%      { transform: translate(3px, -1px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .welcome__line,
-  .welcome__hint {
-    animation: none !important;
-    opacity: 1;
+  .battle__face,
+  .battle__face--tell,
+  .battle--shake {
+    animation: none;
+  }
+
+  .battle__pop {
+    animation: battle-pop 900ms linear forwards;
+  }
+}
+
+/* ==========================================================================
+   夜空の上のボタン（サイト共通）
+   「宇宙空間に緑はイメージが湧かない」という指摘で、暗い面の上のアクセントは
+   ember(#d9a86a = 砂/琥珀)の一色に統一した。緑(--color-accent)は明るい紙面
+   （世界地図など）専用として残す。
+   形はサイト共通のカード言語（2px枠線 + 6px角丸）に合わせ、ピル型は使わない。
+   ========================================================================== */
+.btn-ember {
+  border: 2px solid var(--color-ember);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-ember);
+  font-weight: 700;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.btn-ember:hover {
+  background: var(--color-ember);
+  color: var(--color-space);
+}
+
+/* その画面でいちばん押させたい導線は塗りで出す
+   （枠線ボタンが2つ並ぶと主従が消えて、どちらを押すのか分からなくなる） */
+.btn-ember--solid {
+  background: var(--color-ember);
+  color: var(--color-space);
+}
+
+.btn-ember--solid:hover {
+  background: var(--color-white);
+  border-color: var(--color-white);
+  color: var(--color-space);
+}
+
+/* ==========================================================================
+   オープニング（入口）
+   スターウォーズの「見た目」ではなく「狙い」だけを借りている:
+     ① 静寂の一行 → ② ワードマークが奥へ引く → ③ 前口上が奥へ流れていく
+   の三拍子で「これから宇宙に入る」と体で分からせる。よって
+   - 黄色(#FFE81F)とNews Gothicは使わない。色はパレット内の --color-ember、
+     書体はサイト共通の明朝(--font-display)
+   - 星は本編と同じ .space__star（SpaceBackdrop の "void"）を使って空を地続きにする
+   - 唯一の光源は流れる文字そのもの。text-shadow のグローは足さない。
+     奥の消え際は mask-image のフェード = 「光」ではなく「距離」で見せる
+   ========================================================================== */
+.opening {
+  background: var(--color-space);
+}
+
+/* ① ずっと前、はるか遠くの国で── */
+.opening__prologue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40%;
+  opacity: 0;
+  animation: opening-prologue 3.4s ease-out forwards;
+}
+
+@keyframes opening-prologue {
+  0%        { opacity: 0; }
+  14%, 62%  { opacity: 0.92; }
+  100%      { opacity: 0; }
+}
+
+/* ② ワードマークが奥へ引いていく（サイトのワードマークをそのまま使う） */
+.opening__mark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  animation: opening-mark 3.6s cubic-bezier(0.22, 0.61, 0.36, 1) 3.2s forwards;
+}
+
+@keyframes opening-mark {
+  0%   { opacity: 0; transform: scale(1.34); }
+  16%  { opacity: 1; transform: scale(1.24); }
+  100% { opacity: 0; transform: scale(0.24); }
+}
+
+/* ③ 前口上が奥へ流れていく */
+.opening__stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  perspective: 680px;
+  perspective-origin: 50% 0%;
+}
+
+/* 傾いた面。ここは静止させ、文字は「面の上」を滑らせる（下記 .opening__crawl）。
+   傾き・遠近・幅を画面サイズごとに変えたいので、アニメーションとは分けてある
+   （keyframes 側に rotateX を書くと、メディアクエリで上書きできなくなる） */
+.opening__plane {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(660px, 84vw);
+  transform-origin: 50% 0%;
+  transform: translateX(-50%) rotateX(52deg);
+}
+
+.opening__crawl {
+  color: var(--color-ember);
+  text-align: center;
+  transform: translateY(78vh);
+  animation: opening-crawl 17s linear 3.9s forwards;
+}
+
+@keyframes opening-crawl {
+  from { transform: translateY(78vh); }
+  to   { transform: translateY(-250vh); }
+}
+
+/* スマホ: 縦長画面では
+   - 面を狭くして手前の文字を画面内に収める
+   - 消失点(面の起点)を画面上端ではなく少し下げ、文字の帯が画面の中央に来るようにする
+     （上端に貼り付くと、帯の下に何もない大きな空白ができて構図が抜ける） */
+@media (max-width: 767px) {
+  .opening__stage {
+    perspective: 760px;
+  }
+
+  .opening__plane {
+    top: 20vh;
+    width: 72vw;
+    transform: translateX(-50%) rotateX(56deg);
+  }
+}
+
+/* 消失点と画面下端で文字を夜空に溶かすヴェール。
+   文字側の mask-image では駄目だった: マスクは変形前の自分の箱に貼り付くので、
+   「奥に行くほど薄く」ではなく「最初と最後の行だけ薄い」になってしまう。
+   画面座標の膜としてかぶせ、かつ perspective の外（.opening__stage の兄弟）に置く
+   ＝ 3D空間の中に置くと、手前に来た文字の方が膜より前に描画されてしまう。 */
+.opening__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(9, 10, 9, 0.95) 0%, rgba(9, 10, 9, 0.6) 12%, rgba(9, 10, 9, 0) 32%),
+    linear-gradient(to top, rgb(9, 10, 9) 9%, rgba(9, 10, 9, 0.9) 20%, rgba(9, 10, 9, 0) 36%);
+}
+
+/* 手前のボタン。押せることは色の反転で伝える（枠線2px+6px角丸のサイト共通言語）。
+   前口上が流れ切ったあと画面には星とこのボタンだけが残るので、
+   静かに息をさせて「押せる」ことを保ち続ける（文章で案内しない方針のため） */
+.opening__start {
+  opacity: 0;
+  animation:
+    opening-fade 900ms ease-out 6.6s forwards,
+    opening-breathe 3s ease-in-out 7.6s infinite;
+}
+
+/* クリック/キー操作で前口上を待たずに入れる（待たせない = ワクワクを切らさない） */
+.opening__start--now {
+  animation:
+    opening-fade 320ms ease-out forwards,
+    opening-breathe 3s ease-in-out 400ms infinite;
+}
+
+@keyframes opening-breathe {
+  0%, 100% { transform: scale(1);     border-color: var(--color-ember); }
+  50%      { transform: scale(1.035); border-color: var(--color-white); }
+}
+
+@keyframes opening-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening__prologue,
+  .opening__mark {
+    display: none;
+  }
+
+  .opening__stage {
+    display: grid;
+    place-items: center;
+    padding-left: 24px;
+    padding-right: 24px;
+    perspective: none;
+  }
+
+  .opening__plane {
+    position: static;
+    width: min(660px, 84vw);
+    transform: none;
+  }
+
+  .opening__crawl {
+    transform: none;
+    animation: none;
+  }
+
+  .opening__veil {
+    display: none;
   }
 }
 

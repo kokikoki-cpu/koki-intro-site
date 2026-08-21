@@ -18,11 +18,13 @@ export default function WarpLink({
   href,
   className,
   title,
+  style,
   children,
 }: {
   href: string;
   className?: string;
   title?: string;
+  style?: CSSProperties;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -40,7 +42,7 @@ export default function WarpLink({
 
   return (
     <>
-      <a href={href} onClick={go} className={className} title={title}>
+      <a href={href} onClick={go} className={className} title={title} style={style}>
         {children}
       </a>
 
