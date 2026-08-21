@@ -949,6 +949,464 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
+   世界地図の国別ゲーム（釣り/PK/登攀/逃走/フォトサファリ）共通の考え方
+   - 舞台はその国の実写を暗く敷く（バトルと同じ「舞台に落とす」手法）
+   - 登場する生き物・人はシルエット（地図の生き物と同じ言語。イラスト調にしない）
+   - 光は ember ひとつ。危険・失敗は clay
+   ========================================================================== */
+
+/* --- ペルー: アマゾンの夜釣り ------------------------------------------- */
+.fishing {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-space);
+  cursor: pointer;
+}
+
+.fishing__bg {
+  object-fit: cover;
+  object-position: 50% 62%;
+  filter: brightness(0.34) saturate(0.62);
+}
+
+.fishing__scrim {
+  position: absolute;
+  inset: 0;
+  /* 下半分は水面。上より一段暗くして、水と岸の境を作る */
+  background: linear-gradient(to top, rgba(6, 10, 14, 0.85) 0%, rgba(9, 10, 9, 0.35) 55%, rgba(9, 10, 9, 0.55) 100%);
+}
+
+.fishing__water {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 18%;
+  display: grid;
+  place-items: center;
+}
+
+.fishing__float {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 160ms ease;
+  animation: float-bob 3.2s ease-in-out infinite;
+}
+
+.fishing__stick {
+  width: 3px;
+  height: 22px;
+  background: var(--color-white);
+  border-radius: 2px;
+}
+
+.fishing__ball {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-ember);
+  border: 2px solid var(--color-white);
+}
+
+/* さざ波: 小さく揺れるだけ。ここで合わせると逃げられる */
+.fishing__float--nibble { transform: translateY(5px) rotate(-4deg); }
+/* 本アタリ: 沈み切る。この瞬間だけが本物 */
+.fishing__float--bite   { transform: translateY(18px); opacity: 0.55; }
+.fishing__float--catch  { transform: translateY(-14px) rotate(8deg); }
+
+@keyframes float-bob {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 3px; }
+}
+
+.fishing__ripple {
+  position: absolute;
+  width: 34px;
+  height: 12px;
+  border: 1.5px solid rgba(255, 253, 248, 0.5);
+  border-radius: 50%;
+  animation: ripple-out 700ms ease-out infinite;
+}
+
+.fishing__ripple--big {
+  width: 50px;
+  height: 18px;
+  border-color: rgba(217, 168, 106, 0.8);
+}
+
+@keyframes ripple-out {
+  from { transform: scale(0.6); opacity: 1; }
+  to   { transform: scale(1.7); opacity: 0; }
+}
+
+.fishing__fish {
+  position: absolute;
+  width: 44px;
+  animation: fish-jump 650ms ease-out forwards;
+}
+
+@keyframes fish-jump {
+  0%   { transform: translateY(10px) rotate(0); opacity: 0; }
+  40%  { transform: translateY(-26px) rotate(-18deg); opacity: 1; }
+  100% { transform: translateY(-8px) rotate(-40deg); opacity: 0; }
+}
+
+.fishing__msg,
+.soccer__msg,
+.photohunt__msg {
+  position: absolute;
+  inset-inline: 0;
+  top: 8%;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(13px, 3vw, 16px);
+  font-weight: 800;
+  color: var(--color-bg-soft);
+}
+
+/* --- ブラジル: 夜のPK戦 --------------------------------------------------- */
+.soccer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-space);
+}
+
+.soccer__bg {
+  object-fit: cover;
+  /* 群衆の顔が並ぶ帯をゴールの後ろに置く */
+  object-position: 50% 30%;
+  filter: brightness(0.3) saturate(0.55);
+}
+
+.soccer__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 30%, rgba(217, 168, 106, 0.1) 0%, rgba(9, 10, 9, 0) 60%),
+    linear-gradient(to top, var(--color-space) 6%, rgba(9, 10, 9, 0.5) 40%, rgba(9, 10, 9, 0.4) 100%);
+}
+
+/* ゴール。夜の照明に浮かぶ白い枠 */
+.soccer__goal {
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  width: min(66%, 340px);
+  height: 38%;
+  transform: translateX(-50%);
+  border: 3px solid rgba(255, 253, 248, 0.85);
+  border-bottom: none;
+  border-radius: 2px;
+  display: grid;
+  place-items: end center;
+}
+
+.soccer__keeper {
+  width: clamp(40px, 12%, 56px);
+  transition: transform 420ms cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+.soccer__keeper--dive0 { transform: translateX(-260%) rotate(-24deg); }
+.soccer__keeper--dive1 { transform: translateY(-16%) scale(1.08); }
+.soccer__keeper--dive2 { transform: translateX(260%) rotate(24deg); }
+
+.soccer__ball {
+  position: absolute;
+  left: 50%;
+  bottom: 24%;
+  width: 15px;
+  height: 15px;
+  margin-left: -7.5px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 2px solid rgba(26, 28, 22, 0.6);
+  transition: transform 560ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* 蹴る。コースの分だけ横へ、ゴールの高さまで飛ぶ */
+.soccer__ball--fly0 { transform: translate(-120px, -26vh) scale(0.62); }
+.soccer__ball--fly1 { transform: translate(0, -28vh) scale(0.62); }
+.soccer__ball--fly2 { transform: translate(120px, -26vh) scale(0.62); }
+
+.soccer__cmds {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(5px, 1.4vw, 9px);
+  padding: 8px clamp(8px, 2vw, 14px) clamp(8px, 2vw, 12px);
+  background: linear-gradient(to top, var(--color-space) 40%, rgba(9, 10, 9, 0) 100%);
+}
+
+.soccer__cmd,
+.escape__cmd,
+.photohunt__shutter {
+  min-height: 48px;
+  border: 2px solid var(--color-ember);
+  border-radius: 6px;
+  background: rgba(9, 10, 9, 0.6);
+  color: var(--color-ember);
+  font-size: clamp(14px, 3.4vw, 17px);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+
+.soccer__cmd:active:not(:disabled),
+.escape__cmd:active:not(:disabled),
+.photohunt__shutter:active:not(:disabled) {
+  background: var(--color-ember);
+  color: var(--color-space);
+}
+
+.soccer__cmd:disabled,
+.escape__cmd:disabled,
+.photohunt__shutter:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* --- アルゼンチン: 夜明けの登攀 ------------------------------------------ */
+.climb {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-space);
+  cursor: pointer;
+}
+
+.climb__scene {
+  position: absolute;
+  /* 上下に余らせておき、登った分だけ下へ流す */
+  inset: -20% 0;
+  transition: transform 600ms cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+.climb__bg {
+  object-fit: cover;
+  filter: brightness(0.4) saturate(0.7);
+}
+
+.climb__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--color-space) 8%, rgba(9, 10, 9, 0.3) 45%, rgba(9, 10, 9, 0.45) 100%);
+}
+
+/* 自分。岩壁の小さな灯（ヘッドランプ） */
+.climb__me {
+  position: absolute;
+  left: 46%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-ember);
+  box-shadow: 0 0 12px rgba(217, 168, 106, 0.9);
+  transition: bottom 600ms cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+.climb__meter {
+  position: absolute;
+  inset-inline: clamp(10px, 3vw, 18px);
+  bottom: clamp(10px, 2.4vw, 16px);
+  height: 30px;
+  border: 2px solid rgba(255, 253, 248, 0.4);
+  border-radius: 999px;
+  background: rgba(9, 10, 9, 0.66);
+  overflow: hidden;
+}
+
+.climb__zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(217, 168, 106, 0.4);
+  border-inline: 2px solid var(--color-ember);
+}
+
+.climb__marker {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: 5px;
+  margin-left: -2.5px;
+  border-radius: 3px;
+  background: var(--color-white);
+}
+
+.climb--shake { animation: battle-shake 340ms ease-in-out; }
+.escape--shake { animation: battle-shake 340ms ease-in-out; }
+
+/* --- インド: 人間の森を抜けろ -------------------------------------------- */
+.escape {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-space);
+}
+
+.escape__bg {
+  object-fit: cover;
+  object-position: 50% 30%;
+  filter: brightness(0.34) saturate(0.62);
+}
+
+.escape__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--color-space) 8%, rgba(9, 10, 9, 0.45) 50%, rgba(9, 10, 9, 0.6) 100%);
+}
+
+.escape__lanes {
+  position: absolute;
+  inset: 0 6% 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.escape__lane {
+  position: relative;
+  border-inline: 1px solid rgba(255, 253, 248, 0.1);
+}
+
+.escape__chaser {
+  position: absolute;
+  left: 50%;
+  top: -18%;
+  width: clamp(34px, 42%, 56px);
+  transform: translateX(-50%);
+  animation-name: chaser-run;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* 奥（小さい）から手前（大きい）へ。遠近は大きさで出す */
+@keyframes chaser-run {
+  from { top: -18%; scale: 0.55; opacity: 0.8; }
+  85%  { opacity: 1; }
+  to   { top: 78%; scale: 1.15; opacity: 0; }
+}
+
+.escape__me {
+  position: absolute;
+  bottom: 15%;
+  width: clamp(38px, 11%, 52px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-white);
+  transform: translateX(-50%);
+  transition: left 180ms ease-out;
+}
+
+.escape__cmds {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(5px, 1.4vw, 9px);
+  padding: 8px clamp(8px, 2vw, 14px) clamp(8px, 2vw, 12px);
+  background: linear-gradient(to top, var(--color-space) 40%, rgba(9, 10, 9, 0) 100%);
+}
+
+/* --- ケニア: 夜のフォトサファリ ------------------------------------------ */
+.photohunt {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-space);
+}
+
+.photohunt__bg {
+  object-fit: cover;
+  object-position: 50% 62%;
+  filter: brightness(0.4) saturate(0.7);
+}
+
+.photohunt__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--color-space) 8%, rgba(9, 10, 9, 0.35) 45%, rgba(9, 10, 9, 0.5) 100%);
+}
+
+.photohunt__animal {
+  position: absolute;
+  left: 0;
+  width: clamp(52px, 13%, 76px);
+  animation-name: animal-cross;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.photohunt__animal--flip {
+  animation-name: animal-cross-back;
+  transform: scaleX(-1);
+}
+
+@keyframes animal-cross {
+  from { left: -15%; }
+  to   { left: 115%; }
+}
+
+@keyframes animal-cross-back {
+  from { left: 115%; }
+  to   { left: -15%; }
+}
+
+/* ファインダー。四隅だけの枠（光らせず、線で見せる） */
+.photohunt__frame {
+  position: absolute;
+  pointer-events: none;
+  /* 四隅: 2重のborder-imageは使わず、グラデで角だけ残す */
+  background:
+    linear-gradient(var(--color-ember), var(--color-ember)) top left / 18px 2.5px,
+    linear-gradient(var(--color-ember), var(--color-ember)) top left / 2.5px 18px,
+    linear-gradient(var(--color-ember), var(--color-ember)) top right / 18px 2.5px,
+    linear-gradient(var(--color-ember), var(--color-ember)) top right / 2.5px 18px,
+    linear-gradient(var(--color-ember), var(--color-ember)) bottom left / 18px 2.5px,
+    linear-gradient(var(--color-ember), var(--color-ember)) bottom left / 2.5px 18px,
+    linear-gradient(var(--color-ember), var(--color-ember)) bottom right / 18px 2.5px,
+    linear-gradient(var(--color-ember), var(--color-ember)) bottom right / 2.5px 18px;
+  background-repeat: no-repeat;
+}
+
+/* シャッターの閃光。一瞬だけ白が走る */
+.photohunt--flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 253, 248, 0.55);
+  z-index: 5;
+}
+
+.photohunt__cmds {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: grid;
+  padding: 8px clamp(8px, 2vw, 14px) clamp(8px, 2vw, 12px);
+  background: linear-gradient(to top, var(--color-space) 40%, rgba(9, 10, 9, 0) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fishing__float,
+  .fishing__ripple,
+  .climb--shake,
+  .escape--shake {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
    赤上げて白上げて（スポーツ）
    主役は「読む文字」なので、指示を画面の真ん中で一番大きく置く。
    赤はパレットのクレイ、白は生成り。原色の赤は使わない。

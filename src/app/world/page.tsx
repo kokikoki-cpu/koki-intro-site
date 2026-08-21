@@ -9,33 +9,17 @@ import SpaceBackdrop from "@/components/SpaceBackdrop";
 import ReturnToSystem from "@/components/ReturnToSystem";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
-/* 国ごとに違うゲームを開く。9カ国が全部フライトだと飽きる、という指摘への対応。
-   どのゲームを開くかは data.ts の `game` が持つ（ここで条件分岐を増やさない）。
-   旧 FlightGame（輪をくぐる）は全9カ国がバトル/気球/流氷に置き換わったので
-   ここからは外した。ファイルは残してあるので、使いたくなったら data.ts に
-   `game: "flight"` を足して繋ぎ直せばよい。 */
-const BattleGame = dynamic(() => import("@/components/games/BattleGame"), { ssr: false });
+/* 国ごとに違うゲームを開く。どれを開くかは data.ts の `game` が持つ。
+   9カ国すべて別の体験（気球/流氷/飛行機/釣り/PK/登攀/逃走/サファリ）。
+   BattleGame は全カ国が置き換わって未使用（ファイルは残す。data.ts の battle も残る） */
+const FlightGame = dynamic(() => import("@/components/games/FlightGame"), { ssr: false });
 const BalloonGame = dynamic(() => import("@/components/games/BalloonGame"), { ssr: false });
 const IceflowGame = dynamic(() => import("@/components/games/IceflowGame"), { ssr: false });
-
-/* バトル用の背景写真が置いてある国。ここに無い国は、その国の記憶の写真で代用する
-   （画像の存在確認はクライアントではできないので、置いた分を明示的に持つ）。
-   存在しないパスを /_next/image に渡すと 400 が返って背景が真っ黒になる。 */
-const HAS_BATTLE_BG = new Set([
-  "argentina",
-  "brazil",
-  "peru",
-  "india",
-  "jordan",
-  "antarctica",
-  "turkey",
-  "kenya",
-  "namibia",
-]);
-
-function battleBg(c: Country): string {
-  return HAS_BATTLE_BG.has(c.id) ? `/images/battle/${c.id}.jpg` : c.photo;
-}
+const FishingGame = dynamic(() => import("@/components/games/FishingGame"), { ssr: false });
+const SoccerGame = dynamic(() => import("@/components/games/SoccerGame"), { ssr: false });
+const ClimbGame = dynamic(() => import("@/components/games/ClimbGame"), { ssr: false });
+const EscapeGame = dynamic(() => import("@/components/games/EscapeGame"), { ssr: false });
+const PhotoHuntGame = dynamic(() => import("@/components/games/PhotoHuntGame"), { ssr: false });
 
 const COUNTRY_IDS = COUNTRIES.map((c) => c.id);
 
@@ -168,42 +152,36 @@ export default function WorldPage() {
         </div>
       </section>
 
-      {pending && pending.game === "battle" && pending.battle && (
-        <BattleGame
-          countryName={pending.name}
-          itemId={pending.id}
-          level={pending.level}
-          battle={pending.battle}
-          bgPhoto={battleBg(pending)}
-          playerPhoto="/images/profile/koki-stand.jpg"
-          enemyPhoto={pending.photo}
-          onReveal={reveal}
-          onClose={() => setPending(null)}
-          onUnlockAll={unlockAll}
-        />
-      )}
-
-      {pending && pending.game === "balloon" && (
-        <BalloonGame
-          countryName={pending.name}
-          itemId={pending.id}
-          level={pending.level}
-          onReveal={reveal}
-          onClose={() => setPending(null)}
-          onUnlockAll={unlockAll}
-        />
-      )}
-
-      {pending && pending.game === "iceflow" && (
-        <IceflowGame
-          countryName={pending.name}
-          itemId={pending.id}
-          level={pending.level}
-          onReveal={reveal}
-          onClose={() => setPending(null)}
-          onUnlockAll={unlockAll}
-        />
-      )}
+      {pending &&
+        (() => {
+          const props = {
+            countryName: pending.name,
+            itemId: pending.id,
+            level: pending.level,
+            onReveal: reveal,
+            onClose: () => setPending(null),
+            onUnlockAll: unlockAll,
+          };
+          switch (pending.game) {
+            case "balloon":
+              return <BalloonGame {...props} />;
+            case "iceflow":
+              return <IceflowGame {...props} />;
+            case "fishing":
+              return <FishingGame {...props} />;
+            case "soccer":
+              return <SoccerGame {...props} />;
+            case "climb":
+              return <ClimbGame {...props} />;
+            case "escape":
+              return <EscapeGame {...props} />;
+            case "photo":
+              return <PhotoHuntGame {...props} />;
+            default:
+              /* flight と、万一 game が未設定の国もここで受ける（何も開かないバグを作らない） */
+              return <FlightGame {...props} />;
+          }
+        })()}
 
       <ReturnToSystem />
       <Modal data={modal} onClose={() => setModal(null)} />

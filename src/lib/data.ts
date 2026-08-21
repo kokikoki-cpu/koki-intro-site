@@ -39,8 +39,20 @@ export const PROFILE = {
 /** ゲームの難易度（1=やさしい 〜 5=最難関）。項目ごとに変える */
 export type Level = 1 | 2 | 3 | 4 | 5;
 
-/** どのゲームでその国を解錠するか。地図の9カ国が全部フライトで「飽きた」ため分けた */
-export type CountryGame = "battle" | "balloon" | "iceflow" | "flight";
+/**
+ * どのゲームでその国を解錠するか。**9カ国すべて別の体験**にする（2026-08-21の指示）。
+ * battle は全カ国が専用ゲームに置き換わったため現在は未使用（型と実装は残してある）。
+ */
+export type CountryGame =
+  | "battle"
+  | "balloon" // トルコ: 気球
+  | "iceflow" // 南極: 流氷渡り
+  | "flight" // ヨルダン/ナミビア: 飛行機
+  | "fishing" // ペルー: アマゾンの夜釣り
+  | "soccer" // ブラジル: 夜のPK戦
+  | "climb" // アルゼンチン: パタゴニア登攀
+  | "escape" // インド: 人間の森から逃げる
+  | "photo"; // ケニア: フォトサファリ
 
 /**
  * バトルのコマンド。
@@ -87,7 +99,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/argentina.jpg",
     x: 28.48,
     y: 68.76,
-    game: "battle",
+    game: "climb",
     battle: {
       enemy: "タトゥー軍団",
       telegraph: "取り囲まれる",
@@ -109,7 +121,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/brazil.jpg",
     x: 31.05,
     y: 56.57,
-    game: "battle",
+    game: "soccer",
     battle: {
       enemy: "地球の裏側のホームシック",
       telegraph: "郷愁が押し寄せる",
@@ -131,7 +143,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/peru.jpg",
     x: 25.32,
     y: 54.03,
-    game: "battle",
+    game: "fishing",
     battle: {
       enemy: "樹液の幻覚",
       telegraph: "幻が濃くなる",
@@ -164,7 +176,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/india.jpg",
     x: 69.14,
     y: 38.75,
-    game: "battle",
+    game: "escape",
     battle: {
       enemy: "人間の森",
       telegraph: "人波が来る",
@@ -218,7 +230,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/kenya.jpg",
     x: 56.68,
     y: 49.41,
-    game: "battle",
+    game: "photo",
     battle: {
       enemy: "半日ついてくる物乞い",
       telegraph: "距離を詰めてくる",
