@@ -165,9 +165,12 @@ function buildPlayer(): THREE.Group {
   return group;
 }
 
-function buildEnemyPool(): { groups: THREE.Group[]; sphereMat: THREE.MeshToonMaterial } {
+/* 敵の球は **ライティングを受けない材質** にする。
+   夜のシーンで MeshToonMaterial にすると顔写真が沈んで「見えない」と言われた。
+   狙う対象が見えないのは難しさではなく事故なので、敵だけは常に同じ明るさで出す。 */
+function buildEnemyPool(): { groups: THREE.Group[]; sphereMat: THREE.MeshBasicMaterial } {
   const sphereGeo = new THREE.SphereGeometry(1, 20, 16);
-  const sphereMat = new THREE.MeshToonMaterial({ color: 0xf3ead9 });
+  const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const groups: THREE.Group[] = [];
   for (let i = 0; i < MAX_ENEMIES; i++) {
     const g = new THREE.Group();
@@ -278,7 +281,8 @@ export default function ShootingGameGate() {
     renderer.domElement.style.display = "block";
     mount.appendChild(renderer.domElement);
 
-    addNightLights(scene);
+    /* 夜だが、狙って撃つゲームなので地形と自機が読める明るさは確保する */
+    addNightLights(scene, 1.55);
 
     const dunes = buildDunes();
     scene.add(dunes);

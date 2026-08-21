@@ -9,7 +9,11 @@ import SpaceBackdrop from "@/components/SpaceBackdrop";
 import ReturnToSystem from "@/components/ReturnToSystem";
 import { unlock, useUnlockedFrom } from "@/lib/unlock";
 
+/* 競技ごとに違うゲームを開く。6競技すべてが連打だと飽きる、という指摘への対応。
+   どれを開くかは data.ts の `game` が持つ（ここで条件分岐を増やさない） */
 const SprintGame = dynamic(() => import("@/components/games/SprintGame"), { ssr: false });
+const FlagsGame = dynamic(() => import("@/components/games/FlagsGame"), { ssr: false });
+const PairsGame = dynamic(() => import("@/components/games/PairsGame"), { ssr: false });
 
 const SPORT_IDS = SPORTS.map((s) => s.id);
 
@@ -93,16 +97,21 @@ export default function SportsPage() {
         </div>
       </section>
 
-      {pending && (
-        <SprintGame
-          sportName="？？？"
-          itemId={pending.id}
-          level={pending.level}
-          onReveal={reveal}
-          onClose={() => setPending(null)}
-          onUnlockAll={unlockAll}
-        />
-      )}
+      {pending &&
+        (() => {
+          /* 競技名は伏せたまま（ポケモン図鑑方式）。クリアして初めて正体が出る */
+          const props = {
+            sportName: "？？？",
+            itemId: pending.id,
+            level: pending.level,
+            onReveal: reveal,
+            onClose: () => setPending(null),
+            onUnlockAll: unlockAll,
+          };
+          if (pending.game === "flags") return <FlagsGame {...props} />;
+          if (pending.game === "pairs") return <PairsGame {...props} />;
+          return <SprintGame {...props} />;
+        })()}
 
       <ReturnToSystem />
       <Modal data={modal} onClose={() => setModal(null)} />

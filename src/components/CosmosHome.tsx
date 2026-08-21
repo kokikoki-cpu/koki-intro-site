@@ -385,13 +385,15 @@ export default function CosmosHome({
         <Panel title={`集めた記憶 ${collected} / ${collectTotal}`} onClose={() => setPanel(null)}>
           <div className="flex flex-col gap-4 text-left">
             {/* 賞品の告知は、集めた数のすぐ隣に置く（「続けるか」を決める場所だから）。
-                集めきったあとは告知ではなく祝いの文になる */}
+                集めきったあとは告知ではなく祝いの文になる。
+                枠線は明るい面のカード言語（2pxの墨）。クレイの枠線だと「謎の赤線」に
+                見えて、夜空の世界観から浮く */}
             {collected >= collectTotal ? (
-              <p className="m-0 rounded-md border-2 border-(--color-clay) bg-(--color-clay)/10 px-4 py-3 text-center font-display text-base font-extrabold">
+              <p className="m-0 rounded-md border-2 border-(--color-ink) bg-(--color-bg-soft) px-4 py-3 text-center font-display text-base font-extrabold">
                 全記憶を回収。こうきから豪華賞品を進呈します
               </p>
             ) : (
-              <p className="m-0 rounded-md border-2 border-(--color-clay) bg-(--color-clay)/10 px-4 py-3 text-center font-display text-base font-extrabold">
+              <p className="m-0 rounded-md border-2 border-(--color-ink) bg-(--color-bg-soft) px-4 py-3 text-center font-display text-base font-extrabold">
                 全部クリアして豪華賞品をゲット！！
                 <span className="ml-2 text-sm font-extrabold text-(--color-ink-soft)">
                   あと{collectTotal - collected}個

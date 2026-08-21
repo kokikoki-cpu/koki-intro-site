@@ -135,15 +135,16 @@ export function nightSkyTexture(
 
 /**
  * 夜のライティング。月光（淡い青白）を主光源にし、
+ * `gain` で全体の明るさを上げられる（狙って撃つゲームなど、暗いと成立しない画面用）。
  * 地平線の残光を弱い暖色のフィルとして反対側から1灯だけ入れる。
  * 「光は原則ひとつ」を守りつつ、被写体が真っ黒に潰れないようにするための最小構成。
  */
-export function addNightLights(scene: THREE.Scene): void {
-  scene.add(new THREE.HemisphereLight(0x2b3a4d, 0x1a130a, 0.85));
-  const moon = new THREE.DirectionalLight(PAL.moon, 0.9);
+export function addNightLights(scene: THREE.Scene, gain = 1): void {
+  scene.add(new THREE.HemisphereLight(0x2b3a4d, 0x1a130a, 0.85 * gain));
+  const moon = new THREE.DirectionalLight(PAL.moon, 0.9 * gain);
   moon.position.set(-6, 11, 5);
   scene.add(moon);
-  const ember = new THREE.DirectionalLight(PAL.ember, 0.45);
+  const ember = new THREE.DirectionalLight(PAL.ember, 0.45 * gain);
   ember.position.set(4, 1.6, -8);
   scene.add(ember);
 }

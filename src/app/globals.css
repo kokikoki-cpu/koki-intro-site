@@ -938,6 +938,177 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
+   赤上げて白上げて（スポーツ）
+   主役は「読む文字」なので、指示を画面の真ん中で一番大きく置く。
+   赤はパレットのクレイ、白は生成り。原色の赤は使わない。
+   ========================================================================== */
+.flags {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-space);
+  transition: background-color 160ms ease;
+}
+
+/* 正解/不正解は色を一瞬だけ変えて返す（音とセットで手応えになる） */
+.flags--ok { background: rgba(217, 168, 106, 0.14); }
+.flags--ng { background: rgba(168, 86, 48, 0.22); }
+
+.flags__order {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+}
+
+.flags__order p {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.2em;
+  font-size: clamp(30px, 9vw, 62px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.flags__red   { color: var(--color-clay); }
+.flags__white { color: var(--color-white); }
+
+/* 「あげて / あげないで」は一回り小さく。色より動作が後ろに来る日本語の順に合わせる */
+.flags__verb {
+  font-size: 0.62em;
+  color: var(--color-bg-soft);
+}
+
+.flags__wait {
+  margin: 0;
+  font-size: clamp(20px, 6vw, 34px);
+  font-weight: 800;
+  color: rgba(255, 253, 248, 0.35);
+}
+
+.flags__time {
+  height: 4px;
+  margin: 0 10px 8px;
+  background: rgba(255, 253, 248, 0.14);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.flags__time > span {
+  display: block;
+  height: 100%;
+  background: var(--color-ember);
+}
+
+.flags__hands {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(6px, 1.6vw, 10px);
+  padding: 0 clamp(8px, 2vw, 14px) clamp(8px, 2vw, 14px);
+}
+
+/* サイト共通のボタン言語（2px枠線 + 6px角丸）。指で押せる高さを確保する */
+.flags__flag {
+  min-height: 56px;
+  border: 2px solid;
+  border-radius: 6px;
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.flags__flag--red {
+  border-color: var(--color-clay);
+  background: rgba(168, 86, 48, 0.16);
+  color: var(--color-clay);
+}
+
+.flags__flag--red:active:not(:disabled) {
+  background: var(--color-clay);
+  color: var(--color-space);
+}
+
+.flags__flag--white {
+  border-color: var(--color-white);
+  background: rgba(255, 253, 248, 0.1);
+  color: var(--color-white);
+}
+
+.flags__flag--white:active:not(:disabled) {
+  background: var(--color-white);
+  color: var(--color-space);
+}
+
+.flags__flag:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ==========================================================================
+   神経衰弱（スポーツ）
+   札の絵は実写。裏はサイトの夜空＋emberの枠線で、めくると写真が出る。
+   ========================================================================== */
+.pairs {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  gap: clamp(4px, 1.2vw, 8px);
+  padding: clamp(6px, 1.6vw, 12px);
+  background: var(--color-space);
+  align-content: center;
+}
+
+.pairs__card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pairs__back,
+.pairs__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  transition: opacity 180ms ease;
+}
+
+.pairs__back {
+  border: 2px solid rgba(217, 168, 106, 0.5);
+  background:
+    radial-gradient(circle at 50% 40%, rgba(217, 168, 106, 0.16) 0%, rgba(9, 10, 9, 0) 62%),
+    var(--color-space);
+  opacity: 1;
+}
+
+.pairs__face {
+  overflow: hidden;
+  border: 2px solid var(--color-white);
+  opacity: 0;
+}
+
+.pairs__card--open .pairs__back { opacity: 0; }
+.pairs__card--open .pairs__face { opacity: 1; }
+
+/* 揃った札は少し落として「もう触らなくていい」ことを示す */
+.pairs__card--taken {
+  cursor: default;
+}
+
+.pairs__card--taken .pairs__face {
+  border-color: var(--color-ember);
+  opacity: 0.6;
+}
+
+/* ==========================================================================
    夜空の上のボタン（サイト共通）
    「宇宙空間に緑はイメージが湧かない」という指摘で、暗い面の上のアクセントは
    ember(#d9a86a = 砂/琥珀)の一色に統一した。緑(--color-accent)は明るい紙面
@@ -1043,7 +1214,10 @@ h1, h2, h3, h4 {
   color: var(--color-ember);
   text-align: center;
   transform: translateY(78vh);
-  animation: opening-crawl 17s linear 3.9s forwards;
+  /* 読める速さにする。17s は「めっちゃいい けど読めない」と言われた速さ。
+     日本語の明朝を奥へ流しながら読ませるので、ゆっくりで良い
+     （待たされるのが嫌な人は、どこかを押せば手前のボタンが即出る） */
+  animation: opening-crawl 34s linear 3.9s forwards;
 }
 
 @keyframes opening-crawl {

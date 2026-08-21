@@ -40,7 +40,7 @@ export const PROFILE = {
 export type Level = 1 | 2 | 3 | 4 | 5;
 
 /** どのゲームでその国を解錠するか。地図の9カ国が全部フライトで「飽きた」ため分けた */
-export type CountryGame = "battle" | "balloon" | "iceflow";
+export type CountryGame = "battle" | "balloon" | "iceflow" | "flight";
 
 /**
  * バトルのコマンド。
@@ -186,7 +186,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/jordan.jpg",
     x: 56.46,
     y: 33.62,
-    game: "battle",
+    game: "flight",
     battle: {
       enemy: "サンダル泥棒",
       telegraph: "足音が近づく",
@@ -240,7 +240,7 @@ export const COUNTRIES: Country[] = [
     photo: "/images/countries/namibia.jpg",
     x: 51.29,
     y: 60.97,
-    game: "battle",
+    game: "flight",
     battle: {
       enemy: "猿の群れ",
       telegraph: "荷台を狙ってくる",
@@ -326,12 +326,22 @@ export const PEOPLE: Person[] = [
   },
 ];
 
+/**
+ * どのゲームでその競技を解錠するか。
+ * 6競技すべてが同じ「連打で走る」だと飽きる、という指摘への対応。
+ * - `sprint` … 連打で走る＋ハードルを跳ぶ（既存）
+ * - `pairs`  … 神経衰弱。同じ写真を2枚めくって揃える
+ * - `flags`  … 赤上げて白上げて。言われた通りの旗だけ上げる（引っかけ入り）
+ */
+export type SportGame = "sprint" | "pairs" | "flags";
+
 export type Sport = {
   id: string;
   level: Level;
   name: string;
   photo: string;
   desc: string;
+  game: SportGame;
 };
 
 export const SPORTS: Sport[] = [
@@ -341,6 +351,7 @@ export const SPORTS: Sport[] = [
     name: "公式テニス",
     photo: "/images/sports/tennis.jpg",
     desc: "中学校・高校にてハマる。今でも定期的にやります。",
+    game: "flags",
   },
   {
     id: "ultimate",
@@ -348,6 +359,7 @@ export const SPORTS: Sport[] = [
     name: "アルティメット",
     photo: "/images/sports/ultimate.jpg",
     desc: "大学にて始める。インカレ3位。",
+    game: "pairs",
   },
   {
     id: "padel",
@@ -355,6 +367,7 @@ export const SPORTS: Sport[] = [
     name: "パデル",
     photo: "/images/sports/padel.jpg",
     desc: "当時のクライアントに誘われてハマる。「Fire padel TV」というYouTubeチャンネルを作る。今もたまに試合に出る。",
+    game: "flags",
   },
   {
     id: "futsal",
@@ -362,6 +375,7 @@ export const SPORTS: Sport[] = [
     name: "フットサル",
     photo: "/images/sports/futsal.jpg",
     desc: "渋谷でたまにやります！サッカーを知っていると世界中の男と仲良くなりやすい。",
+    game: "sprint",
   },
   {
     id: "tabletennis",
@@ -369,6 +383,7 @@ export const SPORTS: Sport[] = [
     name: "卓球",
     photo: "/images/sports/tabletennis.jpg",
     desc: "すべてのスポーツの中で一番好き。高校時代にハマりすぎてスポッチャで徹夜卓球をする。",
+    game: "flags",
   },
   {
     id: "marathon",
@@ -376,6 +391,7 @@ export const SPORTS: Sport[] = [
     name: "マラソン",
     photo: "/images/sports/marathon.jpg",
     desc: "妻の趣味に付き合う。ハーフマラソンとトレランの大会には何回か出た。今年の目標はフルマラソン制覇。",
+    game: "sprint",
   },
 ];
 
