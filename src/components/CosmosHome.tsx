@@ -124,6 +124,9 @@ export default function CosmosHome({
   const foundCountries = useUnlockedFrom(COUNTRY_IDS);
   const foundPeople = useUnlockedFrom(PEOPLE_IDS);
   const foundSports = useUnlockedFrom(SPORT_IDS);
+  /* 流星が使う写真の番号。1本が一周するたびに次へ送るので、
+     8本しか無くても眺めているうちにプール全部が空を通る */
+  const [skyIdx, setSkyIdx] = useState<number[]>(() => SHOOTERS.map((_, i) => i));
   const [panel, setPanel] = useState<null | "career" | "hobby" | "memory">(null);
   const [playing, setPlaying] = useState(false);
 
@@ -177,6 +180,15 @@ export default function CosmosHome({
           <div
             key={i}
             className="shooter"
+            /* 一周し終わったタイミングで写真を差し替える。
+               流れている最中に変えると、写真だけ突然入れ替わって見える */
+            onAnimationIteration={() =>
+              setSkyIdx((prev) => {
+                const next = [...prev];
+                next[i] = (next[i] + SHOOTERS.length) % photos.length;
+                return next;
+              })
+            }
             style={
               {
                 top: s.top,
@@ -194,7 +206,7 @@ export default function CosmosHome({
               <div className="shooter__upright">
                 <div className="shooter__photo aspect-4/3 w-full">
                   <Image
-                    src={photos[i % photos.length]}
+                    src={photos[skyIdx[i] % photos.length]}
                     alt=""
                     fill
                     sizes="140px"

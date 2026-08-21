@@ -96,8 +96,11 @@ export default function WorldPage() {
         <p className="relative mx-auto mb-3 w-full max-w-[760px] text-sm font-extrabold text-(--color-ember)">
           到達 {open.size} / {COUNTRIES.length}
         </p>
+        {/* 地図は「夜空に浮かぶ航路図」。白い紙の上のグレー地図は昼の教材のようで
+            ワクワクしない、という指摘で夜に反転した。参考画像（宇宙に浮かぶ光る地図）から
+            借りたのは狙いだけで、青のグラデは使わない（パレットは夜空＋ember） */}
         <div
-          className="relative mx-auto w-full max-w-[760px] overflow-hidden rounded-lg border-2 border-(--color-crystal)/40 bg-(--color-bg-soft)/95 shadow-[0_0_40px_rgba(146,190,224,0.2)]"
+          className="night-map relative mx-auto w-full max-w-[760px] overflow-hidden rounded-lg border-2 border-(--color-ember)/45"
           style={{ aspectRatio: "2752.766 / 1537.631" }}
         >
           <div
@@ -111,12 +114,15 @@ export default function WorldPage() {
                 : { transform: "scale(1)" }
             }
           >
+          {/* SVG自体は触らず、CSSフィルタで夜にする:
+              invert で 白い海→黒 / グレーの大陸→暗い灰 になり、
+              sepia + hue-rotate で大陸だけ ember 側の暖色に寄る（黒には色が乗らない） */}
           <Image
             src="/images/world-map.svg"
             alt="世界地図"
             fill
             className="object-fill"
-            style={{ filter: "sepia(12%) saturate(85%) brightness(0.97)" }}
+            style={{ filter: "invert(1) sepia(0.55) saturate(1.6) hue-rotate(-12deg) brightness(0.86)" }}
           />
           <div className="absolute inset-0">
             {COUNTRIES.map((c) => {
@@ -135,8 +141,10 @@ export default function WorldPage() {
                   {/* 指で押せるように、見た目を変えずに当たり判定だけ広げる */}
                   <span className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2" />
                   <span
-                    className={`block h-4 w-4 rounded-full border-2 border-(--color-white) shadow-[0_3px_8px_rgba(0,0,0,0.3)] transition group-hover:scale-[1.35] ${
-                      done ? "bg-(--color-clay)" : "animate-pulse bg-(--color-ink)/35"
+                    className={`block h-4 w-4 rounded-full border-2 transition group-hover:scale-[1.35] ${
+                      done
+                        ? "border-(--color-white) bg-(--color-ember) shadow-[0_0_14px_rgba(217,168,106,0.85)]"
+                        : "animate-pulse border-(--color-white)/60 bg-(--color-white)/15"
                     }`}
                   />
                 </button>
@@ -208,14 +216,14 @@ function Critter({ kind }: { kind: "penguin" | "whale" | "camel" }) {
   if (kind === "penguin") {
     return (
       <svg viewBox="0 0 40 56" width="100%" aria-hidden>
-        <ellipse cx="20" cy="32" rx="13" ry="20" fill="#1f2430" />
+        <ellipse cx="20" cy="32" rx="13" ry="20" fill="#3d4a5c" />
         <ellipse cx="20" cy="35" rx="8" ry="15" fill="#f4efe2" />
-        <circle cx="20" cy="12" r="10" fill="#1f2430" />
+        <circle cx="20" cy="12" r="10" fill="#3d4a5c" />
         <circle cx="16.5" cy="11" r="1.7" fill="#f4efe2" />
         <circle cx="23.5" cy="11" r="1.7" fill="#f4efe2" />
         <path d="M20 14 l4 3 -4 2.6 -4-2.6z" fill="#e8a05c" />
-        <path d="M7 30 q-4 8 1 14 l3-3z" fill="#1f2430" />
-        <path d="M33 30 q4 8 -1 14 l-3-3z" fill="#1f2430" />
+        <path d="M7 30 q-4 8 1 14 l3-3z" fill="#3d4a5c" />
+        <path d="M33 30 q4 8 -1 14 l-3-3z" fill="#3d4a5c" />
         <path d="M14 52 h5 l-2 4 h-6z" fill="#e8a05c" />
         <path d="M26 52 h-5 l2 4 h6z" fill="#e8a05c" />
       </svg>
@@ -226,9 +234,9 @@ function Critter({ kind }: { kind: "penguin" | "whale" | "camel" }) {
       <svg viewBox="0 0 68 34" width="100%" aria-hidden>
         <path
           d="M6 20 C10 8 26 4 40 7 C52 9 58 15 60 20 C58 25 50 29 38 29 C24 29 11 27 6 20 Z"
-          fill="#2b3c53"
+          fill="#8fa3b8"
         />
-        <path d="M60 20 l8-8 v18 z" fill="#2b3c53" />
+        <path d="M60 20 l8-8 v18 z" fill="#8fa3b8" />
         <path d="M22 26 q8 6 18 2 q-9 3 -18 -2z" fill="#e6e2d4" />
         <circle cx="16" cy="17" r="1.8" fill="#f4efe2" />
         {/* 潮吹き */}
