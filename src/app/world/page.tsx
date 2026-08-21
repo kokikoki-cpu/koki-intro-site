@@ -93,7 +93,7 @@ export default function WorldPage() {
             あぁ素晴らしき地球
           </h1>
         </div>
-        <p className="relative mx-auto mb-3 w-full max-w-[760px] text-sm font-bold text-(--color-ember)">
+        <p className="relative mx-auto mb-3 w-full max-w-[760px] text-sm font-extrabold text-(--color-ember)">
           到達 {open.size} / {COUNTRIES.length}
         </p>
         <div

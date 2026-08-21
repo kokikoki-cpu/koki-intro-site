@@ -284,13 +284,13 @@ export default function SprintGame({
           <div className="absolute inset-x-3 bottom-3 flex gap-3">
             <button
               onPointerDown={run}
-              className="flex-1 rounded-lg border-2 border-(--color-white)/70 bg-(--color-ink)/70 py-3 font-display text-lg font-bold text-(--color-white) active:bg-(--color-nebula)"
+              className="flex-1 rounded-lg border-2 border-(--color-white)/70 bg-(--color-ink)/70 py-3 font-display text-lg font-extrabold text-(--color-white) active:bg-(--color-nebula)"
             >
               走る
             </button>
             <button
               onPointerDown={jump}
-              className="w-1/3 rounded-lg border-2 border-(--color-crystal) bg-(--color-crystal-deep)/70 py-3 font-display text-lg font-bold text-(--color-white) active:bg-(--color-crystal-mid)"
+              className="w-1/3 rounded-lg border-2 border-(--color-crystal) bg-(--color-crystal-deep)/70 py-3 font-display text-lg font-extrabold text-(--color-white) active:bg-(--color-crystal-mid)"
             >
               跳ぶ
             </button>

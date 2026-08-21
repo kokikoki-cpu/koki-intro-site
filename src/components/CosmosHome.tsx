@@ -223,7 +223,7 @@ export default function CosmosHome({
               <span className="text-lg text-(--color-ember)/75"> / {collectTotal}</span>
             </span>
             {/* 装飾的な英語ラベル（旧 "COLLECTION"）は使わない。日本語の見出しだけで足りる */}
-            <span className="text-sm font-bold leading-tight text-(--color-white)">集めた記憶を見る</span>
+            <span className="text-sm font-extrabold leading-tight text-(--color-white)">集めた記憶を見る</span>
           </button>
         </header>
 
@@ -268,7 +268,7 @@ export default function CosmosHome({
                       className="object-cover"
                     />
                   </span>
-                  <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
+                  <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-extrabold text-(--color-white)">
                     {s.title}
                     {p && (
                       <span className="ml-1 text-(--color-ember)">
@@ -293,7 +293,7 @@ export default function CosmosHome({
                   {careerOpen ? "歴" : "？"}
                 </span>
               </span>
-              <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
+              <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-extrabold text-(--color-white)">
                 職歴
               </span>
             </button>
@@ -309,7 +309,7 @@ export default function CosmosHome({
               <span className="orb flex h-full w-full items-center justify-center bg-(--color-space)">
                 <span className="font-display text-2xl font-extrabold text-(--color-white)">趣</span>
               </span>
-              <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-bold text-(--color-white)">
+              <span className="mt-1.5 block text-center font-display text-[clamp(11px,2.2vw,13px)] font-extrabold text-(--color-white)">
                 趣味・活動
               </span>
             </button>
@@ -393,7 +393,7 @@ export default function CosmosHome({
             ) : (
               <p className="m-0 rounded-md border-2 border-(--color-clay) bg-(--color-clay)/10 px-4 py-3 text-center font-display text-base font-extrabold">
                 全部クリアして豪華賞品をゲット！！
-                <span className="ml-2 text-sm font-bold text-(--color-ink-soft)">
+                <span className="ml-2 text-sm font-extrabold text-(--color-ink-soft)">
                   あと{collectTotal - collected}個
                 </span>
               </p>
@@ -450,13 +450,13 @@ function MemoryGroup({
   const got = items.filter((i) => i.got).length;
   return (
     <div>
-      <p className="mb-1.5 flex items-baseline gap-2 text-sm font-bold">
+      <p className="mb-1.5 flex items-baseline gap-2 text-sm font-extrabold">
         {title}
         <span className="text-(--color-nebula)">
           {got} / {items.length}
         </span>
         {href && got < items.length && (
-          <Link href={href} className="ml-auto text-xs font-bold text-(--color-nebula) underline">
+          <Link href={href} className="ml-auto text-xs font-extrabold text-(--color-nebula) underline">
             集めにいく →
           </Link>
         )}
@@ -532,7 +532,7 @@ function Panel({
         >
           &times;
         </button>
-        <h3 className="mb-3 font-display text-xl font-bold">{title}</h3>
+        <h3 className="mb-3 font-display text-xl font-extrabold">{title}</h3>
         {children}
       </div>
     </div>

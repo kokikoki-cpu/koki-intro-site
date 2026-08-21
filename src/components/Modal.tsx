@@ -115,7 +115,7 @@ export default function Modal({ data, onClose }: { data: ModalData; onClose: () 
             {data.tagline && (
               <p className="mb-2 text-sm font-bold text-(--color-nebula)">{data.tagline}</p>
             )}
-            <h3 className="font-display text-xl font-bold">{data.title}</h3>
+            <h3 className="font-display text-xl font-extrabold">{data.title}</h3>
             {data.body && <div className="mt-2 text-sm text-(--color-ink-soft)">{data.body}</div>}
           </div>
         </div>

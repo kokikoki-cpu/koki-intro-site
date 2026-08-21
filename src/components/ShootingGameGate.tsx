@@ -555,10 +555,12 @@ export default function ShootingGameGate() {
     }
   };
 
-  /* ゲートは GameShell を通らないので、効果音の先読みはここでやる */
+  /* ゲートは GameShell を通らないので、効果音の先読みはここでやる。
+     ただしマウント時ではなく、ゲームが始まってから（トップページに常駐しているので、
+     マウント時に読むとオープニングの初期表示と帯域を取り合う） */
   useEffect(() => {
-    preloadSfx();
-  }, []);
+    if (phase === "playing") preloadSfx();
+  }, [phase]);
 
   /* キーボードでも前口上を飛ばせるようにする（クリックと同じ扱い） */
   useEffect(() => {
@@ -592,7 +594,7 @@ export default function ShootingGameGate() {
     return (
       <>
         <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-space) px-4 py-6 text-(--color-white)">
-          <p className="font-display text-2xl font-bold">CLEAR!</p>
+          <p className="font-display text-2xl font-extrabold">CLEAR!</p>
           <p className="text-center text-sm text-(--color-bg-soft)">
             へぇ 案外やるじゃん
             <br />
@@ -629,7 +631,7 @@ export default function ShootingGameGate() {
       >
         <SpaceBackdrop scenery="void" />
 
-        <p className="opening__prologue font-display text-base font-bold tracking-[0.18em] md:text-lg">
+        <p className="opening__prologue font-display text-base font-extrabold tracking-[0.18em] md:text-lg">
           ずっと前、はるか遠くの国で──
         </p>
 
@@ -674,7 +676,7 @@ export default function ShootingGameGate() {
         <div className="absolute inset-x-0 bottom-[12vh] flex justify-center">
           <button
             onClick={startFromWelcome}
-            className={`opening__start rounded-md border-2 border-(--color-ember) px-10 py-3.5 font-display text-lg font-bold text-(--color-ember) transition hover:bg-(--color-ember) hover:text-(--color-space) ${
+            className={`opening__start rounded-md border-2 border-(--color-ember) px-10 py-3.5 font-display text-lg font-extrabold text-(--color-ember) transition hover:bg-(--color-ember) hover:text-(--color-space) ${
               openingRushed ? "opening__start--now" : ""
             }`}
           >
@@ -687,7 +689,7 @@ export default function ShootingGameGate() {
   return (
     <>
     <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-(--color-space) px-4 py-6 text-(--color-white)">
-      <p className="text-center font-display text-2xl font-bold">Who am I ?</p>
+      <p className="text-center font-display text-2xl font-extrabold">Who am I ?</p>
 
       {phase === "intro" && (
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
@@ -742,7 +744,7 @@ export default function ShootingGameGate() {
 
         {phase === "lost" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/75 text-center">
-            <p className="font-display text-2xl font-bold text-(--color-white)">GAME OVER</p>
+            <p className="font-display text-2xl font-extrabold text-(--color-white)">GAME OVER</p>
             <button
               onClick={resetGame}
               className="btn-ember px-6 py-2 text-sm"

@@ -57,10 +57,11 @@ export default function GameShell({
   const [passInput, setPassInput] = useState("");
   const [passError, setPassError] = useState(false);
 
-  /* 開いた時点で効果音を先読みする。押した瞬間に鳴らないと手応えが消える */
+  /* 効果音の先読みは「挑戦する」を押してから。ここで先読みすると
+     オープニングの初期表示と帯域を取り合う（実測 131KB） */
   useEffect(() => {
-    preloadSfx();
-  }, []);
+    if (phase === "playing") preloadSfx();
+  }, [phase]);
 
   /* クリアの音はここ1箇所。全ゲームがこのシェルを通るので、各ゲームに書かなくてよい */
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function GameShell({
     <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 overflow-y-auto bg-(--color-space) px-4 py-6 text-(--color-white)">
       <div className="text-center">
         <p className="text-xs tracking-widest text-(--color-bg-soft)/60">{target}</p>
-        <h2 className="font-display text-2xl font-bold md:text-3xl">{title}</h2>
+        <h2 className="font-display text-2xl font-extrabold md:text-3xl">{title}</h2>
       </div>
 
       {phase === "intro" && (
@@ -133,7 +134,7 @@ export default function GameShell({
 
         {phase === "lost" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-black/78 text-center">
-            <p className="font-display text-2xl font-bold">また今度だな</p>
+            <p className="font-display text-2xl font-extrabold">また今度だな</p>
             <div className="flex gap-2">
               <button
                 onClick={onRetry}
@@ -153,7 +154,7 @@ export default function GameShell({
 
         {phase === "won" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-(--color-space)/88 text-center">
-            <p className="font-display text-3xl font-bold">解錠</p>
+            <p className="font-display text-3xl font-extrabold">解錠</p>
             <p className="text-sm text-(--color-bg-soft)">{target} の中身が見られるようになった</p>
             <button
               onClick={onReveal}

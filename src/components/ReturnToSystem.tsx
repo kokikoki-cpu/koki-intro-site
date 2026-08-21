@@ -18,7 +18,7 @@ export default function ReturnToSystem() {
         <Rocket size={40} />
       </span>
       {/* 装飾的な英語ラベル（旧 "RETURN"）は置かない。ロケットの絵と日本語で足りる */}
-      <span className="text-left font-display text-base font-bold leading-tight">星系へ戻る</span>
+      <span className="text-left font-display text-base font-extrabold leading-tight">星系へ戻る</span>
     </WarpLink>
   );
 }

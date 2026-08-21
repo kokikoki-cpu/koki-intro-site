@@ -58,8 +58,11 @@ export default function BgmPlayer() {
     if (!el) return;
 
     if (!el.paused) return;
-    play();
 
+    /* **ここで play() を呼んではいけない**。自動再生はブラウザに弾かれるのに、
+       ブラウザは再生を試みるために音源のダウンロードを始めてしまう。
+       2.1MB の BGM が初期表示と競合して、開くのが遅くなっていた（実測 3.7MB のうち
+       2.2MB がこれ）。最初の操作を待ってから鳴らす。 */
     const kick = () => play();
     window.addEventListener("pointerdown", kick, { once: true });
     window.addEventListener("keydown", kick, { once: true });
