@@ -275,7 +275,7 @@ export default function SprintGame({
           {/* 進み具合 */}
           <div className="absolute inset-x-4 top-3 h-2 overflow-hidden rounded-full bg-black/45">
             <div
-              className="h-full rounded-full bg-(--color-crystal) transition-[width] duration-75"
+              className="h-full rounded-full bg-(--color-ember) transition-[width] duration-75"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -290,7 +290,7 @@ export default function SprintGame({
             </button>
             <button
               onPointerDown={jump}
-              className="w-1/3 rounded-lg border-2 border-(--color-crystal) bg-(--color-crystal-deep)/70 py-3 font-display text-lg font-extrabold text-(--color-white) active:bg-(--color-crystal-mid)"
+              className="w-1/3 rounded-lg border-2 border-(--color-ember) bg-(--color-nebula)/70 py-3 font-display text-lg font-extrabold text-(--color-white) active:bg-(--color-ember)/60"
             >
               跳ぶ
             </button>

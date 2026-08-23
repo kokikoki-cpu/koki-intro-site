@@ -22,6 +22,11 @@ type Props = {
   hud?: ReactNode;
   /** キャンバスの上に重ねる表示（到達地点の名前など）。プレイ中だけ出る */
   overlay?: ReactNode;
+  /**
+   * 負けた画面に出す助け船。何度も落ちている人にだけ出したいので、
+   * 出すかどうか（何回目から出すか）は各ゲームが決めて、ここには文だけ渡す。
+   */
+  lostHint?: ReactNode;
   /** Three.js のキャンバスを挿す先 */
   mountRef: RefObject<HTMLDivElement | null>;
   /** 3Dを使わないゲーム用。渡すと既定のマウント用 div の代わりにこれを描く */
@@ -45,6 +50,7 @@ export default function GameShell({
   phase,
   hud,
   overlay,
+  lostHint,
   mountRef,
   canvas,
   onStart,
@@ -135,6 +141,11 @@ export default function GameShell({
         {phase === "lost" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-black/78 text-center">
             <p className="font-display text-2xl font-extrabold">また今度だな</p>
+            {lostHint && (
+              <p className="m-0 max-w-[17rem] rounded-md border-2 border-(--color-ember) bg-(--color-space)/85 px-4 py-2.5 text-sm font-bold text-(--color-white)">
+                {lostHint}
+              </p>
+            )}
             <div className="flex gap-2">
               <button
                 onClick={onRetry}

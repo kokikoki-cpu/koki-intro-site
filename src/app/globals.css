@@ -1683,10 +1683,10 @@ h1, h2, h3, h4 {
   color: var(--color-ember);
   text-align: center;
   transform: translateY(78vh);
-  /* 読める速さにする。17s は「めっちゃいい けど読めない」と言われた速さ。
-     日本語の明朝を奥へ流しながら読ませるので、ゆっくりで良い
-     （待たされるのが嫌な人は、どこかを押せば手前のボタンが即出る） */
-  animation: opening-crawl 34s linear 3.9s forwards;
+  /* 読める速さにする。17s は「めっちゃいい けど読めない」、34s でも「はやいな」と
+     言われたので 44s まで落とした。日本語の明朝を奥へ流しながら読ませるので
+     ゆっくりで良い（待たされるのが嫌な人は、どこかを押せば手前のボタンが即出る） */
+  animation: opening-crawl 44s linear 3.9s forwards;
 }
 
 @keyframes opening-crawl {

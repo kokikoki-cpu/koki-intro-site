@@ -664,7 +664,7 @@ export default function ShootingGameGate() {
             <p className="pt-[1.2em]">
               すべての記憶を集めた者には、
               <br />
-              こうきから豪華賞品が贈られる。
+              こうきから賞品をプレゼント。
             </p>
             <p className="pt-[1.2em]">
               まずは肩慣らし。

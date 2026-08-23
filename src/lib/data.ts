@@ -403,7 +403,9 @@ export const SPORTS: Sport[] = [
     name: "マラソン",
     photo: "/images/sports/marathon.jpg",
     desc: "妻の趣味に付き合う。ハーフマラソンとトレランの大会には何回か出た。今年の目標はフルマラソン制覇。",
-    game: "sprint",
+    /* ★5の跳ぶ方（sprint）は「跳ぶ」と「走る」を同時に見るのが難しすぎたので、
+       赤白の最難関（14回連続・持ち時間0.85秒・罠45%・ミス1回）に置き換えた */
+    game: "flags",
   },
 ];
 

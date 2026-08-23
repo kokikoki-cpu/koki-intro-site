@@ -38,7 +38,10 @@ const MEASURED: Record<string, number> = {
   gate: 55,
   /* tools/sim-balloon.mjs で計測（初見 60.8% / 慣れた人 99.5%） */
   turkey: 61,
-  /* tools/sim-iceflow.mjs で計測（初見 12.3% / 慣れた人 100%） */
+  /* tools/sim-iceflow.mjs で計測（初見 12.3% / 慣れた人 100%）。
+     2026-08-23にゲージへ「乗れる幅」の帯を出したので、人間の実測はこれより
+     易しくなっているはず（シミュレータは数値を直接見ているため差が出ない）。
+     GA4が溜まったら実測で置き換える */
   antarctica: 12,
 };
 

@@ -33,6 +33,15 @@ const MIN_GAP = 2.0;
 
 const SPAWN_GAP_Z = 15.5;
 
+/**
+ * 触る端末か。すでにスマホの人に「スマホでやれ」と出すのは無意味なので分ける。
+ * 描画中に評価するが、助け船を出すのは5回落ちたあとで、初回描画は必ず出さないので
+ * サーバ側の描画とずれない。
+ */
+function isTouchDevice(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(hover: none)").matches;
+}
+
 type Item = {
   kind: "wall" | "gate";
   group: THREE.Group;
@@ -56,6 +65,13 @@ export default function CareerRunGame({
 
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [reached, setReached] = useState(0);
+
+  /**
+   * 何回落ちたか。★5・残機なしなので、続けて落ちている人には操作の逃げ道を教える。
+   * マウスは「動かした量」でしか狙えないが、指なら画面の位置をそのまま指せるので、
+   * このゲームはスマホの方が素直に当たる（pointermove を直接 x に流している）。
+   */
+  const [fails, setFails] = useState(0);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
   const phaseRef = useRef<GamePhase>("intro");
@@ -258,6 +274,9 @@ export default function CareerRunGame({
               if (off > it.gapWidth / 2 - RUNNER_HALF) {
                 phaseRef.current = "lost";
                 setPhase("lost");
+                /* 落ちた回数はここで数える（effect で phase を見て数える形にすると
+                   「effect の中で setState するな」に触るし、意味も同じ） */
+                setFails((n) => n + 1);
               }
             }
           }
@@ -333,6 +352,17 @@ export default function CareerRunGame({
           <span className="max-w-full truncate rounded-full bg-(--color-ink)/80 px-4 py-1.5 text-xs font-bold text-(--color-white)">
             {steps[reached - 1]}
           </span>
+        ) : null
+      }
+      lostHint={
+        fails >= 5 && !isTouchDevice() ? (
+          <>
+            モバイルでやったほうが簡単かも！？
+            <br />
+            <span className="font-normal text-(--color-bg-soft)">
+              指で触った場所へそのまま動く
+            </span>
+          </>
         ) : null
       }
       mountRef={mountRef}

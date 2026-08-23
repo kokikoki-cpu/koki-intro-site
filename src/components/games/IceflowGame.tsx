@@ -38,10 +38,14 @@ function tuning(level: Level) {
   };
 }
 
-/* 南極の色。夜の海はほぼ黒、氷は生成りの白、遠景の氷山は青みを一段だけ */
-const SEA = 0x0e1a28;
-const ICE = 0xdfe7ec;
-const BERG = 0x33495e;
+/* 南極の色。海は落ちたら終わりなので暗いまま残し、氷と遠景の氷山は
+   「氷に囲まれた海の上にいる」が一目で分かるまで明度を上げる
+   （2026-08-23: 暗すぎて氷と海の境が読めない、という指摘を受けての調整） */
+const SEA = 0x0b1622;
+const ICE = 0xeaf1f5;
+const BERG = 0x7d9aad;
+/** 奥の列の氷山。手前より一段暗くして奥行きを出す */
+const BERG_FAR = 0x5f7d92;
 
 /** 跳べる距離の下限と上限。ゲージ0で下限、ゲージ1で上限 */
 const JUMP_MIN = 3.5;
@@ -70,6 +74,12 @@ export default function IceflowGame({
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [hops, setHops] = useState(0);
   const [power, setPower] = useState(0);
+  /**
+   * 次の氷に乗れるゲージの範囲（0〜1）。
+   * 溜め具合を数字で見せても跳ぶ距離に結びつかないので、「どこで放せば届くか」を
+   * ゲージ上の帯として見せる（2026-08-23: わかりづらい、という指摘への対応）。
+   */
+  const [zone, setZone] = useState<{ from: number; to: number } | null>(null);
 
   const phaseRef = useRef<GamePhase>("intro");
   const resetRef = useRef<(() => void) | null>(null);
@@ -91,9 +101,11 @@ export default function IceflowGame({
     camera.position.set(2, 4.6, 20);
     camera.lookAt(3, 1.2, 0);
 
-    scene.background = nightSkyTexture({ glow: 0.86, seed: 4417 });
-    scene.fog = new THREE.Fog(0x0d141c, 46, 130);
-    addNightLights(scene);
+    scene.background = nightSkyTexture({ glow: 0.86, seed: 4417, ice: true });
+    /* 霧も氷の色。暗い霧だと遠景の氷山が夜に溶けて、氷原に見えない */
+    scene.fog = new THREE.Fog(0x53748a, 52, 150);
+    /* 氷は自分では光らないので、少し上げないと白が灰色に落ちる */
+    addNightLights(scene, 1.25);
 
     /* --- 海。ほぼ黒。地平線の残光だけが映る -------------------------------- */
     const sea = new THREE.Mesh(new THREE.PlaneGeometry(600, 400), toonMat(SEA, 30));
@@ -101,12 +113,21 @@ export default function IceflowGame({
     sea.position.y = -0.9;
     scene.add(sea);
 
-    /* --- 遠景: テーブル型氷山（上面が平ら。とんがらせない） ---------------- */
-    for (let i = 0; i < 9; i++) {
-      const w = 14 + ((i * 17) % 22);
+    /* --- 遠景: テーブル型氷山（上面が平ら。とんがらせない） ----------------
+       手前と奥の2列で氷原を二重に置く。1列だと隙間から夜空が抜けてしまい、
+       「氷に囲まれている」に見えなかった */
+    for (let i = 0; i < 16; i++) {
+      const w = 16 + ((i * 17) % 24);
       const h = 3 + ((i * 7) % 5);
       const berg = new THREE.Mesh(new THREE.BoxGeometry(w, h, 8), toonMat(BERG, 3));
-      berg.position.set(-90 + i * 26, h / 2 - 0.6, -70 - ((i * 13) % 26));
+      berg.position.set(-150 + i * 21, h / 2 - 0.6, -62 - ((i * 13) % 20));
+      scene.add(berg);
+    }
+    for (let i = 0; i < 12; i++) {
+      const w = 22 + ((i * 13) % 26);
+      const h = 4 + ((i * 5) % 6);
+      const berg = new THREE.Mesh(new THREE.BoxGeometry(w, h, 10), toonMat(BERG_FAR, 3));
+      berg.position.set(-140 + i * 27, h / 2 - 0.8, -96 - ((i * 11) % 18));
       scene.add(berg);
     }
 
@@ -137,6 +158,25 @@ export default function IceflowGame({
       addFloe(d, cfg.width);
     }
 
+    /**
+     * 「どこまで溜めれば次の氷に乗るか」をゲージの割合(0〜1)に翻訳する。
+     * 跳ぶ距離は JUMP_MIN〜JUMP_MAX を溜め量で線形に取っているので、その逆算。
+     * 氷が狭い（=★が高い）ほど帯も細くなるので、難易度の差はそのまま帯の幅に出る。
+     */
+    function refreshZone() {
+      const next = floes.find((f) => f.left > 0.5);
+      if (!next) {
+        setZone(null);
+        return;
+      }
+      const span = JUMP_MAX - JUMP_MIN;
+      const clamp = (v: number) => Math.max(0, Math.min(1, v));
+      setZone({
+        from: clamp((next.left - JUMP_MIN) / span),
+        to: clamp((next.right - JUMP_MIN) / span),
+      });
+    }
+
     let charging = false;
     let charge = 0;
     let jumping = false;
@@ -158,6 +198,7 @@ export default function IceflowGame({
       /* 足元の氷は広めに置く（開始直後に落ちない） */
       addFloe(-4, 8);
       addNext();
+      refreshZone();
       me.position.set(0, 0, 0);
     };
 
@@ -243,6 +284,7 @@ export default function IceflowGame({
                 setPhase("won");
               } else {
                 addNext();
+                refreshZone();
               }
             }
           }
@@ -281,7 +323,7 @@ export default function IceflowGame({
       target={countryName}
       rule={
         <>
-          押して踏み込みを溜め、放して跳ぶ。溜めるほど遠くへ跳ぶ。
+          押して踏み込みを溜め、放して跳ぶ。ゲージの明るい帯が次の氷の位置。
           <br />
           足りなくても跳びすぎても海（ポリニヤ）に落ちる。{cfg.hops}回渡れ。
         </>
@@ -297,11 +339,32 @@ export default function IceflowGame({
         </>
       }
       overlay={
-        <div className="w-full max-w-xs rounded-full border border-(--color-white)/30 bg-(--color-space)/70 p-[3px]">
-          <div
-            className="h-2 rounded-full bg-(--color-ember) transition-[width] duration-75"
-            style={{ width: `${power * 100}%` }}
-          />
+        <div className="w-full max-w-sm">
+          <div className="relative h-5 overflow-hidden rounded-full border-2 border-(--color-white)/45 bg-(--color-space)/85">
+            {/* 乗れる幅。溜め量より先に読ませたいので背面に敷く */}
+            {zone && (
+              <div
+                className="absolute inset-y-0 bg-(--color-white)/35"
+                style={{
+                  left: `${zone.from * 100}%`,
+                  width: `${Math.max(0, zone.to - zone.from) * 100}%`,
+                }}
+              />
+            )}
+            {/* いま溜まっている量。帯が透けるように半透明で重ねる */}
+            <div
+              className="absolute inset-y-0 left-0 bg-(--color-ember)/65 transition-[width] duration-75"
+              style={{ width: `${power * 100}%` }}
+            />
+            {/* 溜めの先端。これが帯の中にあるときに放す */}
+            <div
+              className="absolute inset-y-0 w-[3px] bg-(--color-white)"
+              style={{ left: `${power * 100}%` }}
+            />
+          </div>
+          <p className="mt-1.5 text-center text-xs font-bold text-(--color-white)">
+            白い線が明るい帯に入ったら放す
+          </p>
         </div>
       }
       mountRef={mountRef}

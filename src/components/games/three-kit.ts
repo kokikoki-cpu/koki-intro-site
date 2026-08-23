@@ -76,7 +76,7 @@ function mixHex(a: string, b: string, t: number): string {
 }
 
 export function nightSkyTexture(
-  opts: { glow?: number; stars?: number; seed?: number; dawn?: number } = {}
+  opts: { glow?: number; stars?: number; seed?: number; dawn?: number; ice?: boolean } = {}
 ): THREE.Texture {
   const size = 512;
   const canvas = document.createElement("canvas");
@@ -89,9 +89,20 @@ export function nightSkyTexture(
      混ぜ先の色も土とemberの色域から出さない（紫やピンクは入れない）。 */
   const d = Math.max(0, Math.min(1, opts.dawn ?? 0));
   const grad = ctx.createLinearGradient(0, 0, 0, size);
-  grad.addColorStop(0, mixHex("#05060a", "#223047", d));
-  grad.addColorStop(0.52, mixHex("#0a1017", "#6a4a30", d));
-  grad.addColorStop(1, mixHex("#1b2530", "#d09a5c", d));
+  if (opts.ice) {
+    /* 南極。空も海も暗いままだと「どこが氷でどこが海か」が読めなかったので、
+       地平だけを氷の白へ抜いて、氷原に囲まれていることを空で見せる。
+       天頂は夜のまま＝夜へ統一する方針は崩さない。暖色（ember/土）は入れない
+       （氷に混ぜると氷が汚れて見える） */
+    grad.addColorStop(0, "#070d16");
+    grad.addColorStop(0.46, "#1b3348");
+    grad.addColorStop(0.76, "#5c8098");
+    grad.addColorStop(1, "#c6d8e1");
+  } else {
+    grad.addColorStop(0, mixHex("#05060a", "#223047", d));
+    grad.addColorStop(0.52, mixHex("#0a1017", "#6a4a30", d));
+    grad.addColorStop(1, mixHex("#1b2530", "#d09a5c", d));
+  }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
@@ -122,9 +133,16 @@ export function nightSkyTexture(
   /* 地平線ぎわの残光。これがこの空の唯一の光源 */
   const gy = size * (opts.glow ?? 0.5);
   const glow = ctx.createRadialGradient(size * 0.5, gy, 6, size * 0.5, gy, size * 0.5);
-  glow.addColorStop(0, `rgba(217,168,106,${(0.5 + d * 0.38).toFixed(2)})`);
-  glow.addColorStop(0.45, `rgba(160,110,64,${(0.16 + d * 0.3).toFixed(2)})`);
-  glow.addColorStop(1, "rgba(160,110,64,0)");
+  if (opts.ice) {
+    /* 氷に反射する月光。ここも暖色を使わない */
+    glow.addColorStop(0, "rgba(198,222,235,0.52)");
+    glow.addColorStop(0.45, "rgba(140,178,199,0.18)");
+    glow.addColorStop(1, "rgba(140,178,199,0)");
+  } else {
+    glow.addColorStop(0, `rgba(217,168,106,${(0.5 + d * 0.38).toFixed(2)})`);
+    glow.addColorStop(0.45, `rgba(160,110,64,${(0.16 + d * 0.3).toFixed(2)})`);
+    glow.addColorStop(1, "rgba(160,110,64,0)");
+  }
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, size, size);
 

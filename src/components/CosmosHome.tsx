@@ -402,11 +402,11 @@ export default function CosmosHome({
                 見えて、夜空の世界観から浮く */}
             {collected >= collectTotal ? (
               <p className="m-0 rounded-md border-2 border-(--color-ink) bg-(--color-bg-soft) px-4 py-3 text-center font-display text-base font-extrabold">
-                全記憶を回収。こうきから豪華賞品を進呈します
+                全記憶を回収。こうきから賞品をプレゼント
               </p>
             ) : (
               <p className="m-0 rounded-md border-2 border-(--color-ink) bg-(--color-bg-soft) px-4 py-3 text-center font-display text-base font-extrabold">
-                全部クリアして豪華賞品をゲット！！
+                全部クリアしたらこうきから賞品をプレゼント
                 <span className="ml-2 text-sm font-extrabold text-(--color-ink-soft)">
                   あと{collectTotal - collected}個
                 </span>
