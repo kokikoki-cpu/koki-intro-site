@@ -243,6 +243,11 @@ export default function ShootingGameGate() {
   const [welcomed, setWelcomed] = useState(false);
   /* 前口上を最後まで見なくても入れるように、どこかを押したら手前のボタンを即出す */
   const [openingRushed, setOpeningRushed] = useState(false);
+  /** オープニングの曲が鳴っているか。ブラウザは操作なしに音を出せないので押させる */
+  const [openingSoundOn, setOpeningSoundOn] = useState(false);
+  /** 鳴らせなかった理由。黙って失敗すると原因が分からないので画面に出す */
+  const [openingSoundError, setOpeningSoundError] = useState<string | null>(null);
+  const openingAudioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -574,8 +579,47 @@ export default function ShootingGameGate() {
     return () => window.removeEventListener("keydown", onKey);
   }, [welcomed, openingRushed]);
 
+  /**
+   * オープニングの曲。自動再生はブラウザに弾かれるので、押されたときだけ鳴らす。
+   * 押さなければ今まで通り無音で流れる（演出は成立する）。
+   * 鳴り出すと BgmPlayer 側が「自分以外の音が鳴った」と見て共通BGMを止める。
+   */
+  const toggleOpeningSound = () => {
+    const el = openingAudioRef.current;
+    if (!el) return;
+    if (openingSoundOn) {
+      el.pause();
+      setOpeningSoundOn(false);
+      return;
+    }
+    /* 共通BGMを先に止める。BgmPlayer は window の pointerdown で鳴り始めるので、
+       このボタンの stopPropagation（Reactの合成イベント）では止められない。
+       重なると前口上が聞こえない */
+    for (const other of document.querySelectorAll("audio")) {
+      if (other !== el) other.pause();
+    }
+
+    el.volume = 0.55;
+    /* ここで currentTime を触らない。preload="none" だとまだ読み込んでおらず、
+       再生前の seek がそのまま失敗の原因になる */
+    el.play()
+      .then(() => {
+        setOpeningSoundOn(true);
+        setOpeningSoundError(null);
+      })
+      .catch((err: unknown) => {
+        const name = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        setOpeningSoundError(name);
+        setOpeningSoundOn(false);
+      });
+  };
+
   /** 入口からそのままゲームへ入る（説明画面は挟まない） */
   const startFromWelcome = () => {
+    /* 曲は前口上のためのものなので、ここで終わらせる
+       （鳴らしたまま次に進むと、ゲームの効果音と共通BGMに三重で重なる） */
+    openingAudioRef.current?.pause();
+    setOpeningSoundOn(false);
     setWelcomed(true);
     resetGame();
   };
@@ -634,6 +678,35 @@ export default function ShootingGameGate() {
         onClick={() => setOpeningRushed(true)}
       >
         <SpaceBackdrop scenery="void" />
+
+        {/* 前口上の曲。preload="none" にして押されるまで落としてこない
+            （2.1MBの共通BGMが初期表示と帯域を取り合った件と同じ理由） */}
+        <audio ref={openingAudioRef} src="/audio/opening.m4a" preload="none" />
+
+        {/* 音のスイッチ。親に付いている「押したら開始ボタンを出す」を発火させたくないので
+            クリックをここで止める。右下は共通BGMのボタン(z-120)が居るので右上に置く。
+            鳴っていない間は塗って脈打たせる（押せることに気づいてもらえないと音が出ない） */}
+        <div className="absolute right-4 top-4 z-10 flex flex-col items-end gap-1.5">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleOpeningSound();
+            }}
+            aria-pressed={openingSoundOn}
+            className={`rounded-full border-2 border-(--color-ember) px-5 py-2.5 font-display text-sm font-extrabold transition ${
+              openingSoundOn
+                ? "text-(--color-ember) hover:bg-(--color-ember) hover:text-(--color-space)"
+                : "animate-pulse bg-(--color-ember) text-(--color-space)"
+            }`}
+          >
+            {openingSoundOn ? "♪ 音を止める" : "♪ 音を出す"}
+          </button>
+          {openingSoundError && (
+            <p className="m-0 max-w-[15rem] rounded-md border border-(--color-clay) bg-(--color-space)/90 px-3 py-1.5 text-left text-[11px] font-bold text-(--color-clay)">
+              鳴らせなかった: {openingSoundError}
+            </p>
+          )}
+        </div>
 
         <p className="opening__prologue font-display text-base font-extrabold tracking-[0.18em] md:text-lg">
           ずっと前、はるか遠くの国で──

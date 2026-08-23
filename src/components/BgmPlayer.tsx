@@ -72,16 +72,22 @@ export default function BgmPlayer() {
     };
   }, [muted, play]);
 
-  // 動画（クリア後のモンゴル動画）が鳴っている間はBGMを止めて、音が重ならないようにする。
+  // 他の音（クリア後のモンゴル動画、オープニングの曲）が鳴っている間はBGMを止めて、
+  // 音が重ならないようにする。
   // メディアのイベントは伝播しないが、キャプチャなら document でも拾える
   useEffect(() => {
-    const isVideo = (t: EventTarget | null) => t instanceof HTMLVideoElement;
+    /* 自分以外のメディアかどうか。<audio> も見るのは、オープニングの曲が
+       ここと同じ <audio> で鳴るため。自分自身を弾かないと、再生した瞬間に
+       自分を止めてしまう */
+    const isOtherMedia = (t: EventTarget | null) =>
+      t instanceof HTMLVideoElement ||
+      (t instanceof HTMLAudioElement && t !== audioRef.current);
 
     const onPlay = (e: Event) => {
-      if (isVideo(e.target)) audioRef.current?.pause();
+      if (isOtherMedia(e.target)) audioRef.current?.pause();
     };
     const onStop = (e: Event) => {
-      if (!isVideo(e.target)) return;
+      if (!isOtherMedia(e.target)) return;
       if (muted) return;
       play();
     };
