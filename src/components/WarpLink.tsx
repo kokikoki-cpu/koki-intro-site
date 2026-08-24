@@ -19,12 +19,15 @@ export default function WarpLink({
   className,
   title,
   style,
+  dataTrack,
   children,
 }: {
   href: string;
   className?: string;
   title?: string;
   style?: CSSProperties;
+  /** 計測キー。TrackClicks が closest("[data-track]") で拾う */
+  dataTrack?: string;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -42,7 +45,14 @@ export default function WarpLink({
 
   return (
     <>
-      <a href={href} onClick={go} className={className} title={title} style={style}>
+      <a
+        href={href}
+        onClick={go}
+        className={className}
+        title={title}
+        style={style}
+        data-track={dataTrack}
+      >
         {children}
       </a>
 

@@ -74,6 +74,35 @@ type Events = {
   bgm_toggle: { state: "play" | "pause" };
   /** data-track を付けた要素が押された（下記 TrackClicks から自動で飛ぶ） */
   cta_click: { track_key: string; label?: string };
+
+  /* ---- 以下、GA4計測の要件（測定要件_TODO.md）のために追加 ---------------- */
+
+  /**
+   * SPAのページ遷移。WarpLink が `router.push()` を使うので、
+   * ブラウザのページ読み込みは1回しか起きない。GTMの「ページビュー」トリガーでは
+   * 2ページ目以降が取れないため、遷移を自前で送る。
+   */
+  spa_page_view: { page_path: string; page_title: string; pages_in_session: number };
+  /** 同一セッションで3ページ以上見た。GA4側でキーイベントに指定する */
+  three_pages_viewed: { pages_in_session: number };
+  /** スクロール到達（25/50/75/100）。スクロールできない画面では送らない */
+  scroll_depth: { percent_scrolled: number; page_path: string; device_type: string };
+  /**
+   * セッションの文脈。GTMのデータレイヤー変数として読ませるため、最初に1回だけ積む
+   * （GTMは一度積まれた値を保持するので、以降のイベントからも参照できる）
+   */
+  session_context: {
+    visit_count: number;
+    entry_page: string;
+    referrer_host: string;
+    device_type: string;
+  };
+  /** ゲートを突破した。このサイトの離脱分析の主役になる指標 */
+  gate_cleared: { method: "game" | "passphrase"; elapsed_ms: number };
+  /** いいねを押した/外した */
+  reaction_like: { item_id: string; item_type: string; liked: boolean; like_count: number };
+  /** シェアした */
+  reaction_share: { share_method: string; item_id: string };
 };
 
 declare global {

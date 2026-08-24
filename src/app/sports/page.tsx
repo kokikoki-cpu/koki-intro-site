@@ -64,6 +64,7 @@ export default function SportsPage() {
               <button
                 key={s.id}
                 onClick={() => onTile(s)}
+                data-track={`sports-tile-${s.id}`}
                 className="group flex flex-col items-center gap-2 transition hover:-translate-y-1.5"
               >
                 {/* 競技はそれぞれ小さな惑星。未突破は雲に隠れて見えない */}

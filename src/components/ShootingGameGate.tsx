@@ -659,6 +659,7 @@ export default function ShootingGameGate() {
           />
           <button
             onClick={startTransition}
+            data-track="gate-clear-proceed"
             className="btn-ember btn-ember--solid px-8 py-3"
           >
             {videoEnded ? "サイトへ進む →" : "スキップしてサイトへ →"}
@@ -692,6 +693,7 @@ export default function ShootingGameGate() {
               e.stopPropagation();
               toggleOpeningSound();
             }}
+            data-track="opening-sound"
             aria-pressed={openingSoundOn}
             className={`rounded-full border-2 border-(--color-ember) px-5 py-2.5 font-display text-sm font-extrabold transition ${
               openingSoundOn
@@ -753,6 +755,7 @@ export default function ShootingGameGate() {
         <div className="absolute inset-x-0 bottom-[12vh] flex justify-center">
           <button
             onClick={startFromWelcome}
+            data-track="opening-start"
             className={`opening__start rounded-md border-2 border-(--color-ember) px-10 py-3.5 font-display text-lg font-extrabold text-(--color-ember) transition hover:bg-(--color-ember) hover:text-(--color-space) ${
               openingRushed ? "opening__start--now" : ""
             }`}
@@ -792,6 +795,7 @@ export default function ShootingGameGate() {
           </div>
           <button
             onClick={resetGame}
+            data-track="gate-game-start"
             className="btn-ember btn-ember--solid px-10 py-3.5 text-lg"
           >
             ゲームスタート
@@ -824,6 +828,7 @@ export default function ShootingGameGate() {
             <p className="font-display text-2xl font-extrabold text-(--color-white)">GAME OVER</p>
             <button
               onClick={resetGame}
+              data-track="gate-retry"
               className="btn-ember px-6 py-2 text-sm"
             >
               もう一度
@@ -836,6 +841,7 @@ export default function ShootingGameGate() {
         {!showPassphrase ? (
           <button
             onClick={() => setShowPassphrase(true)}
+            data-track="gate-passphrase-open"
             className="text-xs text-(--color-bg-soft)/70 underline underline-offset-2"
           >
             クリアできない人は合言葉を入れるとスキップできるよ♡
@@ -855,6 +861,7 @@ export default function ShootingGameGate() {
               />
               <button
                 onClick={checkPassphrase}
+                data-track="gate-passphrase-submit"
                 className="btn-ember px-4 py-2 text-sm"
               >
                 入る

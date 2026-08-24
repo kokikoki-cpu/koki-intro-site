@@ -116,6 +116,7 @@ export default function WorldPage() {
                   key={c.id}
                   aria-label={c.name}
                   onClick={() => onPin(c)}
+                  data-track={`world-pin-${c.id}`}
                   className="group absolute -translate-x-1/2 -translate-y-full"
                   style={{ left: `${c.x}%`, top: `${c.y}%` }}
                 >

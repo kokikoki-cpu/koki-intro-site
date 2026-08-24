@@ -228,6 +228,7 @@ export default function CosmosHome({
           </h1>
           <button
             onClick={() => setPanel("memory")}
+            data-track="home-memory-open"
             className="memory-btn mt-4 inline-flex items-center gap-3 rounded-full border-2 border-(--color-ember) bg-(--color-space)/85 px-6 py-3 text-left transition hover:scale-105 hover:border-(--color-white)"
           >
             <span className="font-display text-3xl font-extrabold leading-none text-(--color-white)">
@@ -267,6 +268,7 @@ export default function CosmosHome({
                   className={planetClass}
                   title={s.title}
                   style={{ width: size, height: size }}
+                  dataTrack={`home-planet-${s.key}`}
                 >
                   {/* 国が9つで最多 → 二重の輪。スポーツは6つ → 一重 */}
                   {s.key === "action" && <PlanetRings double />}
@@ -296,6 +298,7 @@ export default function CosmosHome({
           <Orbit {...ORBITS[orbitFor.career]}>
             <button
               onClick={() => (careerOpen ? setPanel("career") : setPlaying(true))}
+              data-track={careerOpen ? "home-planet-career" : "home-planet-career-locked"}
               className={planetClass}
               style={{ width: planetSize(1), height: planetSize(1) }}
               title={careerOpen ? "職歴" : "職歴（未解錠）"}
@@ -314,6 +317,7 @@ export default function CosmosHome({
           <Orbit {...ORBITS[orbitFor.hobby]}>
             <button
               onClick={() => setPanel("hobby")}
+              data-track="home-planet-hobby"
               className={planetClass}
               style={{ width: planetSize(hobbies.length), height: planetSize(hobbies.length) }}
               title="趣味・活動"

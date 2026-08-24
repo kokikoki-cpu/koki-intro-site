@@ -122,6 +122,7 @@ export default function BgmPlayer() {
         )}
         <button
           onClick={toggle}
+          data-track="bgm-toggle"
           aria-label={muted ? `BGMを鳴らす（${TRACK.title} / ${TRACK.artist}）` : "BGMを止める"}
           aria-pressed={!muted}
           title={`${TRACK.title} / ${TRACK.artist}`}

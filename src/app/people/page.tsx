@@ -110,6 +110,7 @@ export default function PeoplePage() {
         <div className="relative z-1 mx-auto flex w-full max-w-[1120px] items-center gap-3">
           <button
             onClick={() => scrollByCard(-1)}
+            data-track="people-prev"
             aria-label="前へ"
             className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-nebula) md:block"
           >
@@ -126,6 +127,7 @@ export default function PeoplePage() {
                   key={p.id}
                   data-card
                   onClick={() => onCard(p)}
+                  data-track={`people-card-${p.id}`}
                   className="w-[min(72vw,300px)] flex-none cursor-pointer rounded-md border-2 border-(--color-white)/30 bg-(--color-ink)/80 backdrop-blur-sm [scroll-snap-align:start] transition hover:-translate-y-1 hover:border-(--color-ember)"
                 >
                   <div className="relative aspect-square w-full overflow-hidden rounded-t-[4px] bg-black/40">
@@ -163,6 +165,7 @@ export default function PeoplePage() {
           </div>
           <button
             onClick={() => scrollByCard(1)}
+            data-track="people-next"
             aria-label="次へ"
             className="hidden h-11 w-11 flex-none rounded-full border border-(--color-white)/30 bg-(--color-ink)/80 text-lg text-(--color-white) transition hover:scale-105 hover:bg-(--color-nebula) md:block"
           >

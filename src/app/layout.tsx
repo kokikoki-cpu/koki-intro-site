@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BgmPlayer from "@/components/BgmPlayer";
 import TrackClicks from "@/components/TrackClicks";
+import SiteAnalytics from "@/components/SiteAnalytics";
 
 /*
  * 日本語フォントは1書体が数百の分割ファイルに分かれている。
@@ -46,23 +47,46 @@ export const metadata: Metadata = {
     "清水航樹の自己紹介サイト。行動力・好奇心・体力を軸に、旅・人との出会い・スポーツを紹介します。",
 };
 
-/* GTM のコンテナID。`.env.local` に NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX を置くと有効になる。
-   未設定なら1行もタグを読み込まない（開発中に本番の計測を汚さないため）。 */
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+/**
+ * GTM のコンテナID。
+ *
+ * 環境変数（`.env.local` / Vercel）を優先し、無ければこの既定値を使う。
+ * コンテナIDは**HTMLにそのまま出る公開情報**なので、コードに置いても秘密は漏れない
+ * （Vercel CLI が `NEXT_PUBLIC_` 付きの変数をシークレット扱いして登録を拒むため、
+ *  デプロイのたびに詰まるより既定値を持たせる方が確実だと判断した）。
+ *
+ * 注意: これで**ローカル開発でもタグが動く**ようになった。開発中の操作をGA4に混ぜたくないので、
+ * GA4側で「内部トラフィックの除外」（localhost / 自分のIP）を必ず設定すること。
+ * 要件⑦の「自身を除く」でどうせ必要になる作業なので、そこで一緒にやる。
+ */
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-WWG4T3ZW";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja" className={`${notoSansJP.variable} ${shipporiMinchoB1.variable}`}>
       <body className="min-h-screen">
         {GTM_ID && (
-          <Script id="gtm" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+          <>
+            <Script id="gtm" strategy="afterInteractive">
+              {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
 var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
 j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${GTM_ID}');`}
-          </Script>
+            </Script>
+            {/* GTM標準実装のnoscript側。このサイトはReactなのでJS無効では動かず実益は無いが、
+                標準の形に揃えておく */}
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+              />
+            </noscript>
+          </>
         )}
         <TrackClicks />
+        <SiteAnalytics />
         <Header />
         <main>{children}</main>
         <Footer />
