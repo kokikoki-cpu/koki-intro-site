@@ -98,18 +98,21 @@ export default function LikeButton({
   };
 
   return (
-    <div className="mt-4 flex flex-col items-center gap-1">
+    <div className="mt-5 flex flex-col items-center gap-1.5">
       <button
         onClick={toggle}
         aria-pressed={liked}
         aria-label={liked ? "いいねを外す" : "いいねする"}
-        className={`inline-flex items-center gap-2 rounded-full border-2 px-5 py-2 font-display text-sm font-extrabold transition ${
+        className={`inline-flex items-center gap-2.5 rounded-full border-2 px-7 py-3 font-display text-base font-extrabold transition active:scale-95 ${
           liked
             ? "border-(--color-clay) bg-(--color-clay) text-(--color-white)"
-            : "border-(--color-ink) text-(--color-ink) hover:border-(--color-clay) hover:text-(--color-clay)"
+            : "like-btn--idle border-(--color-clay) bg-(--color-clay)/8 text-(--color-clay) hover:bg-(--color-clay) hover:text-(--color-white)"
         }`}
       >
-        <span aria-hidden className="text-base leading-none">
+        <span
+          aria-hidden
+          className={`text-2xl leading-none ${liked ? "" : "like-heart--idle"}`}
+        >
           {liked ? "♥" : "♡"}
         </span>
         {liked ? "いいね済み" : "いいね"}

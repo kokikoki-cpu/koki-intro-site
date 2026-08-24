@@ -1,6 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  getGateVisible,
+  getGateVisibleServer,
+  subscribeGateVisible,
+} from "@/lib/gateVisible";
 
 /** 音量。BGMなので控えめに。上げると詐欺師ゲームの操作感を邪魔する */
 const VOLUME = 0.3;
@@ -42,6 +47,12 @@ export default function BgmPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 前回「消す」を選んでいたら、その意思を尊重する
   const muted = useSyncExternalStore(subscribe, getMuted, getServerMuted);
+  /* 前口上には専用の曲がある。その間このボタンを出すと音が二重になるので隠す */
+  const gateVisible = useSyncExternalStore(
+    subscribeGateVisible,
+    getGateVisible,
+    getGateVisibleServer
+  );
 
   const play = useCallback(() => {
     const el = audioRef.current;
@@ -54,6 +65,10 @@ export default function BgmPlayer() {
   // 最初の操作をきっかけに鳴らし始める
   useEffect(() => {
     if (muted) return;
+    /* 前口上の間は鳴らさない。この画面はどこを押しても反応する作りなので、
+       ガードが無いと「前口上を飛ばそうとして押した」だけでBGMが鳴り出し、
+       専用の曲と二重になる */
+    if (gateVisible) return;
     const el = audioRef.current;
     if (!el) return;
 
@@ -70,7 +85,7 @@ export default function BgmPlayer() {
       window.removeEventListener("pointerdown", kick);
       window.removeEventListener("keydown", kick);
     };
-  }, [muted, play]);
+  }, [muted, play, gateVisible]);
 
   // 他の音（クリア後のモンゴル動画、オープニングの曲）が鳴っている間はBGMを止めて、
   // 音が重ならないようにする。
@@ -113,8 +128,14 @@ export default function BgmPlayer() {
     <>
       <audio ref={audioRef} src="/audio/bgm.m4a" loop preload="none" />
 
-      {/* z-120: ゲートやゲームのオーバーレイ(z-100/110)より前。いつでも消せるようにする */}
-      <div className="fixed bottom-4 right-4 z-120 flex items-center gap-2">
+      {/* z-120: ゲームのオーバーレイ(z-100)より前。いつでも消せるようにする。
+          ただし前口上(z-110)の間だけは出さない - あちらには専用の曲があり、
+          ここから鳴らせてしまうと音が二重になる */}
+      <div
+        className={`fixed bottom-4 right-4 z-120 flex items-center gap-2 ${
+          gateVisible ? "hidden" : ""
+        }`}
+      >
         {!muted && (
           <span className="hidden rounded-full border border-(--color-white)/20 bg-(--color-ink)/85 px-3 py-1.5 text-xs text-(--color-bg-soft)/80 backdrop-blur-sm sm:block">
             ♫ {TRACK.title} / {TRACK.artist}

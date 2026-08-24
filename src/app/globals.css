@@ -1913,3 +1913,38 @@ h1, h2, h3, h4 {
   60%  { opacity: 0.12; }
   100% { transform: scale(1.7); opacity: 0; }
 }
+
+/* --- いいねボタン ---------------------------------------------------------
+   まだ押されていない間だけ、ハートが数秒に一度プルッと震えて「押せる」ことを知らせる。
+   ずっと動かし続けると鬱陶しいので、周期の8割は静止していて、最後にだけ揺れる。
+   押した後は震えを止める（もう誘う必要がないし、動き続けると落ち着かない）。 */
+@keyframes like-wiggle {
+  0%, 78%, 100% { transform: rotate(0deg) scale(1); }
+  82% { transform: rotate(-12deg) scale(1.18); }
+  86% { transform: rotate(12deg) scale(1.18); }
+  90% { transform: rotate(-8deg) scale(1.1); }
+  94% { transform: rotate(7deg) scale(1.05); }
+  97% { transform: rotate(-3deg) scale(1.02); }
+}
+
+.like-heart--idle {
+  display: inline-block;
+  animation: like-wiggle 3.2s ease-in-out infinite;
+}
+
+/* ボタンそのものも、うっすら呼吸させて視線を引く（枠線の色だけ動かす） */
+@keyframes like-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 86, 48, 0.28); }
+  50%      { box-shadow: 0 0 0 7px rgba(168, 86, 48, 0); }
+}
+
+.like-btn--idle {
+  animation: like-breathe 2.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .like-heart--idle,
+  .like-btn--idle {
+    animation: none;
+  }
+}

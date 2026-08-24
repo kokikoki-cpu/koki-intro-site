@@ -48,13 +48,15 @@ export default function ShareButtons() {
   const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      <span className="text-xs text-(--color-bg-soft)/55">このサイトを共有</span>
+    <div className="flex flex-wrap items-center justify-center gap-2.5">
+      <span className="font-display text-sm font-extrabold text-(--color-ember)">
+        このサイトをシェア
+      </span>
 
       {canNativeShare && (
         <button
           onClick={nativeShare}
-          className="rounded-full border border-(--color-white)/25 px-4 py-1.5 text-xs font-bold text-(--color-bg-soft)/80 transition hover:border-(--color-ember) hover:text-(--color-ember)"
+          className="rounded-full border-2 border-(--color-ember)/55 px-5 py-2 font-display text-sm font-extrabold text-(--color-bg-soft)/90 transition hover:bg-(--color-ember) hover:text-(--color-space) active:scale-95"
         >
           共有する
         </button>
@@ -65,7 +67,7 @@ export default function ShareButtons() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => send("x")}
-        className="rounded-full border border-(--color-white)/25 px-4 py-1.5 text-xs font-bold text-(--color-bg-soft)/80 transition hover:border-(--color-ember) hover:text-(--color-ember)"
+        className="rounded-full border-2 border-(--color-ember)/55 px-5 py-2 font-display text-sm font-extrabold text-(--color-bg-soft)/90 transition hover:bg-(--color-ember) hover:text-(--color-space) active:scale-95"
       >
         X
       </a>
@@ -75,14 +77,14 @@ export default function ShareButtons() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => send("line")}
-        className="rounded-full border border-(--color-white)/25 px-4 py-1.5 text-xs font-bold text-(--color-bg-soft)/80 transition hover:border-(--color-ember) hover:text-(--color-ember)"
+        className="rounded-full border-2 border-(--color-ember)/55 px-5 py-2 font-display text-sm font-extrabold text-(--color-bg-soft)/90 transition hover:bg-(--color-ember) hover:text-(--color-space) active:scale-95"
       >
         LINE
       </a>
 
       <button
         onClick={copy}
-        className="rounded-full border border-(--color-white)/25 px-4 py-1.5 text-xs font-bold text-(--color-bg-soft)/80 transition hover:border-(--color-ember) hover:text-(--color-ember)"
+        className="rounded-full border-2 border-(--color-ember)/55 px-5 py-2 font-display text-sm font-extrabold text-(--color-bg-soft)/90 transition hover:bg-(--color-ember) hover:text-(--color-space) active:scale-95"
       >
         {copied ? "コピーした" : "URLをコピー"}
       </button>

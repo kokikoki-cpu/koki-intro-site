@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { tryPassphrase, unlock, useIsUnlocked } from "@/lib/unlock";
 import { now, since, track } from "@/lib/track";
+import { setGateVisible } from "@/lib/gateVisible";
 import { clearRate } from "@/lib/difficulty";
 import { preloadSfx, sfx } from "@/lib/sfx";
 import StampedeTransition from "@/components/StampedeTransition";
@@ -582,6 +583,16 @@ export default function ShootingGameGate() {
   useEffect(() => {
     if (phase === "playing") preloadSfx();
   }, [phase]);
+
+  /* 前口上が画面を覆っている間を BgmPlayer に知らせる。
+     あちらは右下のBGMボタンを隠し、共通BGMも鳴らさないようにする（音の二重を防ぐ）。
+     React の state ではなく外部ストアなので、effect から呼んで問題ない */
+  useEffect(() => {
+    const covering = !welcomed && !dismissed;
+    setGateVisible(covering);
+    /* この画面が外れる時は必ず false に戻す（解錠済みで最初から出ない場合も含む） */
+    return () => setGateVisible(false);
+  }, [welcomed, dismissed]);
 
   /* キーボードでも前口上を飛ばせるようにする（クリックと同じ扱い） */
   useEffect(() => {
