@@ -23,7 +23,14 @@ export default function SportsPage() {
   const cleared = useUnlockedFrom(SPORT_IDS);
 
   const showSport = (s: Sport, celebrate = false) =>
-    setModal({ photo: s.photo, title: s.name, body: s.desc, celebrate });
+    setModal({
+      photo: s.photo,
+      title: s.name,
+      body: s.desc,
+      celebrate,
+      itemId: s.id,
+      itemType: "sport",
+    });
 
   const onTile = (s: Sport) => {
     if (cleared.has(s.id)) showSport(s);

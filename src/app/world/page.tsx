@@ -38,7 +38,15 @@ export default function WorldPage() {
   const open = useUnlockedFrom(COUNTRY_IDS);
 
   const showCountry = (c: Country, celebrate = false) =>
-    setModal({ photo: c.photo, title: c.name, tagline: c.tagline, body: c.story, celebrate });
+    setModal({
+      photo: c.photo,
+      title: c.name,
+      tagline: c.tagline,
+      body: c.story,
+      celebrate,
+      itemId: c.id,
+      itemType: "country",
+    });
 
   /* ピンを押したら、その国へ寄ってからゲームを開く（宇宙から降りていく感じ） */
   const onPin = (c: Country) => {

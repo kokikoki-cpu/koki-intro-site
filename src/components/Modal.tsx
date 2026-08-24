@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
+import LikeButton from "./LikeButton";
 
 export type ModalData = {
   photo: string;
@@ -10,6 +11,13 @@ export type ModalData = {
   body?: ReactNode;
   /** ゲームをクリアして開いた時だけ true。開封の演出を出す */
   celebrate?: boolean;
+  /**
+   * いいねの対象。国・人物・スポーツのモーダルは全部ここを通るので、
+   * この2つを渡すだけで19箇所（国9・人物4・スポーツ6）にいいねが付く。
+   * 渡さなければボタンは出ない。
+   */
+  itemId?: string;
+  itemType?: string;
 } | null;
 
 const PALETTE = ["#ffe0aa", "#85b48d", "#e8a05c", "#fffdf8", "#c98f4e"];
@@ -117,6 +125,9 @@ export default function Modal({ data, onClose }: { data: ModalData; onClose: () 
             )}
             <h3 className="font-display text-xl font-extrabold">{data.title}</h3>
             {data.body && <div className="mt-2 text-sm text-(--color-ink-soft)">{data.body}</div>}
+            {data.itemId && data.itemType && (
+              <LikeButton itemId={data.itemId} itemType={data.itemType} />
+            )}
           </div>
         </div>
       </div>

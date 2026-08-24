@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { tryPassphrase, unlock, useIsUnlocked } from "@/lib/unlock";
+import { now, since, track } from "@/lib/track";
 import { clearRate } from "@/lib/difficulty";
 import { preloadSfx, sfx } from "@/lib/sfx";
 import StampedeTransition from "@/components/StampedeTransition";
@@ -248,6 +249,11 @@ export default function ShootingGameGate() {
   /** 鳴らせなかった理由。黙って失敗すると原因が分からないので画面に出す */
   const [openingSoundError, setOpeningSoundError] = useState<string | null>(null);
   const openingAudioRef = useRef<HTMLAudioElement | null>(null);
+  /**
+   * ここに来た時刻。ゲートを抜けるまでに何秒かかったかを測る。
+   * 突破率と所要時間が並ぶと「難しすぎて消えたのか、長すぎて消えたのか」が区別できる。
+   */
+  const arrivedAt = useRef(now());
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -447,6 +453,9 @@ export default function ShootingGameGate() {
           setPhase("won");
           // 勝ちを即座に記録する。この後に動画を見せるので、画面自体はまだ閉じない
           unlock(GATE_ID);
+          /* ゲート突破。このサイトは本編に入る前にゲームがあるので、
+             ここを抜けた人の割合が全ての指標の分母になる */
+          track("gate_cleared", { method: "game", elapsed_ms: since(arrivedAt.current) });
         } else if (livesRef.current <= 0) {
           phaseRef.current = "lost";
           setPhase("lost");
@@ -558,6 +567,9 @@ export default function ShootingGameGate() {
 
   const checkPassphrase = () => {
     if (tryPassphrase(passInput)) {
+      /* 合言葉での突破。ゲームで勝った人と分けて数える
+         （「諦めた人がどれだけ居たか」がこれで分かる） */
+      track("gate_cleared", { method: "passphrase", elapsed_ms: since(arrivedAt.current) });
       setDismissed(true);
     } else {
       setPassError(true);

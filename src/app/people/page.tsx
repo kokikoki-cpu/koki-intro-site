@@ -36,6 +36,8 @@ export default function PeoplePage() {
         title: p.name,
         tagline: `出現場所: ${p.place}`,
         celebrate,
+        itemId: p.id,
+        itemType: "person",
         body: (
           <>
             <ul className="m-0 list-none p-0 text-left">
@@ -63,7 +65,15 @@ export default function PeoplePage() {
         ),
       });
     } else {
-      setModal({ photo: p.photo, title: p.name, tagline: `出現場所: ${p.place}`, body: p.story, celebrate });
+      setModal({
+        photo: p.photo,
+        title: p.name,
+        tagline: `出現場所: ${p.place}`,
+        body: p.story,
+        celebrate,
+        itemId: p.id,
+        itemType: "person",
+      });
     }
   };
 
