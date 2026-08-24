@@ -85,8 +85,24 @@ type Events = {
   spa_page_view: { page_path: string; page_title: string; pages_in_session: number };
   /** 同一セッションで3ページ以上見た。GA4側でキーイベントに指定する */
   three_pages_viewed: { pages_in_session: number };
-  /** スクロール到達（25/50/75/100）。スクロールできない画面では送らない */
-  scroll_depth: { percent_scrolled: number; page_path: string; device_type: string };
+  /**
+   * スクロール到達（25/50/75/100）。スクロールできない画面では送らない。
+   * `time_on_page_ms` を一緒に送ることで「その深さまで読むのに何秒かけたか」が分かる
+   * ＝スクロール率と滞在時間の組み合わせ計測。
+   */
+  scroll_depth: {
+    percent_scrolled: number;
+    page_path: string;
+    device_type: string;
+    time_on_page_ms: number;
+  };
+  /**
+   * 滞在時間の節目（15/30/60/120秒）。
+   * このサイトはPCで画面に収まる設計なのでスクロールが起きず、深度だけでは
+   * 「読まれたか」が測れない。**滞在時間の方が本命の指標になる**ため独立して送る。
+   * 数えるのはタブが見えている間だけ（裏に回している時間は含めない）。
+   */
+  dwell_time: { seconds: number; page_path: string; device_type: string };
   /**
    * セッションの文脈。GTMのデータレイヤー変数として読ませるため、最初に1回だけ積む
    * （GTMは一度積まれた値を保持するので、以降のイベントからも参照できる）

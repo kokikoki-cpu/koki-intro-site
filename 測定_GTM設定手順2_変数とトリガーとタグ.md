@@ -1,218 +1,250 @@
-# GTM / GA4 設定手順 ②（変数・トリガー・タグ／全イベント個別版）
+# GTM / GA4 設定手順 ②（短縮版）
 
-コード側は完成して本番に乗っています。dataLayerには全イベントが流れている状態
-（プレビューで確認済み）。ここから先はGTM/GA4の画面作業だけです。
+コード側は完成して本番稼働中。dataLayerには全イベントが流れています（プレビューで確認済み）。
+ここから先はGTM/GA4の画面作業だけ。
 
-**規模**: 変数30個 + トリガー20個 + タグ20個 = **70設定**。
-1つ1つは単純な繰り返しですが数が多いので、Part単位で区切って進めてください。
-**所要 2〜3時間**（慣れると後半は速くなります）。
-
-> まとめて数個で済ませる作り方もありますが、研修としてイベントごとに
-> トリガーとタグを作る形にしています。1対1で並ぶので、後から見て何が何だか分かる
-> という利点も実際にあります。
+**規模: 変数17 + トリガー7 + タグ7 = 31設定。所要 45〜60分。**
 
 ---
 
-# Part 1. 変数を作る（30個）
+## ⚠️ 入力する時の注意（最初に読んでください）
+
+この文書の表に出てくる名前は、**英数字とアンダースコアだけ**です。
+
+- 正しい入力: `pages_in_session` → **pages_in_session**
+- 間違い: `` `pages_in_session` `` ← バッククォート付き
+
+**引用符・バッククォート・スペースは一切入れないでください。** 混じると
+dataLayerのキー名と一致せず、値が空になります（エラーは出ないので気づきにくい）。
+
+この文書では読みやすさのため名前を枠で囲んで書いていますが、**枠の中身だけ**を入力します。
+
+---
+
+## 何を短縮したか（計測は減りません）
+
+イベントは全部で20種類ありますが、**要件①②③④⑥に名指しされている6つだけ個別にタグを作り、
+残り14イベントは「まとめタグ」1つで拾います。**
+
+まとめタグは、イベント名の欄に **{{Event}}** を入れます。これは
+「dataLayerに来たイベント名をそのままGA4のイベント名として使う」という指定なので、
+**14イベント全部がちゃんと別々の名前でGA4に届きます。** 設定が1つで済むだけです。
+
+減るのは「各イベントの細かいパラメータ」だけ。要件で問われている部分は個別タグで
+きちんと押さえます。
+
+---
+
+# Part 1. 変数を作る（17個）
 
 GTM左メニュー **「変数」** → 下段「ユーザー定義変数」→「新規」
-→ 変数タイプ **「データレイヤーの変数」**
-→ 「データレイヤーの変数名」に**下の値をそのまま**入れる
-→ 変数の名前は `DLV - キー名` にする（例: `DLV - track_key`）
+→ タイプ **「データレイヤーの変数」**
+→ 「データレイヤーの変数名」に下の名前を入力（**記号なし**）
+→ 「データレイヤーのバージョン」は **バージョン 2**（初期値のまま）
+→ 変数の名前は `DLV - 名前` にすると後で探しやすい
 
-| # | データレイヤーの変数名 | 何が入るか |
+| # | 入力する名前 | 使う要件 |
 |---|---|---|
-| 1 | `track_key` | 押されたボタンのキー（`world-pin-turkey` 等） |
-| 2 | `label` | ボタンの文字 |
-| 3 | `percent_scrolled` | 25 / 50 / 75 / 100 |
-| 4 | `page_path` | `/world` などのパス |
-| 5 | `page_title` | ページのタイトル |
-| 6 | `pages_in_session` | そのセッションで見たページ数 |
-| 7 | `visit_count` | 何回目の訪問か |
-| 8 | `entry_page` | 最初に着地したページ |
-| 9 | `referrer_host` | 経由元のホスト名（`(direct)` の場合あり） |
-| 10 | `device_type` | mobile / tablet / desktop |
-| 11 | `item_id` | 対象のID（`turkey` `p2` `tennis` 等） |
-| 12 | `item_type` | country / person / sport |
-| 13 | `item_name` | 対象の名前（日本語） |
-| 14 | `liked` | true = 付けた / false = 外した |
-| 15 | `like_count` | その人の累計いいね数（**メトリクス用の数値**） |
-| 16 | `share_method` | native / x / line / copy |
-| 17 | `method` | ゲート突破の手段（game / passphrase） |
-| 18 | `elapsed_ms` | 経過ミリ秒 |
-| 19 | `game_id` | ゲーム種別（gate / battle / balloon 等） |
-| 20 | `level` | 難易度（1〜5） |
-| 21 | `duration_ms` | ゲームの所要ミリ秒 |
-| 22 | `phase` | 諦めた時点の状態 |
-| 23 | `skipped` | オープニングを飛ばしたか |
-| 24 | `from` | 合言葉をどこで使ったか |
-| 25 | `category` | 記憶の種別（country / person / sport / career） |
-| 26 | `collected` | 集めた数 |
-| 27 | `total` | 全部の数 |
-| 28 | `panel_id` | 開いたパネル |
-| 29 | `to` | ロケットの行き先 |
-| 30 | `state` | BGMの play / pause |
+| 1 | track_key | ② |
+| 2 | label | ② |
+| 3 | percent_scrolled | ① |
+| 4 | page_path | ① |
+| 5 | device_type | ①④ |
+| 6 | pages_in_session | ③ |
+| 7 | visit_count | ④ |
+| 8 | entry_page | ④ |
+| 9 | referrer_host | ④ |
+| 10 | item_id | ⑥ |
+| 11 | item_type | ⑥ |
+| 12 | liked | ⑥ |
+| 13 | like_count | ⑥（メトリクス用の数値） |
+| 14 | share_method | ⑥ |
+| 15 | method | まとめ（ゲート突破手段） |
+| 16 | elapsed_ms | まとめ（所要時間） |
+| 17 | game_id | まとめ（ゲーム種別） |
 
 ---
 
-# Part 2. トリガーを作る（20個）
+# Part 2. トリガーを作る（7個）
 
-GTM左メニュー **「トリガー」** → 「新規」→ トリガータイプ **「カスタムイベント」**
-→ 「イベント名」に下の値を入れる（**正規表現のチェックは不要**）
-→ トリガー名は `CE - イベント名` にする
+「トリガー」→「新規」→ タイプ **「カスタムイベント」**
+→ 「イベント名」に下の名前を入力（**記号なし**）
+→ トリガー名は `CE - 名前`
 
-| # | イベント名（入力値） | いつ飛ぶか |
-|---|---|---|
-| 1 | `session_context` | ページを開いた直後に1回（④の変数を運ぶ） |
-| 2 | `spa_page_view` | ページを移動するたび |
-| 3 | `scroll_depth` | 25/50/75/100%に到達（①） |
-| 4 | `three_pages_viewed` | 3ページ目に着いた瞬間に1回（③） |
-| 5 | `cta_click` | `data-track` 付きのボタンを押した（②） |
-| 6 | `reaction_like` | いいねを押した/外した（⑥） |
-| 7 | `reaction_share` | シェアした（⑥） |
-| 8 | `gate_cleared` | ゲートを突破した |
-| 9 | `opening_start` | オープニングの「ゲームスタート」 |
-| 10 | `opening_skip` | 前口上を飛ばした |
-| 11 | `game_start` | ゲームを始めた |
-| 12 | `game_clear` | クリアした |
-| 13 | `game_fail` | 失敗した |
-| 14 | `game_quit` | 諦めて閉じた |
-| 15 | `passphrase_unlock_all` | 合言葉で全解錠した |
-| 16 | `memory_unlocked` | 記憶を1つ手に入れた |
-| 17 | `all_memories_collected` | 全部集めた |
-| 18 | `panel_open` | パネルを開いた |
-| 19 | `warp_navigate` | ロケットで移動した |
-| 20 | `bgm_toggle` | BGMを切り替えた |
+| # | トリガー名 | 入力するイベント名 | 設定 |
+|---|---|---|---|
+| 1 | CE - scroll_depth | scroll_depth | そのまま |
+| 2 | CE - cta_click | cta_click | そのまま |
+| 3 | CE - three_pages_viewed | three_pages_viewed | そのまま |
+| 4 | CE - session_context | session_context | そのまま |
+| 5 | CE - reaction_like | reaction_like | そのまま |
+| 6 | CE - reaction_share | reaction_share | そのまま |
+| 7 | CE - その他まとめ | ↓下のコードブロック | **正規表現にチェック** |
+
+**7番のイベント名は下の枠の中身をコピペしてください**（これは1行の正規表現です）:
+
+```
+^(spa_page_view|gate_cleared|opening_start|opening_skip|game_start|game_clear|game_fail|game_quit|passphrase_unlock_all|memory_unlocked|all_memories_collected|panel_open|warp_navigate|bgm_toggle)$
+```
+
+→ そして **「正規表現の一致を使用」にチェックを入れる。**
+ここを忘れると1つも発火しません。
 
 ---
 
-# Part 3. タグを作る（20個）
+# Part 3. タグを作る（7個）
 
-GTM左メニュー **「タグ」** → 「新規」→ タグタイプ **「Google アナリティクス: GA4 イベント」**
-→ **測定ID**: `G-KH6VZ8B6HY`
-→ **イベント名**: 下の表の通り
-→ **イベントパラメータ**: 下の表の通り（値の欄は右の **＋** から変数を選ぶ）
-→ **トリガー**: 対応する `CE - 〜`
-→ タグ名は `GA4 - イベント名`
+「タグ」→「新規」→ タイプ **「Google アナリティクス: GA4 イベント」**
+→ **測定ID: G-KH6VZ8B6HY**
+→ イベント名とパラメータを下の通りに
+→ トリガーを対応する `CE - 〜` に
+→ タグ名は `GA4 - 名前`
 
-### 要件に直接かかわる7個（ここは丁寧に）
+**パラメータ名は手入力（記号なし）。値の欄は右の ＋（レゴブロックのアイコン）から
+Part 1 で作った変数を選びます**（手で打つのではなく選ぶので、こちらは記号の心配なし）。
 
-| タグ名 | イベント名 | パラメータ（名前 = 値） |
-|---|---|---|
-| `GA4 - scroll_depth` **①** | `scroll_depth` | `percent_scrolled` = `{{DLV - percent_scrolled}}`<br>`page_path` = `{{DLV - page_path}}`<br>`device_type` = `{{DLV - device_type}}` |
-| `GA4 - cta_click` **②** | `cta_click` | `track_key` = `{{DLV - track_key}}`<br>`label` = `{{DLV - label}}` |
-| `GA4 - three_pages_viewed` **③** | `three_pages_viewed` | `pages_in_session` = `{{DLV - pages_in_session}}` |
-| `GA4 - session_context` **④** | `session_context` | `visit_count` = `{{DLV - visit_count}}`<br>`entry_page` = `{{DLV - entry_page}}`<br>`referrer_host` = `{{DLV - referrer_host}}`<br>`device_type` = `{{DLV - device_type}}` |
-| `GA4 - reaction_like` **⑥** | `reaction_like` | `item_id` = `{{DLV - item_id}}`<br>`item_type` = `{{DLV - item_type}}`<br>`liked` = `{{DLV - liked}}`<br>`like_count` = `{{DLV - like_count}}` |
-| `GA4 - reaction_share` **⑥** | `reaction_share` | `share_method` = `{{DLV - share_method}}`<br>`item_id` = `{{DLV - item_id}}` |
-| `GA4 - spa_page_view` | `spa_page_view` | `page_path` = `{{DLV - page_path}}`<br>`page_title` = `{{DLV - page_title}}`<br>`pages_in_session` = `{{DLV - pages_in_session}}` |
+### 1. GA4 - scroll_depth 【要件①】
+- イベント名: scroll_depth / トリガー: CE - scroll_depth
 
-### このサイト固有の分析用 13個
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| percent_scrolled | DLV - percent_scrolled |
+| page_path | DLV - page_path |
+| device_type | DLV - device_type |
 
-| タグ名 | イベント名 | パラメータ（名前 = 値） |
-|---|---|---|
-| `GA4 - gate_cleared` | `gate_cleared` | `gate_method` = `{{DLV - method}}`<br>`elapsed_ms` = `{{DLV - elapsed_ms}}` |
-| `GA4 - opening_start` | `opening_start` | `skipped` = `{{DLV - skipped}}`<br>`elapsed_ms` = `{{DLV - elapsed_ms}}` |
-| `GA4 - opening_skip` | `opening_skip` | `elapsed_ms` = `{{DLV - elapsed_ms}}` |
-| `GA4 - game_start` | `game_start` | `game_id` = `{{DLV - game_id}}`<br>`item_id` = `{{DLV - item_id}}`<br>`item_name` = `{{DLV - item_name}}`<br>`level` = `{{DLV - level}}` |
-| `GA4 - game_clear` | `game_clear` | 上の4つ + `duration_ms` = `{{DLV - duration_ms}}` |
-| `GA4 - game_fail` | `game_fail` | 上の4つ + `duration_ms` = `{{DLV - duration_ms}}` |
-| `GA4 - game_quit` | `game_quit` | `game_id` / `item_id` / `item_name` + `phase` = `{{DLV - phase}}` |
-| `GA4 - passphrase_unlock_all` | `passphrase_unlock_all` | `from` = `{{DLV - from}}` |
-| `GA4 - memory_unlocked` | `memory_unlocked` | `item_id` = `{{DLV - item_id}}`<br>`category` = `{{DLV - category}}`<br>`collected` = `{{DLV - collected}}`<br>`total` = `{{DLV - total}}` |
-| `GA4 - all_memories_collected` | `all_memories_collected` | `total` = `{{DLV - total}}` |
-| `GA4 - panel_open` | `panel_open` | `panel_id` = `{{DLV - panel_id}}` |
-| `GA4 - warp_navigate` | `warp_navigate` | `to` = `{{DLV - to}}` |
-| `GA4 - bgm_toggle` | `bgm_toggle` | `state` = `{{DLV - state}}` |
+### 2. GA4 - cta_click 【要件②】
+- イベント名: cta_click / トリガー: CE - cta_click
 
-> **`method` だけ、送る名前を `gate_method` に変えています。** `method` はGA4側の
-> 予約語と紛れやすく、レポートで見分けにくくなるためです。GTM変数名は `DLV - method`
-> のままで、タグのパラメータ名だけ変えます。
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| track_key | DLV - track_key |
+| label | DLV - label |
+
+### 3. GA4 - three_pages_viewed 【要件③】
+- イベント名: three_pages_viewed / トリガー: CE - three_pages_viewed
+
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| pages_in_session | DLV - pages_in_session |
+
+### 4. GA4 - session_context 【要件④】
+- イベント名: session_context / トリガー: CE - session_context
+
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| visit_count | DLV - visit_count |
+| entry_page | DLV - entry_page |
+| referrer_host | DLV - referrer_host |
+| device_type | DLV - device_type |
+
+### 5. GA4 - reaction_like 【要件⑥】
+- イベント名: reaction_like / トリガー: CE - reaction_like
+
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| item_id | DLV - item_id |
+| item_type | DLV - item_type |
+| liked | DLV - liked |
+| like_count | DLV - like_count |
+
+### 6. GA4 - reaction_share 【要件⑥】
+- イベント名: reaction_share / トリガー: CE - reaction_share
+
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| share_method | DLV - share_method |
+| item_id | DLV - item_id |
+
+### 7. GA4 - その他まとめ
+- **イベント名の欄に {{Event}} と入れる** ← ここが要点
+  （組み込み変数です。＋ボタンの一覧に Event が出なければ、
+  「変数」画面の上段「組み込み変数」→「設定」→ Event にチェック）
+- トリガー: CE - その他まとめ
+
+| パラメータ名（入力） | 値（＋から選ぶ） |
+|---|---|
+| gate_method | DLV - method |
+| elapsed_ms | DLV - elapsed_ms |
+| game_id | DLV - game_id |
+| item_id | DLV - item_id |
+| page_path | DLV - page_path |
+
+> 値が無いイベントでは、そのパラメータは自動的に送られません。全部載せて問題ありません。
+> パラメータ名だけ gate_method にしています（method はGA4の予約語と紛れやすいため）。
 
 ---
 
-# Part 4. プレビューで確認 → 公開
+# Part 4. プレビュー → 公開
 
-1. 右上 **「プレビュー」** → `https://koki-intro-site.vercel.app/` を入れる
-2. サイトを触りながら、右パネルで **Tags Fired** を確認
-   - 開いた直後 → `GA4 - session_context`
-   - オープニングを飛ばす → `GA4 - opening_skip`
-   - ゲート突破 → `GA4 - gate_cleared` と `GA4 - game_clear`
-   - 惑星を押して移動 → `GA4 - cta_click` `GA4 - warp_navigate` `GA4 - spa_page_view`
-   - 3ページ目 → `GA4 - three_pages_viewed`
-   - モーダルでいいね → `GA4 - reaction_like`
-   - Footerでシェア → `GA4 - reaction_share`
-3. 問題なければ右上 **「公開」**
-
-**発火しないタグがあったら、そのイベント名をメモして教えてください。** dataLayer側か
-タグ側かをこちらで切り分けます。
+1. 右上 **「プレビュー」** → `https://koki-intro-site.vercel.app/`
+2. サイトを触って、右パネルで **Tags Fired** を確認
+   - 開いた直後 → GA4 - session_context
+   - ボタンを押す → GA4 - cta_click
+   - ゲート突破 → GA4 - その他まとめ
+   - 3ページ移動 → GA4 - three_pages_viewed
+   - いいね → GA4 - reaction_like
+   - シェア → GA4 - reaction_share
+3. **変数の値も確認できます。** デバッグ画面で該当イベントを選び「Variables」タブを見ると、
+   各変数に値が入っているかが分かります。**undefined になっていたら名前の入力ミス**です
+4. 問題なければ右上 **「公開」**
 
 ---
 
 # Part 5. GA4側の設定
 
-## 5-1. 自分を除外する（要件⑦・**最優先**）
+## 5-1. 自分を除外（要件⑦・**最優先**）
 
-もう本番でデータが流れているので、これを先に。
+本番はもうデータが流れているので、これを先に。
 
-1. GA4 管理 → データストリーム → ストリームを開く → **「タグ設定を行う」**
+1. 管理 → データストリーム → ストリームを開く → **「タグ設定を行う」**
 2. 「すべて表示」→ **「内部トラフィックの定義」** → 作成
-   - ルール名: `自分` ／ `traffic_type` の値: `internal`
-   - 一致タイプ: **「IPアドレスが次で始まる」** ／ 値: `2400:4050:37c1:9900`
-   - もう1つ足して `127.0.0.1` と `::1`（ローカル開発用）
-3. 管理 → **データ設定 → データフィルタ**
-4. `Internal Traffic` を開き、**状態を「テスト」→「有効」に変更**
-   → **ここを変えないと除外されません。** 初期は「テスト」です
-
-> IPv6は変わりやすいので、回線が変わったら値の確認をお願いします。
+   - ルール名 `自分` / traffic_type の値は internal
+   - 一致タイプ **「IPアドレスが次で始まる」** / 値 `2400:4050:37c1:9900`
+   - もう1つ足して 127.0.0.1 と ::1（ローカル開発分）
+3. 管理 → **データ設定 → データフィルタ** → Internal Traffic を開く
+4. **状態を「テスト」→「有効」に変更** ← ここを変えないと除外されません
 
 ## 5-2. キーイベント（要件③）
 
-管理 → **イベント** → `three_pages_viewed` の右
+管理 → **イベント** → three_pages_viewed の右
 → **「キーイベントとしてマークを付ける」** をON
 
-> 一覧に出るのは実際に1回以上発生した後です。プレビューで3ページ動いてから見てください。
+> 一覧に出るのは1回以上発生した後です。プレビューで3ページ動いてから見てください。
 
 ## 5-3. カスタムディメンション（要件④⑥）
 
-管理 → **カスタム定義** → 「カスタムディメンションを作成」
+管理 → **カスタム定義** → 「カスタムディメンションを作成」（9個）
 
-| ディメンション名 | 範囲 | イベントパラメータ |
+| ディメンション名 | 範囲 | イベントパラメータ（入力） |
 |---|---|---|
-| ボタンキー | イベント | `track_key` |
-| スクロール到達率 | イベント | `percent_scrolled` |
-| デバイス種別 | イベント | `device_type` |
-| リアクション対象種別 | イベント | `item_type` |
-| リアクション対象 | イベント | `item_id` |
-| シェア経路 | イベント | `share_method` |
-| ゲート突破手段 | イベント | `gate_method` |
-| 経由元 | イベント | `referrer_host` |
-| ランディングページ | イベント | `entry_page` |
-| ゲーム種別 | イベント | `game_id` |
-| 記憶の種別 | イベント | `category` |
-| **訪問回数** | **ユーザー** | `visit_count` |
+| ボタンキー | イベント | track_key |
+| スクロール到達率 | イベント | percent_scrolled |
+| デバイス種別 | イベント | device_type |
+| リアクション対象種別 | イベント | item_type |
+| リアクション対象 | イベント | item_id |
+| シェア経路 | イベント | share_method |
+| ゲート突破手段 | イベント | gate_method |
+| 経由元 | イベント | referrer_host |
+| **訪問回数** | **ユーザー** | visit_count |
 
-> `visit_count` だけ範囲を **ユーザー** に。人に紐づく値なので、イベント範囲だと
+> visit_count だけ範囲を **ユーザー** に。人に紐づく値なので、イベント範囲だと
 > 「何回目の訪問の人か」で人を切れなくなります。
 
 ## 5-4. カスタムメトリクス（要件⑥）
 
-同じ「カスタム定義」画面の **「カスタム指標」** タブ → 作成
+同じ画面の **「カスタム指標」** タブ → 作成（2個）
 
-| 指標名 | イベントパラメータ | 単位 |
+| 指標名 | イベントパラメータ（入力） | 単位 |
 |---|---|---|
-| いいね累計数 | `like_count` | 標準 |
-| ゲート突破所要時間 | `elapsed_ms` | ミリ秒 |
-| セッション内閲覧ページ数 | `pages_in_session` | 標準 |
-| ゲーム所要時間 | `duration_ms` | ミリ秒 |
-| 集めた記憶の数 | `collected` | 標準 |
+| いいね累計数 | like_count | 標準 |
+| ゲート突破所要時間 | elapsed_ms | ミリ秒 |
 
 ---
 
 # 終わったら
 
-「GTM公開した」と言ってください。本番のgtm.jsを取得して、
-**タグが実際にコンテナに入っているか**を検証します。
+「GTM公開した」と言ってください。本番のgtm.jsを取得して、タグが実際に
+コンテナに入っているか検証します。
 
 そのあと:
 - ⑤ Looker Studio ← データが溜まってから（24〜48時間）
@@ -222,8 +254,10 @@ GTM左メニュー **「タグ」** → 「新規」→ タグタイプ **「Goo
 
 ## つまずきやすい所
 
+- **名前に記号（バッククォート・引用符）が混じる** → 値が空になる。エラーは出ないので
+  プレビューの Variables タブで undefined を探すのが確実
+- **正規表現のチェック忘れ**（Part 2の7番）→ まとめタグが1つも発火しない
 - **データフィルタが「テスト」のまま** → 自分の操作が除外されない（一番多い見落とし）
-- **カスタムディメンションを作る前のデータには適用されない** → 早めに作る方が良い
+- **{{Event}} が一覧に出ない** → 「組み込み変数」の設定で Event を有効にする
+- **カスタムディメンションは作る前のデータに適用されない** → 早めに作る
 - 通常レポートに出るのは**24〜48時間後**。すぐ見たいときは「リアルタイム」レポート
-- パラメータ名は**半角小文字とアンダースコアだけ**。全角が混じると無効になります
-- タグを作るとき測定IDの入力を忘れやすい（`G-KH6VZ8B6HY`）

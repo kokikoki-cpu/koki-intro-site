@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { track } from "@/lib/track";
+import { now, track } from "@/lib/track";
 
 /**
  * 計測の土台。①スクロール率 ③3ページ遷移のキーイベント ④GTM変数 をまとめて持つ。
@@ -67,6 +67,12 @@ function writeStore(store: "session" | "local", key: string, value: string): voi
 export default function SiteAnalytics() {
   const pathname = usePathname();
   const sessionSent = useRef(false);
+  /**
+   * そのページを実際に見ていた時間（ミリ秒）。タブが裏に回っている間は増えない。
+   * 滞在時間の節目を送るのにも、スクロール到達時刻を添えるのにも使うので、
+   * 両方の effect から読める ref に置く（表示には使わないので state にしない）。
+   */
+  const visibleMsRef = useRef(0);
 
   /* ④ セッションの文脈を1回だけ積む。
      GTMは一度dataLayerに積まれた値を保持するので、以降のイベントからも変数として読める */
@@ -125,6 +131,44 @@ export default function SiteAnalytics() {
     }
   }, [pathname]);
 
+  /* ① 滞在時間。タブが見えている間だけ積算し、節目（15/30/60/120秒）で送る。
+        `visibleMs` はスクロール側からも読むので ref に置く（再描画は要らない値）。
+
+        なぜ滞在時間を独立して測るか: このサイトはPCで画面に収まる設計なので
+        スクロールが起きず、深度だけでは「読まれたか」が分からない。
+        「動かないがずっと見ていた」を捉えられるのは滞在時間だけ。
+
+        タブを裏に回している間を数えない理由: 開いたまま放置されたページが
+        「2分間熱心に読まれた」ことになってしまうと、指標として使えなくなる。 */
+  useEffect(() => {
+    visibleMsRef.current = 0;
+    const marks = [15, 30, 60, 120];
+    const sent = new Set<number>();
+    let last = now();
+
+    const id = window.setInterval(() => {
+      const t = now();
+      if (document.visibilityState === "visible") {
+        visibleMsRef.current += t - last;
+      }
+      last = t;
+
+      const seconds = visibleMsRef.current / 1000;
+      for (const m of marks) {
+        if (seconds >= m && !sent.has(m)) {
+          sent.add(m);
+          track("dwell_time", {
+            seconds: m,
+            page_path: pathname,
+            device_type: deviceType(),
+          });
+        }
+      }
+    }, 1000);
+
+    return () => window.clearInterval(id);
+  }, [pathname]);
+
   /* ① スクロール到達率。pathname を依存に入れているので、
         SPA遷移のたびに「送った閾値」の記録がまっさらに戻る（前ページの到達率を持ち越さない） */
   useEffect(() => {
@@ -144,6 +188,9 @@ export default function SiteAnalytics() {
             percent_scrolled: t,
             page_path: pathname,
             device_type: deviceType(),
+            /* ここが「スクロール率と滞在時間の組み合わせ」。
+               25%を3秒で通過したのか60秒かけたのかで、読み方がまったく違う */
+            time_on_page_ms: Math.round(visibleMsRef.current),
           });
         }
       }
