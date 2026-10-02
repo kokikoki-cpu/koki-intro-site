@@ -34,8 +34,13 @@ const EXPECTED: Record<Level, number> = {
  * ここに入れた項目だけ、想定値ではなく実測が出る。
  */
 const MEASURED: Record<string, number> = {
-  /* tools/sim-gate.mjs の初心者モデルで計測した値（DESIGN.md 2026-08-17 の節） */
-  gate: 55,
+  /* gate は 2026-08-27 に外した。
+     tools/sim-gate.mjs の初心者モデルは「一番下の敵を340ms遅れで追う」だけなので、
+     追いついた瞬間に逆へ切り返される理不尽を再現できない。回避を廃止した今の設定では
+     全試行クリア（100%）に張り付いてしまい、表示する数字として意味を持たない。
+     初回リリース時もこの模型は55%と出していたが、実測は39%だった。
+     **GA4の gate_cleared が溜まったら、その実測率をここに書く。**
+     それまでゲート画面はクリア率を出さない（measured が false の時は非表示にしている）。 */
   /* tools/sim-balloon.mjs で計測（初見 60.8% / 慣れた人 99.5%） */
   turkey: 61,
   /* tools/sim-iceflow.mjs で計測（初見 12.3% / 慣れた人 100%）。

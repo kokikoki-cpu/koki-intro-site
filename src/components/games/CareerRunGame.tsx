@@ -22,14 +22,34 @@ const RUNNER_HALF = 0.62;
 const PLAYER_Z = 0;
 const SPAWN_Z = -78;
 /** 関門ひとつあたりの壁の数。この数を抜けるとゲートが出る */
-const WALLS_PER_GATE = 3;
+const WALLS_PER_GATE = 2;
 
-const BASE_SPEED = 0.58;
-const SPEED_PER_GATE = 0.062;
-const BASE_GAP = 3.5;
-const GAP_PER_GATE = 0.27;
+/**
+ * **2026-08-26に大幅に緩めた。** 経歴6つ ＝ 壁18枚を1ミスも許さず抜ける設計になっていて、
+ * 難しすぎるという声が来たため。壁を12枚に減らし、すき間を広げ、速度の上がり方を鈍らせ、
+ * **残機を3にして「かすったら全部やり直し」をやめた。**
+ *
+ * | | 変更前 | 変更後 |
+ * |---|---|---|
+ * | 壁の数（関門あたり） | 3 | 2 |
+ * | すき間の初期値 | 3.5 | 4.4 |
+ * | 関門ごとの狭まり | 0.27 | 0.14 |
+ * | すき間の下限 | 2.0 | 3.0 |
+ * | 初速 | 0.58 | 0.48 |
+ * | 関門ごとの加速 | 0.062 | 0.032 |
+ * | 残機 | なし | 3 |
+ *
+ * 走者の半幅は 0.62 なので、最後の関門でも すき間3.7 ÷ 2 − 0.62 ＝ 左右1.23 の余裕が残る
+ * （変更前は 2.15 ÷ 2 − 0.62 ＝ 0.45 しかなかった）。
+ */
+const START_LIVES = 3;
+
+const BASE_SPEED = 0.48;
+const SPEED_PER_GATE = 0.032;
+const BASE_GAP = 4.4;
+const GAP_PER_GATE = 0.14;
 /** これ以上は詰めない（詰めすぎると運ゲーになる） */
-const MIN_GAP = 2.0;
+const MIN_GAP = 3.0;
 
 const SPAWN_GAP_Z = 15.5;
 
@@ -65,9 +85,12 @@ export default function CareerRunGame({
 
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [reached, setReached] = useState(0);
+  const [lives, setLives] = useState(START_LIVES);
+  /** ぶつかった直後だけ出す表示。残機が減ったことを黙って進めると理不尽に見える */
+  const [bumped, setBumped] = useState(false);
 
   /**
-   * 何回落ちたか。★5・残機なしなので、続けて落ちている人には操作の逃げ道を教える。
+   * 何回落ちたか（残機を使い切った回数）。続けて落ちている人には操作の逃げ道を教える。
    * マウスは「動かした量」でしか狙えないが、指なら画面の位置をそのまま指せるので、
    * このゲームはスマホの方が素直に当たる（pointermove を直接 x に流している）。
    */
@@ -76,6 +99,8 @@ export default function CareerRunGame({
   const mountRef = useRef<HTMLDivElement | null>(null);
   const phaseRef = useRef<GamePhase>("intro");
   const reachedRef = useRef(0);
+  const livesRef = useRef(START_LIVES);
+  const bumpTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetSignal = useRef(0);
 
   useEffect(() => {
@@ -269,14 +294,23 @@ export default function CareerRunGame({
                 setPhase("won");
               }
             } else {
-              // すき間から少しでもはみ出していたら即終了
+              // すき間からはみ出していたら残機を1つ減らす。0になった時だけ終了
               const off = Math.abs(runner.position.x - it.gapCenter);
               if (off > it.gapWidth / 2 - RUNNER_HALF) {
-                phaseRef.current = "lost";
-                setPhase("lost");
-                /* 落ちた回数はここで数える（effect で phase を見て数える形にすると
-                   「effect の中で setState するな」に触るし、意味も同じ） */
-                setFails((n) => n + 1);
+                livesRef.current -= 1;
+                setLives(livesRef.current);
+                if (livesRef.current <= 0) {
+                  phaseRef.current = "lost";
+                  setPhase("lost");
+                  /* 落ちた回数はここで数える（effect で phase を見て数える形にすると
+                     「effect の中で setState するな」に触るし、意味も同じ） */
+                  setFails((n) => n + 1);
+                } else {
+                  /* まだ残機がある。ぶつかった表示を一瞬だけ出して走り続ける */
+                  setBumped(true);
+                  if (bumpTimer.current) clearTimeout(bumpTimer.current);
+                  bumpTimer.current = setTimeout(() => setBumped(false), 600);
+                }
               }
             }
           }
@@ -306,6 +340,7 @@ export default function CareerRunGame({
 
     return () => {
       cancelAnimationFrame(raf);
+      if (bumpTimer.current) clearTimeout(bumpTimer.current);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
       renderer.domElement.removeEventListener("pointermove", onPointer);
@@ -320,6 +355,9 @@ export default function CareerRunGame({
   const start = () => {
     reachedRef.current = 0;
     setReached(0);
+    livesRef.current = START_LIVES;
+    setLives(START_LIVES);
+    setBumped(false);
     resetSignal.current += 1;
     phaseRef.current = "playing";
     setPhase("playing");
@@ -331,12 +369,12 @@ export default function CareerRunGame({
       target="職歴"
       rule={
         <>
-          壁のすき間を抜けて{total}つの関門を通過せよ。かすっただけで即終了、残機なし。
+          壁のすき間を抜けて{total}つの関門を通過せよ。ぶつかっても{START_LIVES}回までは走り続けられる。
           <br />
-          関門を越えるごとに速くなり、すき間は狭くなる。
+          関門を越えるごとに少しだけ速くなり、すき間も少しだけ狭くなる。
         </>
       }
-      difficulty={5}
+      difficulty={2}
       itemId="career"
       phase={phase}
       hud={
@@ -344,18 +382,25 @@ export default function CareerRunGame({
           <span>
             関門: {reached} / {total}
           </span>
-          <span className="text-(--color-clay)">残機なし</span>
+          <span>
+            残機: {"\u25cf".repeat(Math.max(lives, 0))}
+            {"\u25cb".repeat(Math.max(START_LIVES - lives, 0))}
+          </span>
         </>
       }
       overlay={
-        reached > 0 ? (
+        bumped ? (
+          <span className="rounded-full bg-(--color-clay) px-4 py-1.5 text-xs font-bold text-(--color-white)">
+            ぶつかった！ 残機 −1
+          </span>
+        ) : reached > 0 ? (
           <span className="max-w-full truncate rounded-full bg-(--color-ink)/80 px-4 py-1.5 text-xs font-bold text-(--color-white)">
             {steps[reached - 1]}
           </span>
         ) : null
       }
       lostHint={
-        fails >= 5 && !isTouchDevice() ? (
+        fails >= 3 && !isTouchDevice() ? (
           <>
             モバイルでやったほうが簡単かも！？
             <br />

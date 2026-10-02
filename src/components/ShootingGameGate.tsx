@@ -13,11 +13,23 @@ import { PAL, addNightLights, nightSkyTexture } from "@/components/games/three-k
 
 /** 解錠キー。合言葉で全解錠した場合もこれを満たす */
 const GATE_ID = "gate";
-const WIN_SCORE = 10;
-/* 難易度は、ゲームロジックをそのまま再現したシミュレータで詰めた値。
-   「初見の人が半分くらい勝てる」= 初見 53% / 数回遊んで慣れた人 75% を狙っている。
-   どれか一つでも緩めると一気に簡単になるので、変えるときはセットで考えること。 */
-const START_LIVES = 3;
+const WIN_SCORE = 5;
+/* 難易度は tools/sim-gate.mjs（このゲームのロジックを再現したシミュレータ）で詰めた値。
+   **2026-08-26に大幅に緩めた。** ここは全ページの前に立つ関門で、突破しないと先へ進めない。
+   実測で36名中22名（61%）がここで離れ、難しすぎるという声も来たため。
+
+   | | 変更前 | 変更後 |
+   |---|---|---|
+   | 撃退数 | 10 | 5 |
+   | 残機 | 3 | 8 |
+   | 敵速 | 2.8〜4.0 | 2.0〜2.8 |
+   | 直前の回避 | あり（sinを1.5πまで回して切り返す） | **廃止**（片側へ寄るだけ・手元では横に動かない） |
+
+   シミュレータの初見モデルの勝率は 50.3% → 97.3%（慣れた人 92.5% → 99.9%、n=4000）。
+   実測はシミュレータより低く出る（初見50.3%に対し実測39%）ので、実際は9割前後に着地する見込み。
+   よけ幅・当たり判定・連射間隔は触っていない。**ゲームの見た目と手触りは同じまま、
+   短くして余裕を持たせただけ。** 締める方へ戻す時は、まず撃退数を戻すこと。 */
+const START_LIVES = 8;
 
 const CANVAS_W = 360;
 const CANVAS_H = 560;
@@ -31,7 +43,6 @@ const ENEMY_SPAWN_INTERVAL = 780;
 const ENEMY_SIZE = 26;
 
 const ENEMY_SPRITE_SRC = "/images/game/scammer.jpg";
-const DODGE_START_Y = PLAYER_Y - 210;
 
 const MAX_BULLETS = 36;
 const MAX_ENEMIES = 22;
@@ -48,13 +59,10 @@ type Enemy = {
 type Burst = { x: number; y: number; born: number };
 
 function enemyDisplayX(en: Enemy): number {
-  if (en.y <= DODGE_START_Y) return en.baseX;
-  const progress = Math.min(1, (en.y - DODGE_START_Y) / (PLAYER_Y - DODGE_START_Y));
-  /* 一度よけたあと、手元に来る直前で逆方向に切り返す（sin を 1.5π まで回す）。
-     ただ追いかけるだけだと置いていかれるので、ここが難しさの中心。 */
-  const shape = Math.sin(progress * Math.PI * 1.5);
-  const x = en.baseX + en.driftDir * en.driftAmp * shape;
-  return Math.max(ENEMY_SIZE / 2, Math.min(CANVAS_W - ENEMY_SIZE / 2, x));
+  /* 2026-10-02に横移動を全廃した。敵は出た位置からまっすぐ落ちる。
+     08-27版は片側へ26〜44px寄せていたが、「避けないで」の指摘で0にした。
+     戻す時は tools/sim-gate.mjs の BEFORE_20260827 を参照。 */
+  return en.baseX;
 }
 
 type Phase = "intro" | "playing" | "won" | "lost";
@@ -382,9 +390,9 @@ export default function ShootingGameGate() {
           enemies.current.push({
             baseX: ENEMY_SIZE / 2 + Math.random() * (CANVAS_W - ENEMY_SIZE),
             y: -ENEMY_SIZE,
-            speed: 2.8 + Math.random() * 1.2,
+            speed: 2.0 + Math.random() * 0.8,
             driftDir: Math.random() < 0.5 ? -1 : 1,
-            driftAmp: 80 + Math.random() * 45,
+            driftAmp: 0,
           });
           lastSpawn.current = t;
         }
@@ -796,17 +804,20 @@ export default function ShootingGameGate() {
 
       {phase === "intro" && (
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
-          <p className="text-lg tracking-[0.3em] text-(--color-ember)" aria-label="難易度 3 / 5">
-            ★★★<span className="text-(--color-white)/25">★★</span>
+          <p className="text-lg tracking-[0.3em] text-(--color-ember)" aria-label="難易度 1 / 5">
+            ★<span className="text-(--color-white)/25">★★★★</span>
           </p>
-          {/* ここだけは実測値。tools/sim-gate.mjs の初心者モデルで計測してある */}
-          <p className="m-0 flex items-baseline gap-1.5">
-            <span className="text-xs font-bold text-(--color-bg-soft)/70">初回クリア率</span>
-            <span className="font-display text-2xl font-extrabold leading-none text-(--color-ember)">
-              {clearRate(GATE_ID, 3).percent}
-              <span className="text-sm">%</span>
-            </span>
-          </p>
+          {/* クリア率はGA4の実測が入るまで出さない。シミュレータの推計は上限に張り付いて
+              意味を持たないので、推計値を実測のように見せるのをやめた（2026-08-27） */}
+          {clearRate(GATE_ID, 1).measured && (
+            <p className="m-0 flex items-baseline gap-1.5">
+              <span className="text-xs font-bold text-(--color-bg-soft)/70">初回クリア率</span>
+              <span className="font-display text-2xl font-extrabold leading-none text-(--color-ember)">
+                {clearRate(GATE_ID, 1).percent}
+                <span className="text-sm">%</span>
+              </span>
+            </p>
+          )}
           <div className="w-full rounded-md border-2 border-(--color-nebula) bg-(--color-space)/70 px-5 py-4">
             <p className="text-sm text-(--color-bg-soft)">
               {WIN_SCORE}体撃退でクリア（残機{START_LIVES}）

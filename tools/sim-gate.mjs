@@ -18,10 +18,12 @@ function makeGame(cfg) {
   function enemyDisplayX(en) {
     if (en.y <= DODGE_START_Y) return en.baseX;
     const progress = Math.min(1, (en.y - DODGE_START_Y) / (PLAYER_Y - DODGE_START_Y));
-    // juke: 一度よけてから終盤で逆に切り返す（追従だけでは置いていかれる）
+    // juke: 一度よけてから終盤で逆に切り返す（2026-08-27に本番から廃止）
+    // juke=false: 片側へ寄って止まるだけ。freezeAt から先は横に動かない（いまの本番）
+    const freeze = cfg.freezeAt ?? 0.7;
     const shape = cfg.juke
       ? Math.sin(progress * Math.PI * 1.5)
-      : progress * progress;
+      : Math.sin(Math.min(progress, freeze) * Math.PI * 0.5);
     const x = en.baseX + en.driftDir * en.driftAmp * shape;
     return Math.max(ENEMY_SIZE / 2, Math.min(CANVAS_W - ENEMY_SIZE / 2, x));
   }
@@ -186,20 +188,60 @@ export function winRate(cfg, player, trials = 600) {
   return wins / trials;
 }
 
-/** 今の本番設定 */
+/**
+ * 今の本番設定。**ShootingGameGate.tsx を変えたらここも変える。**
+ * 2026-08-26 まで、ここの値はコンポーネントとずれていた（残機5/敵速1.1・実際は残機3/敵速2.8）。
+ * そのせいで「初見53%を狙っている」というコメントが実機では成立しておらず、
+ * 実際には初見50.3%・実測39%の難易度で出ていた。
+ */
 export const CURRENT = {
-  winScore: 10,
-  startLives: 5,
+  winScore: 5,
+  startLives: 8,
   playerSpeed: 6,
-  fireInterval: 180,
-  spawnInterval: 950,
-  speedMin: 1.1,
-  speedSpread: 1.1,
-  driftMin: 55,
+  fireInterval: 240,
+  spawnInterval: 780,
+  speedMin: 2.0,
+  speedSpread: 0.8,
+  driftMin: 0,      // 2026-10-02に横移動を全廃
+  driftSpread: 0,
+  dodgeStart: 210,
+  hitTolX: 3,
+  hitTolY: 7,
+  juke: false,      // 2026-08-27に廃止
+  freezeAt: 0.7,    // 手元の3割は横に動かない
+};
+
+/**
+ * このシミュレータの限界（2026-08-27に分かったこと）
+ *
+ * 初見モデルは「一番下の敵を、340ms遅れで追う」だけなので、
+ * **追いついた瞬間に逆へ切り返される理不尽**を再現できない。
+ * juke を廃止する前の設定でも初見98.6%と出ていたのに、実測は39%だった。
+ * → **この指標が9割を超えたら、そこから先の比較には使えない。** 実測（gate_cleared）で見る。
+ */
+
+/** 2026-08-26に緩める前の値（初回リリース時）。戻す時の参照用 */
+export const BEFORE_20260826 = {
+  ...CURRENT,
+  winScore: 10,
+  startLives: 3,
+  speedMin: 2.8,
+  speedSpread: 1.2,
+  driftMin: 80,
   driftSpread: 45,
-  dodgeStart: 160,
-  hitTolX: 10,
-  hitTolY: 12,
+  juke: true,
+};
+
+/** 2026-08-27に回避を廃止する前の値 */
+export const BEFORE_20260827 = {
+  ...CURRENT,
+  winScore: 6,
+  startLives: 5,
+  speedMin: 2.3,
+  speedSpread: 1.0,
+  driftMin: 80,
+  driftSpread: 45,
+  juke: true,
 };
 
 /** 初見プレイヤー: 反応が鈍く、先読みせず、狙う敵を間違え、時々手が止まる */
